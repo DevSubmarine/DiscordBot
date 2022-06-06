@@ -11,8 +11,9 @@ global using Microsoft.Extensions.Options;
 
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
-using DevSubmarine.DiscordBot.Client;
 using Microsoft.Extensions.DependencyInjection;
+using DevSubmarine.DiscordBot.Client;
+using DevSubmarine.DiscordBot.Database;
 
 namespace DevSubmarine.DiscordBot
 {
@@ -33,11 +34,11 @@ namespace DevSubmarine.DiscordBot
                 {
                     // options
                     services.Configure<DiscordOptions>(context.Configuration);
+                    services.Configure<MongoOptions>(context.Configuration.GetSection("Database"));
 
-                    // client services
+                    // dependencies
                     services.AddDiscordClient();
-
-                    // utilities
+                    services.AddMongoDB();
 
                     // features
                 })
