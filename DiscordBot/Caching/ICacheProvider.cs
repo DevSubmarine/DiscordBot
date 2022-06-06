@@ -2,10 +2,10 @@
 
 namespace DevSubmarine.DiscordBot.Caching
 {
-    internal interface ICacheProvider
+    internal interface ICacheProvider<TItem>
     {
-        void ConfigureCache(string cacheName, MemoryCacheEntryOptions options);
-        TItem AddItem<TItem>(CacheItemKey key, TItem item);
-        bool TryGetItem<TItem>(CacheItemKey key, out TItem item);
+        void ConfigureCache(Action<MemoryCacheEntryOptions> configureOptions);
+        TItem AddItem(CacheItemKey key, TItem item);
+        bool TryGetItem(CacheItemKey key, out TItem item);
     }
 }

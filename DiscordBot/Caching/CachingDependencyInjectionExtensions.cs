@@ -13,7 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services.AddMemoryCache(configureOptions);
-            services.TryAddSingleton<ICacheProvider, CacheProvider>();
+            services.TryAddSingleton(typeof(ICacheProvider<>), typeof(CacheProvider<>));
 
             return services;
         }

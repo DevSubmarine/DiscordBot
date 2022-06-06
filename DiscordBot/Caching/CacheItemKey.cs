@@ -1,21 +1,15 @@
 ﻿namespace DevSubmarine.DiscordBot.Caching
 {
-    internal class CacheItemKey : IEquatable<CacheItemKey>
+    public class CacheItemKey : IEquatable<CacheItemKey>
     {
-        public string CacheName { get; }
-        public object ItemKey { get; }
+        public Type CacheType { get; }
+        public object ItemIdentifier { get; }
 
-        public CacheItemKey(string cacheName, object itemKey)
+        public CacheItemKey(Type cacheType, object itemIdentifier)
         {
-            this.CacheName = cacheName;
-            this.ItemKey = itemKey;
+            this.CacheType = cacheType;
+            this.ItemIdentifier = itemIdentifier;
         }
-
-        public static CacheItemKey FromItem<TItem>(TItem item)
-            => new CacheItemKey(GetCacheName<TItem>(), item.GetHashCode());
-
-        public static string GetCacheName<TItem>()
-            => typeof(TItem).FullName;
 
         public override bool Equals(object obj)
             => this.Equals(obj as CacheItemKey);
@@ -23,12 +17,12 @@
         public bool Equals(CacheItemKey other)
         {
             return other != null &&
-                   this.CacheName == other.CacheName &&
-                   EqualityComparer<object>.Default.Equals(this.ItemKey, other.ItemKey);
+                   this.CacheType == other.CacheType &&
+                   EqualityComparer<object>.Default.Equals(this.ItemIdentifier, other.ItemIdentifier);
         }
 
         public override int GetHashCode()
-            => HashCode.Combine(this.CacheName, this.ItemKey);
+            => HashCode.Combine(this.CacheType, this.ItemIdentifier);
 
         public static bool operator ==(CacheItemKey left, CacheItemKey right)
             => EqualityComparer<CacheItemKey>.Default.Equals(left, right);
