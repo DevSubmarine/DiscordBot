@@ -39,6 +39,7 @@ namespace DevSubmarine.DiscordBot
                     // dependencies
                     services.AddDiscordClient();
                     services.AddMongoDB();
+                    services.AddPasteMyst();
 
                     // features
                 })
