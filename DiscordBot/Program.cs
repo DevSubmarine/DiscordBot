@@ -7,8 +7,12 @@ global using Newtonsoft.Json;
 global using Newtonsoft.Json.Linq;
 global using System.Text.RegularExpressions;
 global using Microsoft.Extensions.Logging;
+global using Microsoft.Extensions.Options;
+
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using DevSubmarine.DiscordBot.Client;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DevSubmarine.DiscordBot
 {
@@ -28,8 +32,10 @@ namespace DevSubmarine.DiscordBot
                 .ConfigureServices((context, services) =>
                 {
                     // options
+                    services.Configure<DiscordOptions>(context.Configuration);
 
                     // client services
+                    services.AddDiscordClient();
 
                     // utilities
 
