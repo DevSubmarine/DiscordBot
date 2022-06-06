@@ -1,4 +1,4 @@
-# Luke Dictionary Bot
+# DevSubmarine Discord Bot
 [![GitHub top language](https://img.shields.io/github/languages/top/DevSubmarine/DiscordBot)](https://github.com/DevSubmarine/DiscordBot) [![GitHub](https://img.shields.io/github/license/DevSubmarine/DiscordBot)](LICENSE) [![GitHub Workflow Status](https://img.shields.io/github/workflow/status/DevSubmarine/DiscordBot/.NET%20Build)](https://github.com/DevSubmarine/DiscordBot/actions) [![GitHub issues](https://img.shields.io/github/issues/DevSubmarine/DiscordBot)](https://github.com/DevSubmarine/DiscordBot/issues)
 
 A new Discord Bot for DevSubmarine.
@@ -34,6 +34,6 @@ Or better yet, automate it with Azure DevOps or something. :)
 > Tip: on linux hosts, [dockerscript.sh](DiscordBot/dockerscript.sh) can be run to build, configure and start docker image. Just make sure the docker host has write permissions to `/var/log/DevSubmarine/*` directories.
 
 ## License
-Copyright (c) 2021 [DevSubmarine](https://github.com/DevSubmarine) & [TehGM](https://github.com/TehGM)
+Copyright (c) 2022 [DevSubmarine](https://github.com/DevSubmarine) & [TehGM](https://github.com/TehGM)
 
 Licensed under [Apache 2.0 License](LICENSE).
