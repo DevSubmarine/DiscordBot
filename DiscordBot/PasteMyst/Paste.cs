@@ -44,5 +44,12 @@ namespace DevSubmarine.DiscordBot.PasteMyst
             this.Title = title;
             this.Pasties = pasties;
         }
+
+        public string GetURL()
+        {
+            if (string.IsNullOrWhiteSpace(this.ID))
+                throw new InvalidOperationException("Paste is not yet uploaded, cannot get URL");
+            return $"https://paste.myst.rs/{this.ID}";
+        }
     }
 }

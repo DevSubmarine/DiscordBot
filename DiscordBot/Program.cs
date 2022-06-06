@@ -12,8 +12,6 @@ global using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using DevSubmarine.DiscordBot.Client;
-using DevSubmarine.DiscordBot.Database;
 
 namespace DevSubmarine.DiscordBot
 {
@@ -33,8 +31,9 @@ namespace DevSubmarine.DiscordBot
                 .ConfigureServices((context, services) =>
                 {
                     // options
-                    services.Configure<DiscordOptions>(context.Configuration);
-                    services.Configure<MongoOptions>(context.Configuration.GetSection("Database"));
+                    services.Configure<Client.DiscordOptions>(context.Configuration);
+                    services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
+                    services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
 
                     // dependencies
                     services.AddDiscordClient();
@@ -43,6 +42,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddCaching();
 
                     // features
+                    services.AddSubWords();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);
