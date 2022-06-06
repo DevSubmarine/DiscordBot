@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net6.0</TargetFramework>
+    <AssemblyName>DevSubDiscordBot</AssemblyName>
+    <RootNamespace>DevSubmarine.DiscordBot</RootNamespace>
+    <PackageId>DevSubmarine.DiscordBot</PackageId>
+    <Authors>TehGM</Authors>
+    <Company>DevSubmarine</Company>
+    <Product>DevSubmarine Discord Bot</Product>
+    <Copyright>Copyright (c) 2022 DevSubmarine &amp; TehGM</Copyright>
+    <PackageProjectUrl>https://github.com/DevSubmarine/DiscordBot</PackageProjectUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/DevSubmarine/DiscordBot</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>bot; discord; devsub; devsubmarine</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Serilog" Version="2.11.0" />
+  </ItemGroup>
+
+</Project>
