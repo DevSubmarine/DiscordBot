@@ -40,6 +40,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddDiscordClient();
                     services.AddMongoDB();
                     services.AddPasteMyst();
+                    services.AddCaching();
 
                     // features
                 })
