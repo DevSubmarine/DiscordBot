@@ -31,7 +31,7 @@ Run on host:
 Or better yet, automate it with Azure DevOps or something. :)
 
 > Note: Do ***NOT*** push this docker image to remote repo (like dockerhub) if you created `appsecrets.json` file. Just don't, unless you want yor secrets compromised.
-> Tip: on linux hosts, [dockerscript.sh](DiscordBot/dockerscript.sh) can be run to build, configure and start docker image. Just make sure the docker host has write permissions to `/var/log/DevSubDiscordBot/*` directories.
+> Tip: on linux hosts, [dockerscript.sh](DiscordBot/dockerscript.sh) can be run to build, configure and start docker image. Just make sure the docker host has write permissions to `/var/log/DevSubmarine/*` directories.
 
 ## License
 Copyright (c) 2021 [DevSubmarine](https://github.com/DevSubmarine) & [TehGM](https://github.com/TehGM)

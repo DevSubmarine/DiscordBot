@@ -14,7 +14,7 @@ docker run -d --restart=always \
 --name=$CONTAINER \
 -e ASPNETCORE_ENVIRONMENT=$ENVIRONMENT \
 -e DOTNET_ENVIRONMENT=$ENVIRONMENT \
--v "/var/log/DevSubDiscordBot/$ENVIRONMENT":"/logs" \
+-v "/var/log/DevSubmarine/DiscordBot/$ENVIRONMENT":"/logs" \
 $IMAGE
 
 echo "Pruning old Docker Images"
