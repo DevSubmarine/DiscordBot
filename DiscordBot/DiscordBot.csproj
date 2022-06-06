@@ -18,6 +18,40 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<None Remove=".dockerignore" />
+    <None Remove="appsecrets.Development.json" />
+    <None Remove="appsecrets.json" />
+    <None Remove="appsettings.Development.json" />
+    <None Remove="appsettings.json" />
+    <None Remove="Dockerfile" />
+    <None Remove="dockerscript.sh" />
+  </ItemGroup>
+
+  <ItemGroup>
+	<Content Include=".dockerignore" Condition="Exists('.dockerignore')">
+	 <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	</Content>
+    <Content Include="appsecrets.Development.json" Condition="Exists('appsettings.Development.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsecrets.json" Condition="Exists('appsecrets.json')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.Development.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Dockerfile" Condition="Exists('Dockerfile')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="dockerscript.sh" Condition="Exists('dockerscript.sh')">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\README.md">
       <Pack>True</Pack>
       <PackagePath>\</PackagePath>
