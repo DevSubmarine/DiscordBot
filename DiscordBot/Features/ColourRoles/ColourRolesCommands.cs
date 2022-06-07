@@ -59,7 +59,8 @@ namespace DevSubmarine.DiscordBot.ColourRoles
 
             try
             {
-                await this.RemoveColourRolesAsync(user, oldRole => oldRole.Id != role.Id).ConfigureAwait(false);
+                if (this._options.CurrentValue.RemoveOldRoles)
+                    await this.RemoveColourRolesAsync(user, oldRole => oldRole.Id != role.Id).ConfigureAwait(false);
 
                 // special case is when user already has requested role. Just skip doing any changes then to prevent exceptions, Discord vomiting or whatever else
                 if (!user.RoleIds.Contains(role.Id))
@@ -157,17 +158,14 @@ namespace DevSubmarine.DiscordBot.ColourRoles
 
         private Task RemoveColourRolesAsync(IGuildUser user, Func<IRole, bool> filter = null)
         {
-            if (this._options.CurrentValue.RemoveOldRoles)
-            {
-                IEnumerable<IRole> rolesToRemove = this.GetUserCurrentRoles(user);
-                if (filter != null)
-                    rolesToRemove = rolesToRemove.Where(role => filter(role));
+            IEnumerable<IRole> rolesToRemove = this.GetUserCurrentRoles(user);
+            if (filter != null)
+                rolesToRemove = rolesToRemove.Where(role => filter(role));
 
-                if (rolesToRemove.Any())
-                {
-                    this._log.LogTrace("Removing {Count} old colour roles from user {UserID}", rolesToRemove.Count(), user.Id);
-                    return user.RemoveRolesAsync(rolesToRemove.Select(role => role.Id), base.GetRequestOptions());
-                }
+            if (rolesToRemove.Any())
+            {
+                this._log.LogTrace("Removing {Count} old colour roles from user {UserID}", rolesToRemove.Count(), user.Id);
+                return user.RemoveRolesAsync(rolesToRemove.Select(role => role.Id), base.GetRequestOptions());
             }
 
             return Task.CompletedTask;
