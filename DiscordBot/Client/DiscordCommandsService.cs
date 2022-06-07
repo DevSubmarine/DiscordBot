@@ -30,12 +30,19 @@ namespace DevSubmarine.DiscordBot.Client
 
         private async Task OnClientReady()
         {
+            this._log.LogTrace("Loading all command modules");
             await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
 
             if (this._options.CommandsGuildID != null)
+            {
+                this._log.LogDebug("Registering all commands for guild {GuildID}", this._options.CommandsGuildID.Value);
                 await this._interactions.RegisterCommandsToGuildAsync(this._options.CommandsGuildID.Value).ConfigureAwait(false);
+            }
             else
+            {
+                this._log.LogDebug("Registering all commands globally");
                 await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+            }
         }
 
         private Task OnLog(Discord.LogMessage logMessage)
