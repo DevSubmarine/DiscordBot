@@ -1,25 +1,25 @@
 ﻿using Discord;
-using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot
 {
     public static class DiscordGuildExtensions
     {
-        public static async Task<SocketGuildUser> GetGuildUserAsync(this SocketGuild guild, ulong id)
+        public static async Task<IGuildUser> GetGuildUserAsync(this IGuild guild, ulong id, CancellationToken cancellationToken = default)
         {
-            SocketGuildUser user = guild.GetUser(id);
+            RequestOptions options = new RequestOptions() { CancelToken = cancellationToken };
+            IGuildUser user = await guild.GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);
             if (user == null)
             {
                 await guild.DownloadUsersAsync();
-                user = guild.GetUser(id);
+                user = await guild.GetUserAsync(id, CacheMode.AllowDownload, options).ConfigureAwait(false);
             }
             return user;
         }
-        public static Task<SocketGuildUser> GetGuildUserAsync(this SocketGuildChannel channel, ulong id)
+        public static Task<IGuildUser> GetGuildUserAsync(this IGuildChannel channel, ulong id)
             => GetGuildUserAsync(channel.Guild, id);
-        public static Task<SocketGuildUser> GetGuildUserAsync(this SocketGuildChannel channel, IUser user)
+        public static Task<IGuildUser> GetGuildUserAsync(this IGuildChannel channel, IUser user)
             => GetGuildUserAsync(channel, user.Id);
-        public static Task<SocketGuildUser> GetGuildUserAsync(this SocketGuild guild, IUser user)
+        public static Task<IGuildUser> GetGuildUserAsync(this IGuild guild, IUser user)
             => GetGuildUserAsync(guild, user.Id);
     }
 }
