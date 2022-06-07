@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<RootNamespace>DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper</RootNamespace>
+		<PackageId>DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper</PackageId>
+		<Authors>TehGM</Authors>
+		<Company>DevSubmarine</Company>
+		<Product>DevSub Discord Bot - Tool - Database Bootstrapper</Product>
+		<Version>1.0.0</Version>
+		<PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+		<PackageProjectUrl>https://github.com/DevSubmarine/DiscordBot</PackageProjectUrl>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/DevSubmarine/DiscordBot</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<Copyright>Copyright (c) 2022 DevSubmarine &amp; TehGM</Copyright>
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+		<PackageTags>bot; discord; devsub; devsubmarine</PackageTags>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="MongoDB.Driver" Version="2.16.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\DiscordBot\DiscordBot.csproj" />
+	</ItemGroup>
+
+</Project>
