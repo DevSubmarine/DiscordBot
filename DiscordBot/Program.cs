@@ -34,6 +34,7 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<Client.DiscordOptions>(context.Configuration);
                     services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
+                    services.Configure<ColourRoles.ColourRolesOptions>(context.Configuration.GetSection("ColourRoles"));
 
                     // dependencies
                     services.AddDiscordClient();
