@@ -26,9 +26,11 @@ namespace DevSubmarine.DiscordBot.Client
             });
 
             this._client.Ready += OnClientReady;
-            this._client.SlashCommandExecuted += OnSlashCommand;
-            this._client.UserCommandExecuted += OnUserCommand;
-            this._client.MessageCommandExecuted += OnMessageCommand;
+            this._client.SlashCommandExecuted += OnSlashCommandAsync;
+            this._client.UserCommandExecuted += OnUserCommandAsync;
+            this._client.MessageCommandExecuted += OnMessageCommandAsync;
+            this._client.ButtonExecuted += OnButtonCommandAsync;
+            this._client.SelectMenuExecuted += OnMenuCommandAsync;
             this._interactions.Log += OnLog;
         }
 
@@ -49,21 +51,21 @@ namespace DevSubmarine.DiscordBot.Client
             }
         }
 
-        private async Task OnSlashCommand(SocketSlashCommand interaction)
-        {
-            DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
-            using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
-            await this._interactions.ExecuteCommandAsync(ctx, this._services).ConfigureAwait(false);
-        }
 
-        private async Task OnUserCommand(SocketUserCommand interaction)
-        {
-            DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
-            using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
-            await this._interactions.ExecuteCommandAsync(ctx, this._services);
-        }
+        // currently interactions don't really differ much
+        // it might change later, but for now we can delegate all event handlers to the same method
+        private Task OnSlashCommandAsync(SocketSlashCommand interaction)
+            => this.OnInteractionAsync(interaction);
+        private  Task OnUserCommandAsync(SocketUserCommand interaction)
+            => this.OnInteractionAsync(interaction);
+        private  Task OnMessageCommandAsync(SocketMessageCommand interaction)
+            => this.OnInteractionAsync(interaction);
+        private Task OnMenuCommandAsync(SocketMessageComponent interaction)
+            => this.OnInteractionAsync(interaction);
+        private Task OnButtonCommandAsync(SocketMessageComponent interaction)
+            => this.OnInteractionAsync(interaction);
 
-        private async Task OnMessageCommand(SocketMessageCommand interaction)
+        private async Task OnInteractionAsync(SocketInteraction interaction)
         {
             DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
             using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
@@ -92,9 +94,11 @@ namespace DevSubmarine.DiscordBot.Client
         public void Dispose()
         {
             try { this._client.Ready -= OnClientReady; } catch { }
-            try { this._client.SlashCommandExecuted -= OnSlashCommand; } catch { }
-            try { this._client.UserCommandExecuted -= OnUserCommand; } catch { }
-            try { this._client.MessageCommandExecuted -= OnMessageCommand; } catch { }
+            try { this._client.SlashCommandExecuted -= OnSlashCommandAsync; } catch { }
+            try { this._client.UserCommandExecuted -= OnUserCommandAsync; } catch { }
+            try { this._client.MessageCommandExecuted -= OnMessageCommandAsync; } catch { }
+            try { this._client.ButtonExecuted -= OnMenuCommandAsync; } catch { }
+            try { this._client.SelectMenuExecuted -= OnButtonCommandAsync; } catch { }
             try { this._interactions.Log -= OnLog; } catch { }
             try { this._interactions?.Dispose(); } catch { }
             try { this._cts?.Dispose(); } catch { }
