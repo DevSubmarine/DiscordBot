@@ -24,6 +24,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IDiscordClient>(s => s.GetRequiredService<IHostedDiscordClient>().Client);
             services.TryAddSingleton<DiscordSocketClient>(s => (DiscordSocketClient)s.GetRequiredService<IDiscordClient>());
 
+            services.AddHostedService<DiscordCommandsService>();
+
             return services;
         }
     }

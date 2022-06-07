@@ -9,5 +9,7 @@
         public string ConnectionString { get; set; }
         /// <summary>Name of the database to access.</summary>
         public string DatabaseName { get; set; } = "DiscordBot";
+
+        public string SubWordsCollectionName { get; set; } = "SubWords";
     }
 }

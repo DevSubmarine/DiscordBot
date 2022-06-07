@@ -1,7 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
 using Discord;
-using Discord.Commands;
-using Serilog.Context;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace DevSubmarine.DiscordBot
@@ -16,29 +14,25 @@ namespace DevSubmarine.DiscordBot
 
             using (logger.BeginScope(new Dictionary<string, object>()
             {
-                { "Label", $"DiscordNet: {message.Source}" }
+                { "Source", $"DNet {message.Source}" }
             }))
             {
-                logger.Log(level, message.Exception, message.Message);
+                logger.Log(level, message.Exception, "[{Source}] " + message.Message);
             }
         }
 
-        public static IDisposable UseSource(string source)
-            => LogContext.PushProperty("Source", source);
-        public static IDisposable UseSource(this ILogger log, string source)
-            => LogContext.PushProperty("Source", source);
-
-        public static IDisposable BeginCommandScope(this ILogger log, SocketCommandContext context, object handler = null, [CallerMemberName] string cmdName = null)
+        public static IDisposable BeginCommandScope(this ILogger log, IInteractionContext context, object handler = null, [CallerMemberName] string cmdName = null)
             => BeginCommandScope(log, context, handler?.GetType(), cmdName);
 
-        public static IDisposable BeginCommandScope(this ILogger log, SocketCommandContext context, Type handlerType = null, [CallerMemberName] string cmdName = null)
+        public static IDisposable BeginCommandScope(this ILogger log, IInteractionContext context, Type handlerType = null, [CallerMemberName] string cmdName = null)
         {
             Dictionary<string, object> state = new Dictionary<string, object>
             {
                 { "Command.UserID", context.User?.Id },
-                { "Command.MessageID", context.Message?.Id },
+                { "Command.InteractionID", context.Interaction?.Id },
                 { "Command.ChannelID", context.Channel?.Id },
-                { "Command.GuildID", context.Guild?.Id }
+                { "Command.GuildID", context.Guild?.Id },
+                { "Source", "BOT" }
             };
             if (!string.IsNullOrWhiteSpace(cmdName))
                 state.Add("Command.Method", cmdName);
