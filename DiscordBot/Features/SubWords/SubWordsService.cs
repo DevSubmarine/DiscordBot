@@ -50,16 +50,16 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         public async Task<SubWord> AddOrGetWordAsync(SubWord word, CancellationToken cancellationToken = default)
         {
             SubWord result = await this.GetSubWordAsync(word.Word, word.AuthorID, cancellationToken).ConfigureAwait(false);
-            if (result == null)
-            {
-                this._log.LogDebug("Adding SubWord {Word} to DB; Author ID = {AuthorID}", word.Word, word.AuthorID);
-                await this._store.AddWordAsync(word, cancellationToken).ConfigureAwait(false);
-                this._cache.AddItem(word);
-            }
-            return result;
+            if (result != null)
+                return result;
+
+            this._log.LogDebug("Adding SubWord {Word} to DB; Author ID = {AuthorID}", word.Word, word.AuthorID);
+            await this._store.AddWordAsync(word, cancellationToken).ConfigureAwait(false);
+            this._cache.AddItem(word);
+            return word;
         }
 
-        public Task GetRandomWordAsync(ulong? authorID, CancellationToken cancellationToken = default)
+        public Task<SubWord> GetRandomWordAsync(ulong? authorID, CancellationToken cancellationToken = default)
         {
             this._log.LogDebug("Retrieving random SubWord; Author ID = {AuthorID}", authorID?.ToString() ?? "null");
             return this._store.GetRandomWordAsync(authorID, cancellationToken);

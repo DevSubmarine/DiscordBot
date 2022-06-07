@@ -16,7 +16,20 @@ namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper.CollectionCreators
         {
             IMongoCollection<SubWord> collection = await base.GetOrCreateCollectionAsync(cancellationToken).ConfigureAwait(false);
 
+            await this.CreateWordIndex(collection, cancellationToken).ConfigureAwait(false);
             await this.CreateAuthorIdIndex(collection, cancellationToken).ConfigureAwait(false);
+        }
+
+        private Task CreateWordIndex(IMongoCollection<SubWord> collection, CancellationToken cancellationToken = default)
+        {
+            base.Log.LogDebug("Creating index on property {Property} in {Collection}", nameof(SubWord.Word), CollectionName);
+            return collection.Indexes.CreateOneAsync(new CreateIndexModel<SubWord>(
+                Builders<SubWord>.IndexKeys.Ascending(k => k.Word),
+                new CreateIndexOptions<SubWord>()
+                {
+                    Unique = false
+                }),
+                null, cancellationToken);
         }
 
         private Task CreateAuthorIdIndex(IMongoCollection<SubWord> collection, CancellationToken cancellationToken = default)

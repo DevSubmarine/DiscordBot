@@ -8,6 +8,9 @@ namespace DevSubmarine.DiscordBot.SubWords
     public class SubWord : IEquatable<SubWord>, IEquatable<string>, ICacheable
     {
         [BsonId]
+        [JsonIgnore]
+        private Guid DatabaseID { get; init; }
+        [BsonElement("Word")]
         [JsonProperty("word")]
         public string Word { get; }
         [BsonElement("Author")]
