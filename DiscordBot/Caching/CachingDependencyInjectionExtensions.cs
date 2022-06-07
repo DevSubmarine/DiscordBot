@@ -12,7 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (services == null)
                 throw new ArgumentNullException(nameof(services));
 
-            services.AddMemoryCache(configureOptions);
+            services.AddMemoryCache(configureOptions ?? (_ => { }));
             services.TryAddSingleton(typeof(ICacheProvider<>), typeof(CacheProvider<>));
 
             return services;
