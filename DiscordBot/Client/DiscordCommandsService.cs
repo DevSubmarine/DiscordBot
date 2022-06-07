@@ -49,22 +49,25 @@ namespace DevSubmarine.DiscordBot.Client
             }
         }
 
-        private Task OnSlashCommand(SocketSlashCommand interaction)
+        private async Task OnSlashCommand(SocketSlashCommand interaction)
         {
             DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
-            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+            using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
+            await this._interactions.ExecuteCommandAsync(ctx, this._services).ConfigureAwait(false);
         }
 
-        private Task OnUserCommand(SocketUserCommand interaction)
+        private async Task OnUserCommand(SocketUserCommand interaction)
         {
             DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
-            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+            using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
+            await this._interactions.ExecuteCommandAsync(ctx, this._services);
         }
 
-        private Task OnMessageCommand(SocketMessageCommand interaction)
+        private async Task OnMessageCommand(SocketMessageCommand interaction)
         {
             DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
-            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+            using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
+            await this._interactions.ExecuteCommandAsync(ctx, this._services);
         }
 
         private Task OnLog(Discord.LogMessage logMessage)
