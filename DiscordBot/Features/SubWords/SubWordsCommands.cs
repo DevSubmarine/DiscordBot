@@ -3,7 +3,7 @@ using Discord.Interactions;
 
 namespace DevSubmarine.DiscordBot.SubWords.Services
 {
-    [Group("subdictionary", "Commands for managing dictionary of dev sub invented words.")]
+    [Group("dictionary", "Commands for managing dictionary of dev sub invented words.")]
     public class SubWordsCommands : DevSubInteractionModule
     {
         private readonly ISubWordsService _subwords;
