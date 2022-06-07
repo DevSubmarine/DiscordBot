@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.SubWords.Services
 {
@@ -8,12 +7,10 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
     public class SubWordsCommands : DevSubInteractionModule
     {
         private readonly ISubWordsService _subwords;
-        private readonly DiscordSocketClient _client;
 
-        public SubWordsCommands(ISubWordsService subwords, DiscordSocketClient client)
+        public SubWordsCommands(ISubWordsService subwords)
         {
             this._subwords = subwords;
-            this._client = client;
         }
 
         [SlashCommand("add", "Adds a new word to DevSub Dictionary")]
@@ -68,13 +65,12 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             else
             {
                 Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
-                RequestOptions options = new RequestOptions() { CancelToken = base.Context.CancellationToken };
                 string message = username != null ? $"Random word by {username} from DevSub Dictionary:" : "Random word from DevSub Dictionary:";
 
                 await base.RespondAsync(
                     message, embed: embed, 
                     allowedMentions: AllowedMentions.None, 
-                    options: options).ConfigureAwait(false);
+                    options: base.GetRequestOptions()).ConfigureAwait(false);
             }
         }
 
@@ -87,22 +83,21 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             {
                 string result = await this._subwords.UploadWordsListAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
                 string username = await this.GetUserNameAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
-                RequestOptions options = new RequestOptions() { CancelToken = base.Context.CancellationToken };
 
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
                     msg.Content = $"All words by {username}:\n{ResponseEmoji.ParrotParty} {result} {ResponseEmoji.ParrotParty}";
                     msg.AllowedMentions = AllowedMentions.None;
                 }, 
-                options).ConfigureAwait(false);
+                    base.GetRequestOptions()).ConfigureAwait(false);
             }
             catch
             {
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
                     msg.Content = $"{ResponseEmoji.FeelsBeanMan} I couldn't save the list to PasteMyst for some damn reason.";
-                }, new RequestOptions() { CancelToken = base.Context.CancellationToken })
-                    .ConfigureAwait(false);
+                }, 
+                    base.GetRequestOptions()).ConfigureAwait(false);
             }
         }
 
@@ -113,7 +108,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             if (word == null)
                 throw new ArgumentNullException(nameof(word));
 
-            IUser author = await this._client.GetUserAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
+            IUser author = await base.Context.Client.GetUserAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
             string authorName = await this.GetUserNameAsync(author.Id, cancellationToken).ConfigureAwait(false);
             string addedByName = await this.GetUserNameAsync(word.AddedByUserID, cancellationToken).ConfigureAwait(false);
             string authorAvatarUrl = author.GetMaxAvatarUrl();
@@ -139,7 +134,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
                 return MentionUtils.MentionUser(id);
 
             // if not a member, get as user and build string
-            user = await this._client.GetUserAsync(id, cancellationToken).ConfigureAwait(false);
+            user = await base.Context.Client.GetUserAsync(id, cancellationToken).ConfigureAwait(false);
             return user.GetUsernameWithDiscriminator();
         }
     }

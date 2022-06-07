@@ -5,11 +5,11 @@ namespace DevSubmarine.DiscordBot
 {
     public class DevSubInteractionModule<TContext> : InteractionModuleBase<TContext> where TContext : class, IInteractionContext
     {
-        public Task RespondAsync(string text, Embed embed, CancellationToken cancellationToken)
+        protected Task RespondAsync(string text, Embed embed, CancellationToken cancellationToken)
             => base.RespondAsync(text: text, embed: embed, options: this.GetRequestOptions(cancellationToken));
-        public Task RespondAsync(string text, CancellationToken cancellationToken)
+        protected Task RespondAsync(string text, CancellationToken cancellationToken)
             => this.RespondAsync(text, null, cancellationToken);
-        public Task RespondAsync(Embed embed, CancellationToken cancellationToken)
+        protected Task RespondAsync(Embed embed, CancellationToken cancellationToken)
             => this.RespondAsync(null, embed, cancellationToken);
 
         protected RequestOptions GetRequestOptions(CancellationToken cancellationToken)
@@ -24,5 +24,8 @@ namespace DevSubmarine.DiscordBot
             => base.RespondAsync(text, base.Context.CancellationToken);
         public Task RespondAsync(Embed embed)
             => base.RespondAsync(embed, base.Context.CancellationToken);
+
+        protected RequestOptions GetRequestOptions()
+            => this.GetRequestOptions(base.Context.CancellationToken);
     }
 }
