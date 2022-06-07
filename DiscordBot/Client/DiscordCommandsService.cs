@@ -63,7 +63,7 @@ namespace DevSubmarine.DiscordBot.Client
         public void Dispose()
         {
             try { this._client.Ready -= OnClientReady; } catch { }
-            try { this._interactions.Log += OnLog; } catch { }
+            try { this._interactions.Log -= OnLog; } catch { }
             try { this._interactions?.Dispose(); } catch { }
         }
     }
