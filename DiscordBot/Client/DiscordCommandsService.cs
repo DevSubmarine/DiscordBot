@@ -11,6 +11,7 @@ namespace DevSubmarine.DiscordBot.Client
         private readonly InteractionService _interactions;
         private readonly IServiceProvider _services;
         private readonly ILogger _log;
+        private CancellationTokenSource _cts;
 
         public DiscordCommandsService(DiscordSocketClient client, IServiceProvider services, ILogger<DiscordCommandsService> log, IOptions<DiscordOptions> options)
         {
@@ -25,6 +26,9 @@ namespace DevSubmarine.DiscordBot.Client
             });
 
             this._client.Ready += OnClientReady;
+            this._client.SlashCommandExecuted += OnSlashCommand;
+            this._client.UserCommandExecuted += OnUserCommand;
+            this._client.MessageCommandExecuted += OnMessageCommand;
             this._interactions.Log += OnLog;
         }
 
@@ -45,6 +49,24 @@ namespace DevSubmarine.DiscordBot.Client
             }
         }
 
+        private Task OnSlashCommand(SocketSlashCommand interaction)
+        {
+            DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
+            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+        }
+
+        private Task OnUserCommand(SocketUserCommand interaction)
+        {
+            DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
+            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+        }
+
+        private Task OnMessageCommand(SocketMessageCommand interaction)
+        {
+            DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
+            return this._interactions.ExecuteCommandAsync(ctx, this._services);
+        }
+
         private Task OnLog(Discord.LogMessage logMessage)
         {
             this._log.Log(logMessage);
@@ -52,10 +74,14 @@ namespace DevSubmarine.DiscordBot.Client
         }
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
-            => Task.CompletedTask;
+        {
+            this._cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            return Task.CompletedTask;
+        }
 
         Task IHostedService.StopAsync(CancellationToken cancellationToken)
         {
+            try { this._cts?.Cancel(); } catch { }
             this.Dispose();
             return Task.CompletedTask;
         }
@@ -63,8 +89,12 @@ namespace DevSubmarine.DiscordBot.Client
         public void Dispose()
         {
             try { this._client.Ready -= OnClientReady; } catch { }
+            try { this._client.SlashCommandExecuted -= OnSlashCommand; } catch { }
+            try { this._client.UserCommandExecuted -= OnUserCommand; } catch { }
+            try { this._client.MessageCommandExecuted -= OnMessageCommand; } catch { }
             try { this._interactions.Log -= OnLog; } catch { }
             try { this._interactions?.Dispose(); } catch { }
+            try { this._cts?.Dispose(); } catch { }
         }
     }
 }
