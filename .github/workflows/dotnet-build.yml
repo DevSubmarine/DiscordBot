@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-net5:
+  build-net6:
 
     runs-on: ubuntu-latest
 
