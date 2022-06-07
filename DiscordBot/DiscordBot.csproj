@@ -31,7 +31,7 @@
 	<Content Include=".dockerignore" Condition="Exists('.dockerignore')">
 	 <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	</Content>
-    <Content Include="appsecrets.Development.json" Condition="Exists('appsettings.Development.json')">
+    <Content Include="appsecrets.Development.json" Condition="Exists('appsecrets.Development.json')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="appsecrets.json" Condition="Exists('appsecrets.json')">
