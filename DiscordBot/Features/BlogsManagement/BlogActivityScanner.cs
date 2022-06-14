@@ -135,9 +135,6 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
         {
-            if (this.Options.GuildID == 0)
-                throw new InvalidOperationException("Blogs channels guild is not configured");
-
             this._cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _ = this.ScannerLoopAsync(this._cts.Token);
             return Task.CompletedTask;
