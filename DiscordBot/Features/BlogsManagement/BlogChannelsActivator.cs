@@ -24,6 +24,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         public Task DeactivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
             => this.MoveChannelAsync(channelID, this.Options.ActiveBlogsCategoryID, this.Options.InactiveBlogsCategoryID, cancellationToken);
 
+#pragma warning disable CA2017 // Parameter count mismatch
         private async Task MoveChannelAsync(ulong channelID, ulong sourceCategoryID, ulong targetCategoryID, CancellationToken cancellationToken = default)
         {
             if (channelID == default)
@@ -35,27 +36,29 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             SocketCategoryChannel targetCategory = guild.GetCategoryChannel(targetCategoryID);
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
             {
-                { "GuildID", channel.Guild.Id },
-                { "GuildName", channel.Guild.Name },
+                { "GuildID", guild.Id },
+                { "GuildName", guild.Name },
                 { "ChannelID", channel.Id },
-                { "ChannelName", channel.Name }
+                { "ChannelName", channel.Name },
+                { "SourceCategoryID", sourceCategory.Id },
+                { "SourceCategoryName", sourceCategory.Name },
+                { "TargetCategoryID", targetCategory.Id },
+                { "TargetCategoryName", targetCategory.Name }
             });
 
             if (channel.CategoryId == targetCategoryID)
             {
-                this._log.LogDebug("Channel {ChannelID} is already in category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
+                this._log.LogDebug("Channel {ChannelName} is already in category {TargetCategoryName} ({TargetCategoryID})");
                 return;
             }
             if (channel.CategoryId != sourceCategoryID)
-                this._log.LogWarning("Channel {ChannelID} is not in category {CategoryName} ({CategoryID})", channelID, sourceCategory.Name, sourceCategory.Id);
+                this._log.LogWarning("Channel {ChannelName} is not in category {SourceCategoryName} ({SourceCategoryID})");
 
-            this._log.LogInformation("Moving channel {ChannelID} to category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
+            this._log.LogInformation("Moving channel {ChannelName} to category {TargetCategoryName} ({TargetCategoryID})");
             await channel.ModifyAsync(options => options.CategoryId = targetCategory.Id,
                 new RequestOptions() { CancelToken = cancellationToken });
-            this._log.LogDebug("Channel {ChannelID} moved to category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
+            this._log.LogDebug("Channel {ChannelName} moved to category {TargetCategoryName} ({TargetCategoryID})");
         }
-
-        private bool IsChannelIgnored(ulong channelID)
-            => this.Options.IgnoredChannelsIDs.Contains(channelID);
+#pragma warning restore CA2017 // Parameter count mismatch
     }
 }
