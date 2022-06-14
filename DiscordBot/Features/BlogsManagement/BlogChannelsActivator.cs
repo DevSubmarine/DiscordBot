@@ -24,20 +24,15 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         public Task DeactivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
             => this.MoveChannelAsync(channelID, this.Options.ActiveBlogsCategoryID, this.Options.InactiveBlogsCategoryID, cancellationToken);
 
-        private async Task MoveChannelAsync(ulong channelID, ulong fromCategoryID, ulong toCategoryID, CancellationToken cancellationToken = default)
+        private async Task MoveChannelAsync(ulong channelID, ulong sourceCategoryID, ulong targetCategoryID, CancellationToken cancellationToken = default)
         {
             if (channelID == default)
                 throw new ArgumentException($"{channelID} is not a valid channel ID", nameof(channelID));
 
-
-            if (this.IsChannelIgnored(channelID))
-            {
-                this._log.LogDebug("Channel {ChannelID} is ignored", channelID);
-                return;
-            }
-
             SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
             SocketTextChannel channel = guild.GetTextChannel(channelID);
+            SocketCategoryChannel sourceCategory = guild.GetCategoryChannel(targetCategoryID);
+            SocketCategoryChannel targetCategory = guild.GetCategoryChannel(targetCategoryID);
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
             {
                 { "GuildID", channel.Guild.Id },
@@ -46,19 +41,18 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 { "ChannelName", channel.Name }
             });
 
-            if (channel.CategoryId == toCategoryID)
+            if (channel.CategoryId == targetCategoryID)
             {
-                this._log.LogDebug("Channel {ChannelID} is already in category {CategoryID}", channelID, toCategoryID);
+                this._log.LogDebug("Channel {ChannelID} is already in category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
                 return;
             }
-            if (channel.CategoryId != fromCategoryID)
-                this._log.LogWarning("Channel {ChannelID} is not in category {CategoryID}", channelID, fromCategoryID);
+            if (channel.CategoryId != sourceCategoryID)
+                this._log.LogWarning("Channel {ChannelID} is not in category {CategoryName} ({CategoryID})", channelID, sourceCategory.Name, sourceCategory.Id);
 
-            SocketCategoryChannel category = guild.GetCategoryChannel(channel.CategoryId.Value);
-            this._log.LogInformation("Moving channel {ChannelID} to category {CategoryName} ({CategoryID})", channel, category.Name, category.Id);
-            await channel.ModifyAsync(options => options.CategoryId = toCategoryID,
+            this._log.LogInformation("Moving channel {ChannelID} to category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
+            await channel.ModifyAsync(options => options.CategoryId = targetCategory.Id,
                 new RequestOptions() { CancelToken = cancellationToken });
-            this._log.LogDebug("Channel {ChannelID} moved to category {CategoryID}", channel, toCategoryID);
+            this._log.LogDebug("Channel {ChannelID} moved to category {CategoryName} ({CategoryID})", channel, targetCategory.Name, targetCategory.Id);
         }
 
         private bool IsChannelIgnored(ulong channelID)
