@@ -29,6 +29,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 #pragma warning disable CA2017 // Parameter count mismatch
         private async Task ScannerLoopAsync(CancellationToken cancellationToken)
         {
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+
             while (!cancellationToken.IsCancellationRequested)
             {
                 SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
@@ -112,12 +114,12 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
                 if (isInactive && channel.CategoryId == this.Options.ActiveBlogsCategoryID)
                 {
-                    await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
+                    await this._activator.DeactivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
                     return true;
                 }
                 else if (!isInactive && channel.CategoryId == this.Options.InactiveBlogsCategoryID)
                 {
-                    await this._activator.DeactivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
+                    await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
                     return true;
                 }
                 else
