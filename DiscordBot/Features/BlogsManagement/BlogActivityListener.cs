@@ -36,6 +36,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 return;
             if (channel.CategoryId != this.Options.InactiveBlogsCategoryID)
                 return;
+            if (this.Options.IgnoredChannelsIDs.Contains(channel.Id))
+                return;
 
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
             {

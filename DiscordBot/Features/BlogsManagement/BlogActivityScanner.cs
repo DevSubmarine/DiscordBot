@@ -87,6 +87,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             });
 
 
+            if (this.Options.IgnoredChannelsIDs.Contains(channel.Id))
+                return false;
+
             this._log.LogDebug("Scanning channel {ChannelName} ({ChannelID})");
             IMessage lastMessage;
             try
