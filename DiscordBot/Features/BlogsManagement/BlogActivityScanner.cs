@@ -29,10 +29,14 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 #pragma warning disable CA2017 // Parameter count mismatch
         private async Task ScannerLoopAsync(CancellationToken cancellationToken)
         {
-            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
-
             while (!cancellationToken.IsCancellationRequested)
             {
+                while (this._client.ConnectionState != ConnectionState.Connected)
+                {
+                    this._log.LogTrace("Client not connected, waiting");
+                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+                }
+
                 SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
                 using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>() 
                 { 
