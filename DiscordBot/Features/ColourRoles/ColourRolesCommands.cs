@@ -177,7 +177,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
             {
                 msg.AllowedMentions = new AllowedMentions(AllowedMentionTypes.Users);
                 msg.Embed = new EmbedBuilder()
-                    .WithTitle("Role Colour changed!")
+                    .WithTitle("Colour Role changed!")
                     .WithAuthor(base.Context.User)
                     .WithColor(roleColour)
                     .WithDescription($"You're now {roleText} {ResponseEmoji.EyesBlurry}")
