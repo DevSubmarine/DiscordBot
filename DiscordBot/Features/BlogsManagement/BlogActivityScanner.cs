@@ -9,16 +9,18 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly IBlogActivator _activator;
+        private readonly IBlogChannelsSorter _sorter;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
         private CancellationTokenSource _cts;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogActivityScanner(IBlogActivator activator, DiscordSocketClient client,
+        public BlogActivityScanner(IBlogActivator activator, IBlogChannelsSorter sorter, DiscordSocketClient client,
             ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._activator = activator;
+            this._sorter = sorter;
             this._client = client;
             this._log = log;
             this._options = options;
@@ -56,12 +58,22 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 .Where(c => c is SocketTextChannel)
                 .Cast<SocketTextChannel>();
 
-            bool needsReordering = false;
+            bool needsSorting = false;
             foreach (SocketTextChannel channel in channels)
-                needsReordering |= await this.ScanChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+                needsSorting |= await this.ScanChannelAsync(channel, cancellationToken).ConfigureAwait(false);
 
-            if (needsReordering)
-                await this.ReorderCategoryAsync(category, cancellationToken).ConfigureAwait(false);
+            if (needsSorting)
+            {
+                try
+                {
+                    await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
+                }
+                catch (HttpException ex)
+                    when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
+                        && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID}) due to missing permissions")) { }
+                catch (Exception ex)
+                    when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID})")) { }
+            }
         }
 
         private async Task<bool> ScanChannelAsync(SocketTextChannel channel, CancellationToken cancellationToken)
@@ -118,40 +130,6 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelName}, guild {GuildID})")) { }
 
             return false;
-        }
-
-        private async Task ReorderCategoryAsync(SocketCategoryChannel category, CancellationToken cancellationToken)
-        {
-            using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
-            {
-                { "CategoryID", category.Id },
-                { "CategoryName", category.Name }
-            });
-
-            IOrderedEnumerable<SocketGuildChannel> channels = category.Channels
-                .OrderBy(c => !this.Options.IgnoredChannelsIDs.Contains(c.Id))
-                .ThenBy(c => c.Name);
-
-            IDictionary<SocketGuildChannel, int> channelPositions = new Dictionary<SocketGuildChannel, int>(channels.Count());
-            int minPosition = category.Channels.Min(c => c.Position);
-
-            foreach (SocketGuildChannel channel in channels)
-            {
-                channelPositions[channel] = minPosition;
-                minPosition++;
-            }
-
-            try
-            {
-                await category.Guild.ReorderChannelsAsync(
-                    channelPositions.Select(pair => new ReorderChannelProperties(pair.Key.Id, pair.Value)),
-                    new RequestOptions() { CancelToken = cancellationToken });
-            }
-            catch (HttpException ex)
-                when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID}) due to missing permissions")) { }
-            catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID})")) { }
         }
 #pragma warning restore CA2017 // Parameter count mismatch
 
