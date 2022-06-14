@@ -2,7 +2,7 @@
 {
     public interface IBlogActivator
     {
-        Task ActivateBlogChannel(ulong channelID, ulong guildID, CancellationToken cancellationToken = default);
-        Task DeactivateBlogChannel(ulong channelID, ulong guildID, CancellationToken cancellationToken = default);
+        Task ActivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default);
+        Task DeactivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default);
     }
 }

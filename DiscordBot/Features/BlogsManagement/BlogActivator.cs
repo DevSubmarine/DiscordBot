@@ -18,18 +18,16 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             this._options = options;
         }
 
-        public Task ActivateBlogChannel(ulong channelID, ulong guildID, CancellationToken cancellationToken = default)
-            => this.MoveChannelAsync(channelID, guildID, this.Options.InactiveBlogsCategoryID, this.Options.ActiveBlogsCategoryID, cancellationToken);
+        public Task ActivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
+            => this.MoveChannelAsync(channelID, this.Options.InactiveBlogsCategoryID, this.Options.ActiveBlogsCategoryID, cancellationToken);
 
-        public Task DeactivateBlogChannel(ulong channelID, ulong guildID, CancellationToken cancellationToken = default)
-            => this.MoveChannelAsync(channelID, guildID, this.Options.ActiveBlogsCategoryID, this.Options.InactiveBlogsCategoryID, cancellationToken);
+        public Task DeactivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
+            => this.MoveChannelAsync(channelID, this.Options.ActiveBlogsCategoryID, this.Options.InactiveBlogsCategoryID, cancellationToken);
 
-        private async Task MoveChannelAsync(ulong channelID, ulong guildID, ulong fromCategoryID, ulong toCategoryID, CancellationToken cancellationToken = default)
+        private async Task MoveChannelAsync(ulong channelID, ulong fromCategoryID, ulong toCategoryID, CancellationToken cancellationToken = default)
         {
             if (channelID == default)
                 throw new ArgumentException($"{channelID} is not a valid channel ID", nameof(channelID));
-            if (guildID == default)
-                throw new ArgumentException($"{guildID} is not a valid guild ID", nameof(guildID));
 
 
             if (this.IsChannelIgnored(channelID))
@@ -39,7 +37,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             }
 
 
-            SocketGuild guild = this._client.GetGuild(guildID);
+            SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
             SocketTextChannel channel = guild.GetTextChannel(channelID);
 
             if (channel.CategoryId == toCategoryID)
