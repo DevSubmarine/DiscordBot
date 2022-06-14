@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Configure(configureOptions);
 
             services.TryAddSingleton<IValidateOptions<BlogsManagementOptions>, BlogsManagementOptionsValidator>();
+            services.TryAddTransient<IBlogActivator, BlogActivator>();
 
             return services;
         }
