@@ -1,4 +1,6 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.Net;
+using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
@@ -38,8 +40,16 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             this._log.LogInformation("Message received from inactive blog channel {ChannelName} ({ChannelID}, guild {GuildID})", channel.Name, channel.Id, channel.Guild.Id);
             CancellationToken cancellationToken = this._cts.Token;
             SocketCategoryChannel category = channel.Guild.GetCategoryChannel(channel.CategoryId.Value);
-            await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
-            await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
+            try
+            {
+                await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
+                await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
+            }
+            catch (HttpException ex)
+                when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
+                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelName}, guild {GuildID}) due to missing permissions")) { }
+            catch (Exception ex)
+                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelName}, guild {GuildID})")) { }
         }
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
