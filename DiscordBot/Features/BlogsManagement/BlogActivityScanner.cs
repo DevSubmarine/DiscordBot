@@ -8,7 +8,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     internal class BlogActivityScanner : IHostedService, IDisposable
     {
         private readonly DiscordSocketClient _client;
-        private readonly IBlogActivator _activator;
+        private readonly IBlogChannelsActivator _activator;
         private readonly IBlogChannelsSorter _sorter;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
@@ -16,7 +16,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogActivityScanner(IBlogActivator activator, IBlogChannelsSorter sorter, DiscordSocketClient client,
+        public BlogActivityScanner(IBlogChannelsActivator activator, IBlogChannelsSorter sorter, DiscordSocketClient client,
             ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._activator = activator;
