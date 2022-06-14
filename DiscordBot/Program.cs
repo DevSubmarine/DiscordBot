@@ -35,6 +35,7 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
                     services.Configure<ColourRoles.ColourRolesOptions>(context.Configuration.GetSection("ColourRoles"));
+                    services.Configure<BlogsManagement.BlogsManagementOptions>(context.Configuration.GetSection("BlogsManagement"));
 
                     // dependencies
                     services.AddDiscordClient();
@@ -44,6 +45,7 @@ namespace DevSubmarine.DiscordBot
 
                     // features
                     services.AddSubWords();
+                    services.AddBlogsManagement();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);
