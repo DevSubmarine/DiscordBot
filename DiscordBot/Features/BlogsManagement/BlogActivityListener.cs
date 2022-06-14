@@ -37,7 +37,15 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             if (channel.CategoryId != this.Options.InactiveBlogsCategoryID)
                 return;
 
-            this._log.LogInformation("Message received from inactive blog channel {ChannelName} ({ChannelID}, guild {GuildID})", channel.Name, channel.Id, channel.Guild.Id);
+            using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
+            {
+                { "GuildID", channel.Guild.Id },
+                { "GuildName", channel.Guild.Name },
+                { "ChannelID", channel.Id },
+                { "ChannelName", channel.Name }
+            });
+
+            this._log.LogInformation("Message received from inactive blog channel {ChannelName} ({ChannelID})", channel.Name, channel.Id);
             CancellationToken cancellationToken = this._cts.Token;
             SocketCategoryChannel category = channel.Guild.GetCategoryChannel(channel.CategoryId.Value);
             try
@@ -47,9 +55,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             }
             catch (HttpException ex)
                 when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelName}, guild {GuildID}) due to missing permissions")) { }
+                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions", channel.Name, channel.Id)) { }
             catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelName}, guild {GuildID})")) { }
+                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelID})", channel.Name, channel.Id)) { }
         }
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)

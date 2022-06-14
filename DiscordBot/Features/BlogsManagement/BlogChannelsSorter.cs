@@ -19,13 +19,13 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         {
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
             {
-                { "CategoryID", category.Id },
-                { "CategoryName", category.Name },
                 { "GuildID", category.Guild.Id },
-                { "GuildName", category.Guild.Name }
+                { "GuildName", category.Guild.Name },
+                { "CategoryID", category.Id },
+                { "CategoryName", category.Name }
             });
 
-            this._log.LogInformation("Sorting channels in category {CategoryName} ({CategoryID}, guild {GuildID})");
+            this._log.LogInformation("Sorting channels in category {CategoryName} ({CategoryID})");
             IOrderedEnumerable<SocketGuildChannel> channels = category.Channels
                 .OrderBy(c => !this._options.CurrentValue.IgnoredChannelsIDs.Contains(c.Id))
                 .ThenBy(c => c.Name);

@@ -36,9 +36,15 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 return;
             }
 
-
             SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
             SocketTextChannel channel = guild.GetTextChannel(channelID);
+            using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
+            {
+                { "GuildID", channel.Guild.Id },
+                { "GuildName", channel.Guild.Name },
+                { "ChannelID", channel.Id },
+                { "ChannelName", channel.Name }
+            });
 
             if (channel.CategoryId == toCategoryID)
             {
@@ -48,8 +54,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             if (channel.CategoryId != fromCategoryID)
                 this._log.LogWarning("Channel {ChannelID} is not in category {CategoryID}", channelID, fromCategoryID);
 
-
-            this._log.LogInformation("Moving channel {ChannelID} to category {CategoryID}", channel, toCategoryID);
+            SocketCategoryChannel category = guild.GetCategoryChannel(channel.CategoryId.Value);
+            this._log.LogInformation("Moving channel {ChannelID} to category {CategoryName} ({CategoryID})", channel, category.Name, category.Id);
             await channel.ModifyAsync(options => options.CategoryId = toCategoryID,
                 new RequestOptions() { CancelToken = cancellationToken });
             this._log.LogDebug("Channel {ChannelID} moved to category {CategoryID}", channel, toCategoryID);

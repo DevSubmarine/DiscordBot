@@ -55,7 +55,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 { "CategoryID", category.Id },
                 { "CategoryName", category.Name }
             });
-            this._log.LogDebug("Scanning category {CategoryName} ({CategoryID}, guild {GuildID})");
+            this._log.LogDebug("Scanning category {CategoryName} ({CategoryID})");
             IEnumerable<SocketTextChannel> channels = category.Channels
                 .Where(c => c is SocketTextChannel)
                 .Cast<SocketTextChannel>();
@@ -72,22 +72,22 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 }
                 catch (HttpException ex)
                     when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                        && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID}) due to missing permissions")) { }
+                        && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
                 catch (Exception ex)
-                    when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}, guild {GuildID})")) { }
+                    when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})")) { }
             }
         }
 
         private async Task<bool> ScanChannelAsync(SocketTextChannel channel, CancellationToken cancellationToken)
         {
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>() 
-            { 
+            {
                 { "ChannelID", channel.Id },
                 { "ChannelName", channel.Name }
             });
 
 
-            this._log.LogDebug("Scanning channel {ChannelName} ({ChannelName}, guild {GuildID})");
+            this._log.LogDebug("Scanning channel {ChannelName} ({ChannelID})");
             IMessage lastMessage;
             try
             {
@@ -100,9 +100,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             }
             catch (HttpException ex) 
                 when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelName}, guild {GuildID}) due to missing permissions")) { return false; }
+                    && ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelID}) due to missing permissions")) { return false; }
             catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelName}, guild {GuildID})")) { return false; }
+                when (ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelID})")) { return false; }
 
 
             try
@@ -123,13 +123,13 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                     return true;
                 }
                 else
-                    this._log.LogTrace("Channel {ChannelName} ({ChannelName}, guild {GuildID}) requires no changes", channel.Id, channel.Guild.Id);
+                    this._log.LogTrace("Channel {ChannelName} ({ChannelID}) requires no changes");
             }
             catch (HttpException ex)
                 when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelName}, guild {GuildID}) due to missing permissions")) { }
+                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions")) { }
             catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelName}, guild {GuildID})")) { }
+                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelID})")) { }
 
             return false;
         }
