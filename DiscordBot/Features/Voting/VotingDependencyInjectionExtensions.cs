@@ -13,6 +13,7 @@ namespace Microsoft.Extensions.DependencyInjection
 
             services.AddMongoDB();
             services.TryAddSingleton<IVotesStore, MongoVotesStore>();
+            services.TryAddSingleton<IVotingCooldownManager, VotingCooldownManager>();
 
             return services;
         }
