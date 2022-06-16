@@ -18,6 +18,10 @@ namespace DevSubmarine.DiscordBot
                 .FirstOrDefault();
 
 
+        public static Color GetUserColour(this IGuildUser user)
+            => GetHighestRole(user, role => role.Color != default)?.Color ?? Color.Default;
+
+
         public static Task ModifyAsync(this IGuildUser user, Action<GuildUserProperties> func, CancellationToken cancellationToken)
             => user.ModifyAsync(func, new RequestOptions { CancelToken = cancellationToken });
         public static string GetMaxAvatarUrl(this IUser user, ImageFormat format = ImageFormat.Auto)
