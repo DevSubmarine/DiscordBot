@@ -17,5 +17,11 @@
         public TimeSpan ActivityScanningRate { get; set; } = TimeSpan.FromDays(1);
         /// <summary>The time since last message for blog to be considered inactive.</summary>
         public TimeSpan MaxBlogInactivityTime { get; set; } = TimeSpan.FromDays(14);
+
+        /// <summary>Time the member must be in the guild at minimum to create a blog channel.</summary>
+        public TimeSpan MinMemberAge { get; set; } = TimeSpan.FromDays(3);
+        /// <summary>Words that cannot be contained in blog channel name.</summary>
+        /// <remarks>This can be used to forbid certain words, such as swears or whatever.</remarks>
+        public IEnumerable<string> ForbiddenChannelNameWords { get; set; } = Enumerable.Empty<string>();
     }
 }
