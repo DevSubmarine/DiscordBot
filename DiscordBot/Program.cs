@@ -57,6 +57,7 @@ namespace DevSubmarine.DiscordBot
                     // features
                     services.AddSubWords();
                     services.AddBlogsManagement();
+                    services.AddVoting();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);

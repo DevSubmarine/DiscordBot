@@ -11,5 +11,6 @@
         public string DatabaseName { get; set; } = "DiscordBot";
 
         public string SubWordsCollectionName { get; set; } = "SubWords";
+        public string VotesCollectionName { get; set; } = "Votes";
     }
 }
