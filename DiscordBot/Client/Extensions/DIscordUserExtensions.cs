@@ -23,7 +23,7 @@ namespace DevSubmarine.DiscordBot
 
 
         public static Task ModifyAsync(this IGuildUser user, Action<GuildUserProperties> func, CancellationToken cancellationToken)
-            => user.ModifyAsync(func, new RequestOptions { CancelToken = cancellationToken });
+            => user.ModifyAsync(func, cancellationToken.ToRequestOptions());
         public static string GetMaxAvatarUrl(this IUser user, ImageFormat format = ImageFormat.Auto)
             => GetSafeAvatarUrl(user, format, (ushort)(user is SocketUser ? 2048 : 1024));
         public static string GetSafeAvatarUrl(this IUser user, ImageFormat format = ImageFormat.Auto, ushort size = 128)

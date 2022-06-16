@@ -41,7 +41,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
             return category.Guild.ReorderChannelsAsync(
                 channelPositions.Select(pair => new ReorderChannelProperties(pair.Key.Id, pair.Value)),
-                new RequestOptions() { CancelToken = cancellationToken });
+                cancellationToken.ToRequestOptions());
         }
 #pragma warning restore CA2017 // Parameter count mismatch
     }

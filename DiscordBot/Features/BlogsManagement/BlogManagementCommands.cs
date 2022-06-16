@@ -97,7 +97,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                             Emote.Parse(ResponseEmoji.EyesBlurry),
                             $"https://discord.com/channels/{result.GuildId}/{result.Id}")
                         .Build();
-                });
+                }, base.GetRequestOptions());
             }
             catch (HttpException ex) when (
                 (ex.DiscordCode == DiscordErrorCode.MissingPermissions || ex.DiscordCode == DiscordErrorCode.InsufficientPermissions)

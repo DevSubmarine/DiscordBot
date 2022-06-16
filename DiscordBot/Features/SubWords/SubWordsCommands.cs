@@ -78,7 +78,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         public async Task CmdListAsync(
             [Summary("User", "User that said the silly word")] IUser user)
         {
-            await base.DeferAsync(options: new RequestOptions() { CancelToken = base.Context.CancellationToken }).ConfigureAwait(false);
+            await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
             try
             {
                 string result = await this._subwords.UploadWordsListAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);

@@ -40,7 +40,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             List<IGuildChannel> results = new List<IGuildChannel>(channels.Count());
             foreach (IGuildChannel channel in channels)
             {
-                IEnumerable<IGuildUser> channelUsers = await channel.GetUsersAsync(CacheMode.AllowDownload, new RequestOptions() { CancelToken = cancellationToken }).FlattenAsync().ConfigureAwait(false);
+                IEnumerable<IGuildUser> channelUsers = await channel.GetUsersAsync(CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).FlattenAsync().ConfigureAwait(false);
                 IGuildUser user = channelUsers.FirstOrDefault(u => u.Id == userID);
                 if (user == null)
                     continue;
@@ -86,8 +86,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                         manageWebhooks: PermValue.Allow
                     )));
                 }
-            },
-                new RequestOptions() { CancelToken = cancellationToken });
+            }, cancellationToken.ToRequestOptions());
 
             this._log.LogTrace("Sorting channels");
             await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);

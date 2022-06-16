@@ -99,8 +99,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             try
             {
                 lastMessage = (await channel
-                    .GetMessagesAsync(limit: 1,
-                        new RequestOptions() { CancelToken = cancellationToken })
+                    .GetMessagesAsync(limit: 1, cancellationToken.ToRequestOptions())
                     .FlattenAsync()
                     .ConfigureAwait(false))
                     .FirstOrDefault();

@@ -55,8 +55,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 this._log.LogWarning("Channel {ChannelName} is not in category {SourceCategoryName} ({SourceCategoryID})");
 
             this._log.LogInformation("Moving channel {ChannelName} to category {TargetCategoryName} ({TargetCategoryID})");
-            await channel.ModifyAsync(options => options.CategoryId = targetCategory.Id,
-                new RequestOptions() { CancelToken = cancellationToken });
+            await channel.ModifyAsync(options => options.CategoryId = targetCategory.Id, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
             this._log.LogDebug("Channel {ChannelName} moved to category {TargetCategoryName} ({TargetCategoryID})");
         }
 #pragma warning restore CA2017 // Parameter count mismatch
