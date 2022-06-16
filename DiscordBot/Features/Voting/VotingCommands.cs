@@ -1,5 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
+using System.Text;
 
 namespace DevSubmarine.DiscordBot.Voting.Services
 {
@@ -91,6 +92,97 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 .WithTimestamp(vote.CreatedVote.Timestamp)
                 .WithColor(target.GetUserColour())
                 .Build();
+        }
+
+        [Group("statistics", "Check various voting statistics")]
+        public class VotingStatisticsCommands : DevSubInteractionModule
+        {
+            private readonly IVotesStore _store;
+
+            public VotingStatisticsCommands(IVotingService voting, IVotesStore store, ILogger<VotingCommands> log)
+            {
+                this._store = store;
+            }
+
+            [SlashCommand("search", "Query for statistics using specified search criteria")]
+            public async Task CmdFindAsync(
+                [Summary("Target", "User the vote was sent against")] IUser target = null,
+                [Summary("Voter", "User that sent the vote")] IUser voter = null,
+                [Summary("VoteType", "Type of the vote")] VoteType? voteType = null)
+            {
+                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
+                IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, base.Context.CancellationToken).ConfigureAwait(false);
+
+                EmbedBuilder embed = new EmbedBuilder()
+                    .WithTitle($"Found {results.LongCount()} votes")
+                    .AddField("Search Criteria", this.BuildCriteriaString(target, voter, voteType));
+
+
+                if (!results.Any())
+                {
+                    await base.ModifyOriginalResponseAsync(msg =>
+                    {
+                        msg.Embed = embed
+                            .WithDescription($"No votes matching your criteria found. {ResponseEmoji.FeelsBeanMan}")
+                            .Build();
+                        msg.AllowedMentions = AllowedMentions.None;
+                    }, base.GetRequestOptions()).ConfigureAwait(false);
+                    return;
+                }
+
+
+                if (target == null)
+                {
+                    IEnumerable<IGrouping<ulong, Vote>> top = GetTop(vote => vote.TargetID);
+                    embed.AddField("Top Targets",
+                        string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times")));
+                }
+                if (voter == null)
+                {
+                    IEnumerable<IGrouping<ulong, Vote>> top = GetTop(vote => vote.VoterID);
+                    embed.AddField("Top Voters",
+                        string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times")));
+                }
+                if (voteType == null)
+                {
+                    IEnumerable<IGrouping<VoteType, Vote>> top = GetTop(vote => vote.Type);
+                    embed.AddField("Top Vote Types",
+                        string.Join('\n', top.Select(value => $"{value.Key.GetText()}: {value.LongCount()} times")));
+                }
+
+                const int lastCount = 5;
+                IEnumerable<Vote> lastVotes = results
+                    .OrderByDescending(vote => vote.Timestamp)
+                    .Take(lastCount);
+                embed.AddField($"Last {Math.Min(lastCount, lastVotes.Count())} Votes",
+                    string.Join('\n', lastVotes.Select(vote 
+                        => $"{MentionUtils.MentionUser(vote.VoterID)} voted to {vote.Type.GetText()} {MentionUtils.MentionUser(vote.TargetID)} {TimestampTag.FromDateTimeOffset(vote.Timestamp, TimestampTagStyles.Relative)}")));
+
+                await base.ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Embed = embed.Build();
+                    msg.AllowedMentions = AllowedMentions.None;
+                }, 
+                    base.GetRequestOptions()).ConfigureAwait(false);
+
+                IEnumerable<IGrouping<TKey, Vote>> GetTop<TKey>(Func<Vote, TKey> keySelector, int count = 3)
+                {
+                    return results
+                        .GroupBy(keySelector)
+                        .OrderByDescending(grouping => grouping.LongCount())
+                        .Take(count);
+                }
+            }
+
+            private string BuildCriteriaString(IUser target, IUser voter, VoteType? voteType)
+            {
+                const string any = "`any`";
+                StringBuilder builder = new StringBuilder();
+                builder.AppendFormat("User: {0}\n", target?.Mention ?? any);
+                builder.AppendFormat("Voter: {0}\n", voter?.Mention ?? any);
+                builder.AppendFormat("Vote Type: {0}\n", voteType?.GetText() ?? any);
+                return builder.ToString();
+            }
         }
     }
 }
