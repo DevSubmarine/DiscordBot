@@ -21,7 +21,6 @@ namespace DevSubmarine.DiscordBot.SubWords
         public ulong AddedByUserID { get; }
         [BsonElement("CreationTime")]
         [JsonProperty("creationTime")]
-        [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime CreationTimeUTC { get; }
 
         // additional metadata, in case needed in future?

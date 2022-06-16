@@ -12,6 +12,8 @@ global using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using DevSubmarine.DiscordBot.Serialization;
+using Newtonsoft.Json.Converters;
 
 namespace DevSubmarine.DiscordBot
 {
@@ -20,6 +22,15 @@ namespace DevSubmarine.DiscordBot
         static async Task Main(string[] args)
         {
             LoggingInitializationExtensions.EnableUnhandledExceptionLogging();
+
+            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter>()
+                {
+                    new UnixTimestampConverter(),
+                    new StringEnumConverter()
+                }
+            };
 
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
