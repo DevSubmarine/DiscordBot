@@ -95,7 +95,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                         .WithButton("Go now!", null,
                             ButtonStyle.Link,
                             Emote.Parse(ResponseEmoji.EyesBlurry),
-                            $"https://discord.com/channels/{result.GuildId}/{result.Id}")
+                            result.GetURL())
                         .Build();
                 }, base.GetRequestOptions());
             }
