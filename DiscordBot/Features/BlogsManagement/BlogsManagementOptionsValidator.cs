@@ -13,10 +13,12 @@
             if (options.InactiveBlogsCategoryID == default)
                 return ValidateOptionsResult.Fail($"{nameof(options.InactiveBlogsCategoryID)} is required.");
 
-            if (options.ActivityScanningRate <= TimeSpan.Zero)
+            if (options.ActivityScanningRate < TimeSpan.Zero)
                 return ValidateOptionsResult.Fail($"{nameof(options.ActivityScanningRate)} must be greater than 0.");
             if (options.MaxBlogInactivityTime <= TimeSpan.Zero)
-                return ValidateOptionsResult.Fail($"{nameof(options.MaxBlogInactivityTime)} must be greater than 0.");
+                return ValidateOptionsResult.Fail($"{nameof(options.MaxBlogInactivityTime)} cannot be less than 0.");
+            if (options.MinMemberAge <= TimeSpan.Zero)
+                return ValidateOptionsResult.Fail($"{nameof(options.MinMemberAge)} cannot be less than 0.");
 
             return ValidateOptionsResult.Success;
         }
