@@ -47,6 +47,7 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
                     services.Configure<ColourRoles.ColourRolesOptions>(context.Configuration.GetSection("ColourRoles"));
                     services.Configure<BlogsManagement.BlogsManagementOptions>(context.Configuration.GetSection("BlogsManagement"));
+                    services.Configure<Voting.VotingOptions>(context.Configuration.GetSection("Voting"));
 
                     // dependencies
                     services.AddDiscordClient();
