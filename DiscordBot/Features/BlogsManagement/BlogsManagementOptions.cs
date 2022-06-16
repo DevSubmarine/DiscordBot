@@ -22,6 +22,6 @@
         public TimeSpan MinMemberAge { get; set; } = TimeSpan.FromDays(3);
         /// <summary>Words that cannot be contained in blog channel name.</summary>
         /// <remarks>This can be used to forbid certain words, such as swears or whatever.</remarks>
-        public IEnumerable<string> ForbiddenChannelNameWords { get; set; } = Enumerable.Empty<string>();
+        public IEnumerable<string> ForbiddenChannelNameWords { get; set; }
     }
 }
