@@ -16,10 +16,12 @@
             if (vote == null)
                 throw new ArgumentNullException(nameof(vote));
 
-            if (!_cooldown.IsReady(vote.VoterID, vote.TargetID, out TimeSpan cooldownRemaining))
+            if (!this._cooldown.IsReady(vote.VoterID, vote.TargetID, out TimeSpan cooldownRemaining))
                 return new CooldownVotingResult(cooldownRemaining);
 
             await this._store.AddVoteAsync(vote, cancellationToken).ConfigureAwait(false);
+            this._cooldown.AddCooldown(vote.VoterID, vote.TargetID);
+
             IEnumerable<Vote> votesAgainstTarget = await this._store.GetVotesAsync(vote.TargetID, null, vote.Type, cancellationToken).ConfigureAwait(false);
             return new SuccessVotingResult(vote)
             {
