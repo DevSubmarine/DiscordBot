@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot
 {
-    public static class DIscordUserExtensions
+    public static class DiscordUserExtensions
     {
         public static bool IsOwner(this IGuildUser user)
             => user.Id == user.Guild.OwnerId;
