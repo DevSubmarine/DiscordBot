@@ -3,12 +3,12 @@ using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
-    internal class BlogChannelsSorter : IBlogChannelsSorter
+    internal class BlogChannelSorter : IBlogChannelSorter
     {
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
 
-        public BlogChannelsSorter(ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options)
+        public BlogChannelSorter(ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._log = log;
             this._options = options;

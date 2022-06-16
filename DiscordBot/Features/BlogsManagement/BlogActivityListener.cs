@@ -8,15 +8,15 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     internal class BlogActivityListener : IHostedService, IDisposable
     {
         private readonly DiscordSocketClient _client;
-        private readonly IBlogChannelsActivator _activator;
-        private readonly IBlogChannelsSorter _sorter;
+        private readonly IBlogChannelActivator _activator;
+        private readonly IBlogChannelSorter _sorter;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
         private CancellationTokenSource _cts;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogActivityListener(IBlogChannelsActivator activator, IBlogChannelsSorter sorter, DiscordSocketClient client,
+        public BlogActivityListener(IBlogChannelActivator activator, IBlogChannelSorter sorter, DiscordSocketClient client,
             ILogger<BlogActivityListener> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._activator = activator;

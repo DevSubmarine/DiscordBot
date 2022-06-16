@@ -15,8 +15,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Configure(configureOptions);
 
             services.TryAddSingleton<IValidateOptions<BlogsManagementOptions>, BlogsManagementOptionsValidator>();
-            services.TryAddTransient<IBlogChannelsActivator, BlogChannelsActivator>();
-            services.TryAddTransient<IBlogChannelsSorter, BlogChannelsSorter>();
+            services.TryAddTransient<IBlogChannelActivator, BlogChannelActivator>();
+            services.TryAddTransient<IBlogChannelSorter, BlogChannelSorter>();
             services.AddHostedService<BlogActivityScanner>();
             services.AddHostedService<BlogActivityListener>();
 

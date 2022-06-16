@@ -3,7 +3,7 @@ using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
-    internal class BlogChannelsActivator : IBlogChannelsActivator
+    internal class BlogChannelActivator : IBlogChannelActivator
     {
         private readonly DiscordSocketClient _client;
         private readonly ILogger _log;
@@ -11,7 +11,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogChannelsActivator(DiscordSocketClient client, ILogger<BlogChannelsActivator> log, IOptionsMonitor<BlogsManagementOptions> options)
+        public BlogChannelActivator(DiscordSocketClient client, ILogger<BlogChannelActivator> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._client = client;
             this._log = log;
