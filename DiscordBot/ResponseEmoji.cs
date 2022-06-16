@@ -15,5 +15,7 @@
         public static string FeelsBeanMan => "<:FeelsBeanMan:526803534197424128>";
         public static string FeelsDumbMan => "<:FeelsDumbMan:526803505219108879>";
         public static string BlobSweatAnimated => "<a:ablobSweat:820386948484431952>";
+        public static string KekYu => "<:KEKyu:852593520798990376>";
+        public static string KekPoint => "<:kekPoint:963854834795184158>";
     }
 }
