@@ -57,7 +57,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         public async Task<IGuildChannel> CreateBlogChannel(string name, IEnumerable<ulong> userIDs, CancellationToken cancellationToken = default)
         {
-            this._log.LogInformation("Creating blog channel {ChannelName} for user(s) {{ {UserIDs} }}", name, string.Join(", ", userIDs));
+            this._log.LogInformation("Creating blog channel {ChannelName} for user(s) {UserIDs}", name, string.Join(", ", userIDs));
 
             SocketGuild guild = this._client.GetGuild(this._options.GuildID);
             SocketCategoryChannel category = guild.GetCategoryChannel(this._options.ActiveBlogsCategoryID);
@@ -65,12 +65,27 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             IGuildChannel result = await guild.CreateTextChannelAsync(name, props =>
             {
                 props.CategoryId = category.Id;
-                props.PermissionOverwrites = new Optional<IEnumerable<Overwrite>>(userIDs.Select(id =>
-                    new Overwrite(id, PermissionTarget.User, new OverwritePermissions(
-                            sendMessages: PermValue.Allow,
-                            manageMessages: PermValue.Allow,
-                            manageWebhooks: PermValue.Allow
-                        ))));
+
+                this._log.LogTrace("Calculating permissions");
+                // discord perm overwrites don't merge with each other
+                // so each overwrite is to be created by modifying @everyone perms from the category
+                // this is so we can both respect category permissions, as well as assign our own overrides
+                OverwritePermissions categoryPerms = category.PermissionOverwrites.First(p
+                    => p.TargetId == guild.EveryoneRole.Id && p.TargetType == PermissionTarget.Role)
+                    .Permissions;
+
+                List<Overwrite> perms = new List<Overwrite>(category.PermissionOverwrites);
+                props.PermissionOverwrites = perms;
+                perms.Add(new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role,
+                            categoryPerms.Modify(sendMessages: PermValue.Deny)));
+                foreach (ulong uid in userIDs)
+                {
+                    perms.Add(new Overwrite(uid, PermissionTarget.User, categoryPerms.Modify(
+                        sendMessages: PermValue.Allow,
+                        manageMessages: PermValue.Allow,
+                        manageWebhooks: PermValue.Allow
+                    )));
+                }
             },
                 new RequestOptions() { CancelToken = cancellationToken });
 
