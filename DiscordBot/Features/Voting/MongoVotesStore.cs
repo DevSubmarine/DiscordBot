@@ -11,7 +11,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         public MongoVotesStore(IMongoDatabaseClient client, IOptions<MongoOptions> databaseOptions, ILogger<MongoVotesStore> log)
         {
             this._log = log;
-            this._collection = client.GetCollection<Vote>(databaseOptions.Value.SubWordsCollectionName);
+            this._collection = client.GetCollection<Vote>(databaseOptions.Value.VotesCollectionName);
         }
 
         public Task AddVoteAsync(Vote vote, CancellationToken cancellationToken = default)

@@ -9,7 +9,7 @@ namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper.CollectionCreators
         public VotesCollectionCreator(IMongoDatabaseClient client, ILogger<VotesCollectionCreator> log, IOptions<MongoOptions> options)
             : base(client, log, options)
         {
-            this.CollectionName = options.Value.SubWordsCollectionName;
+            this.CollectionName = options.Value.VotesCollectionName;
         }
 
         public override async Task ProcessCollectionAsync(CancellationToken cancellationToken = default)
