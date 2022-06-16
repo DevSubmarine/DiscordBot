@@ -17,5 +17,8 @@
         public static string BlobSweatAnimated => "<a:ablobSweat:820386948484431952>";
         public static string KekYu => "<:KEKyu:852593520798990376>";
         public static string KekPoint => "<:kekPoint:963854834795184158>";
+        public static string BlobHearts => "<a:blobhearts:526810634650779688>";
+        public static string Reeeeee => "<:reeeeee:741760373274837042>";
+        public static string BlobHug => "<:blobHug:776368699216494631>";
     }
 }

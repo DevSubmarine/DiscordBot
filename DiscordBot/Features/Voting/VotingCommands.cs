@@ -104,6 +104,91 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 this._store = store;
             }
 
+            [SlashCommand("check", "Check voting statistics for specific user")]
+            public async Task CmdCheckAsync(
+                [Summary("User", "User to check statistics for")] IGuildUser user = null)
+            {
+                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
+
+                if (user == null)
+                    user = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken); 
+
+                Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, base.Context.CancellationToken);
+                Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, base.Context.CancellationToken);
+                await Task.WhenAll(votesTargetTask, votesVoterTask).ConfigureAwait(false);
+
+                IEnumerable<Vote> votesTarget = votesTargetTask.Result;
+                IEnumerable<Vote> votesVoter = votesVoterTask.Result;
+                IEnumerable<Vote> votesAll = Enumerable.Union(votesTarget, votesVoter);
+
+                EmbedBuilder embed = new EmbedBuilder()
+                    .WithTitle($"Voting stats for {user.GetUsernameWithDiscriminator()}")
+                    .WithColor(user.GetUserColour())
+                    .WithAuthor(user);
+
+                StringBuilder builder = new StringBuilder();
+                if (votesVoter.Any())
+                {
+                    builder.Clear();
+                    IEnumerable<Vote> votesMod = votesVoter.Where(vote => vote.Type == VoteType.Mod);
+                    IEnumerable<Vote> votesKickOrBan = votesVoter.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+
+                    if (votesMod.Any())
+                    {
+                        IGrouping<ulong, Vote> topTarget = this.GetTop(votesMod, vote => vote.TargetID, 1).First();
+                        builder.Append($"*{MentionUtils.MentionUser(topTarget.Key)} is {user.Mention}'s crush - `{topTarget.LongCount()}` votes for {VoteType.Mod.GetText()}! {ResponseEmoji.BlobHug}*\n");
+                    }
+                    if (votesKickOrBan.Any())
+                    {
+                        IGrouping<ulong, Vote> topTarget = this.GetTop(votesKickOrBan, vote => vote.TargetID, 1).First();
+                        builder.Append($"*{user.Mention} is on a crusade against {MentionUtils.MentionUser(topTarget.Key)} - `{topTarget.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.JerryWhat}*\n");
+                    }
+
+                    if (builder.Length > 0)
+                        builder.Append('\n');
+                    builder.AppendFormat("Top votes made:\n{0}", this.BuildTopVotersString(votesVoter));
+                    embed.AddField("As a Voter", builder.ToString(), inline: true);
+                }
+                else
+                    embed.AddField("As a Voter", $"{user.Mention} didn't vote for anyone yet... what a boomer. {ResponseEmoji.FeelsDumbMan}");
+
+
+                if (votesTarget.Any())
+                {
+                    builder.Clear();
+                    IEnumerable<Vote> votesMod = votesTarget.Where(vote => vote.Type == VoteType.Mod);
+                    IEnumerable<Vote> votesKickOrBan = votesTarget.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+
+                    if (votesMod.Any())
+                    {
+                        IGrouping<ulong, Vote> topVoter = this.GetTop(votesMod, vote => vote.VoterID, 1).First();
+                        builder.Append($"*{user.Mention} seems to be loved by {MentionUtils.MentionUser(topVoter.Key)} - `{topVoter.LongCount()}` votes for {VoteType.Mod.GetText()}! {ResponseEmoji.BlobHearts}*\n");
+                    }
+                    if (votesKickOrBan.Any())
+                    {
+                        IGrouping<ulong, Vote> topVoter = this.GetTop(votesKickOrBan, vote => vote.VoterID, 1).First();
+                        builder.Append($"*{MentionUtils.MentionUser(topVoter.Key)} is harassing {user.Mention} - `{topVoter.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.Reeeeee}*\n");
+                    }
+
+                    if (builder.Length > 0)
+                        builder.Append('\n');
+                    builder.AppendFormat("Top votes received:\n{0}", this.BuildTopVotersString(votesTarget));
+                    embed.AddField("As a Target", builder.ToString());
+                }
+                else
+                    embed.AddField("As a Target", $"{user.Mention} hasn't been voted on yet? Huh?! {ResponseEmoji.FeelsBeanMan}");
+
+                if (votesAll.Any())
+                    embed.AddField($"Last Votes", this.BuildLastVotesString(votesAll, 10));
+
+                await base.ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Embed = embed.Build();
+                    msg.AllowedMentions = AllowedMentions.None;
+                },
+                    base.GetRequestOptions()).ConfigureAwait(false);
+            }
+
             [SlashCommand("search", "Query for statistics using specified search criteria")]
             public async Task CmdFindAsync(
                 [Summary("Target", "User the vote was sent against")] IUser target = null,
@@ -132,31 +217,14 @@ namespace DevSubmarine.DiscordBot.Voting.Services
 
 
                 if (target == null)
-                {
-                    IEnumerable<IGrouping<ulong, Vote>> top = GetTop(vote => vote.TargetID);
-                    embed.AddField("Top Targets",
-                        string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times")));
-                }
+                    embed.AddField("Top Targets", this.BuildTopTargetsString(results));
                 if (voter == null)
-                {
-                    IEnumerable<IGrouping<ulong, Vote>> top = GetTop(vote => vote.VoterID);
-                    embed.AddField("Top Voters",
-                        string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times")));
-                }
+                    embed.AddField("Top Voters", this.BuildTopVotersString(results));
                 if (voteType == null)
-                {
-                    IEnumerable<IGrouping<VoteType, Vote>> top = GetTop(vote => vote.Type);
-                    embed.AddField("Top Vote Types",
-                        string.Join('\n', top.Select(value => $"{value.Key.GetText()}: {value.LongCount()} times")));
-                }
+                    embed.AddField("Top Vote Types", this.BuildTopTypesString(results));
 
-                const int lastCount = 5;
-                IEnumerable<Vote> lastVotes = results
-                    .OrderByDescending(vote => vote.Timestamp)
-                    .Take(lastCount);
-                embed.AddField($"Last {Math.Min(lastCount, lastVotes.Count())} Votes",
-                    string.Join('\n', lastVotes.Select(vote 
-                        => $"{MentionUtils.MentionUser(vote.VoterID)} voted to {vote.Type.GetText()} {MentionUtils.MentionUser(vote.TargetID)} {TimestampTag.FromDateTimeOffset(vote.Timestamp, TimestampTagStyles.Relative)}")));
+                embed.AddField($"Last Votes", this.BuildLastVotesString(results));
+
 
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
@@ -164,14 +232,41 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     msg.AllowedMentions = AllowedMentions.None;
                 }, 
                     base.GetRequestOptions()).ConfigureAwait(false);
+            }
 
-                IEnumerable<IGrouping<TKey, Vote>> GetTop<TKey>(Func<Vote, TKey> keySelector, int count = 3)
-                {
-                    return results
-                        .GroupBy(keySelector)
-                        .OrderByDescending(grouping => grouping.LongCount())
-                        .Take(count);
-                }
+            private IEnumerable<IGrouping<TKey, Vote>> GetTop<TKey>(IEnumerable<Vote> votes, Func<Vote, TKey> keySelector, int count)
+            {
+                return votes
+                    .GroupBy(keySelector)
+                    .OrderByDescending(grouping => grouping.LongCount())
+                    .Take(count);
+            }
+
+            private string BuildTopTargetsString(IEnumerable<Vote> votes, int count = 3)
+            {
+                IEnumerable<IGrouping<ulong, Vote>> top = this.GetTop(votes, vote => vote.TargetID, count);
+                return string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times"));
+            }
+
+            private string BuildTopVotersString(IEnumerable<Vote> votes, int count = 3)
+            {
+                IEnumerable<IGrouping<ulong, Vote>> top = this.GetTop(votes, vote => vote.VoterID, count);
+                return string.Join('\n', top.Select(value => $"{MentionUtils.MentionUser(value.Key)}: {value.LongCount()} times"));
+            }
+
+            private string BuildTopTypesString(IEnumerable<Vote> votes, int count = 3)
+            {
+                IEnumerable<IGrouping<VoteType, Vote>> top = this.GetTop(votes, vote => vote.Type, count);
+                return string.Join('\n', top.Select(value => $"{value.Key.GetText()}: {value.LongCount()} times"));
+            }
+
+            private string BuildLastVotesString(IEnumerable<Vote> votes, int count = 5)
+            {
+                IEnumerable<Vote> lastVotes = votes
+                    .OrderByDescending(vote => vote.Timestamp)
+                    .Take(count);
+                return string.Join('\n', lastVotes.Select(vote
+                        => $"{MentionUtils.MentionUser(vote.VoterID)} voted to {vote.Type.GetText()} {MentionUtils.MentionUser(vote.TargetID)} {TimestampTag.FromDateTimeOffset(vote.Timestamp, TimestampTagStyles.Relative)}"));
             }
 
             private string BuildCriteriaString(IUser target, IUser voter, VoteType? voteType)

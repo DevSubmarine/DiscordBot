@@ -2,7 +2,7 @@
 
 namespace DevSubmarine.DiscordBot.Voting
 {
-    public class Vote
+    public class Vote : IEquatable<Vote>
     {
         [BsonId]
         [JsonProperty("id")]
@@ -41,5 +41,25 @@ namespace DevSubmarine.DiscordBot.Voting
 
         public override string ToString()
             => this.ID.ToString();
+
+        public override bool Equals(object obj)
+            => Equals(obj as Vote);
+
+        public bool Equals(Vote other)
+            => other != null &&
+                   ID.Equals(other.ID) &&
+                   Type == other.Type &&
+                   VoterID == other.VoterID &&
+                   TargetID == other.TargetID &&
+                   Timestamp.Equals(other.Timestamp);
+
+        public override int GetHashCode()
+            => this.ID.GetHashCode();
+
+        public static bool operator ==(Vote left, Vote right)
+            => EqualityComparer<Vote>.Default.Equals(left, right);
+
+        public static bool operator !=(Vote left, Vote right)
+            => !(left == right);
     }
 }
