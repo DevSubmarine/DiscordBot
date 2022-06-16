@@ -17,7 +17,7 @@ namespace DevSubmarine.DiscordBot
         public static Task<RestUserMessage> ReplyAsync(this SocketCommandContext message, string text, CancellationToken cancellationToken)
             => ReplyAsync(message.Message, text, false, null, null, cancellationToken);
         public static Task<RestUserMessage> ReplyAsync(this SocketMessage message, string text, bool isTTS, Embed embed, AllowedMentions mentions, CancellationToken cancellationToken)
-            => ReplyAsync(message, text, isTTS, embed, mentions, cancellationToken.ToRequestOptions();
+            => ReplyAsync(message, text, isTTS, embed, mentions, cancellationToken.ToRequestOptions());
         public static Task<RestUserMessage> ReplyAsync(this SocketMessage message, string text, bool isTTS, Embed embed, CancellationToken cancellationToken)
             => ReplyAsync(message, text, isTTS, embed, null, cancellationToken.ToRequestOptions());
         public static Task<RestUserMessage> ReplyAsync(this SocketMessage message, string text, CancellationToken cancellationToken)
