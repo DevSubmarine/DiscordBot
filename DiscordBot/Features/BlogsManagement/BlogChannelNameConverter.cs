@@ -42,7 +42,8 @@
         private string Normalize(string value)
             => value
                 .ToLowerInvariant()
-                .Replace(" ", "-")
+                .Replace(' ', '-')
+                .Replace("'", "")
                 .Trim('-');
     }
 }
