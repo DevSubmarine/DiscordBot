@@ -188,10 +188,10 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (builder.Length > 0)
                         builder.Append('\n');
                     builder.AppendFormat("Top votes received:\n{0}", this.BuildTopVotersString(votesTarget));
-                    embed.AddField("As a Target", builder.ToString());
+                    embed.AddField("As a Survivor", builder.ToString());
                 }
                 else
-                    embed.AddField("As a Target", $"{user.Mention} hasn't been voted on yet? Huh?! {ResponseEmoji.FeelsBeanMan}");
+                    embed.AddField("As a Survivor", $"{user.Mention} hasn't been voted on yet? Huh?! {ResponseEmoji.FeelsBeanMan}");
 
 
                 if (votesAll.Any())
@@ -199,7 +199,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (voterAlignment != null)
                         embed.AddField("Voter Rep", VotingAlignment.FormatScore(voterAlignment.Score), inline: true);
                     if (targetAlignment != null)
-                        embed.AddField("Target Rep", VotingAlignment.FormatScore(targetAlignment.Score), inline: true);
+                        embed.AddField("Survivor Rep", VotingAlignment.FormatScore(targetAlignment.Score), inline: true);
                     totalAlignment = this._alignment.CalculateAlignment(votesAll);
                     embed.AddField("Alignment", totalAlignment.ToString(), inline: true);
                     embed.WithThumbnailUrl(totalAlignment.ImageURL);
