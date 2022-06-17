@@ -15,6 +15,9 @@ namespace DevSubmarine.DiscordBot
         [ThreadStatic]
         private static StringBuilder _builder;
 
+        /// <summary>Converts a timespan to user-friendly text.</summary>
+        /// <param name="timespan">Timespan to convert</param>
+        /// <returns>User-friendly text, with unnecessary parts ommited.</returns>
         public static string ToDisplayString(this TimeSpan timespan)
         {
             if (_components == null)

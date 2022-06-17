@@ -1,8 +1,8 @@
-﻿using Discord;
-using Discord.WebSocket;
+﻿using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <inheritdoc/>
     internal class BlogChannelActivator : IBlogChannelActivator
     {
         private readonly DiscordSocketClient _client;
@@ -18,9 +18,11 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             this._options = options;
         }
 
+        /// <inheritdoc/>
         public Task ActivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
             => this.MoveChannelAsync(channelID, this.Options.InactiveBlogsCategoryID, this.Options.ActiveBlogsCategoryID, cancellationToken);
 
+        /// <inheritdoc/>
         public Task DeactivateBlogChannel(ulong channelID, CancellationToken cancellationToken = default)
             => this.MoveChannelAsync(channelID, this.Options.ActiveBlogsCategoryID, this.Options.InactiveBlogsCategoryID, cancellationToken);
 

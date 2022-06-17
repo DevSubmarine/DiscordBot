@@ -1,7 +1,9 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting
 {
+    /// <summary>Voting result indicating a successful vote.</summary>
     internal class SuccessVotingResult : IVotingResult
     {
+        /// <summary>The vote that was created.</summary>
         public Vote CreatedVote { get; }
 
         /// <summary>Count of votes of same type as <see cref="CreatedVote"/> created by the same voter.</summary>

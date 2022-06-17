@@ -2,6 +2,7 @@
 
 namespace DevSubmarine.DiscordBot.Voting
 {
+    /// <summary>Represents a single vote.</summary>
     public class Vote : IEquatable<Vote>
     {
         [BsonId]

@@ -1,5 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting.Services
 {
+    /// <inheritdoc/>
     internal class VotingService : IVotingService
     {
         private readonly IVotesStore _store;
@@ -11,6 +12,7 @@
             this._cooldown = cooldown;
         }
 
+        /// <inheritdoc/>
         public async Task<IVotingResult> VoteAsync(Vote vote, CancellationToken cancellationToken = default)
         {
             if (vote == null)

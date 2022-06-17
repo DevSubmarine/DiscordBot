@@ -3,7 +3,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace DevSubmarine.DiscordBot.SubWords
 {
-    /// <summary>Represents Luke's misspelled word + metadata.</summary>
+    /// <summary>Represents a word invented by a dev sub member + metadata.</summary>
     public class SubWord : IEquatable<SubWord>, IEquatable<string>, ICacheable
     {
         [BsonId]

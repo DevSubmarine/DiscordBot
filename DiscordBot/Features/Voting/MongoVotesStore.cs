@@ -3,6 +3,7 @@ using MongoDB.Driver;
 
 namespace DevSubmarine.DiscordBot.Voting.Services
 {
+    /// <inheritdoc/>
     internal class MongoVotesStore : IVotesStore
     {
         private readonly ILogger _log;
@@ -14,6 +15,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             this._collection = client.GetCollection<Vote>(databaseOptions.Value.VotesCollectionName);
         }
 
+        /// <inheritdoc/>
         public Task AddVoteAsync(Vote vote, CancellationToken cancellationToken = default)
         {
             if (vote == null)
@@ -23,6 +25,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             return this._collection.InsertOneAsync(vote, null, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<Vote>> GetVotesAsync(ulong? targetID, ulong? voterID, VoteType? type, CancellationToken cancellationToken = default)
         {
             this._log.LogTrace("Getting votes from DB; filters: TargetID = {TargetID}, VoterID = {VoterID}, Type = {Type}", targetID, voterID, type);

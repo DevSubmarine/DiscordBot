@@ -3,6 +3,7 @@ using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <inheritdoc/>
     internal class BlogChannelManager : IBlogChannelManager
     {
         private readonly IBlogChannelSorter _sorter;
@@ -19,6 +20,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             this._options = options.CurrentValue;
         }
 
+        /// <inheritdoc/>
         public Task<IEnumerable<IGuildChannel>> GetBlogChannelsAsync(CancellationToken cancellationToken = default)
         {
             SocketGuild guild = this._client.GetGuild(this._options.GuildID);
@@ -31,6 +33,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             return Task.FromResult(channels);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<IGuildChannel>> FindUserBlogChannelsAsync(ulong userID, CancellationToken cancellationToken = default)
         {
             IEnumerable<IGuildChannel> channels = await this.GetBlogChannelsAsync(cancellationToken).ConfigureAwait(false);
@@ -55,6 +58,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             return results;
         }
 
+        /// <inheritdoc/>
         public async Task<IGuildChannel> CreateBlogChannel(string name, IEnumerable<ulong> userIDs, CancellationToken cancellationToken = default)
         {
             this._log.LogInformation("Creating blog channel {ChannelName} for user(s) {UserIDs}", name, string.Join(", ", userIDs));

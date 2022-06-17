@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <summary>Background service that periodically scans blog channels for last activity and activates or deactivates them.</summary>
     internal class BlogActivityScanner : IHostedService, IDisposable
     {
         private readonly DiscordSocketClient _client;

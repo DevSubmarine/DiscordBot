@@ -3,6 +3,7 @@ using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <inheritdoc/>
     internal class BlogChannelSorter : IBlogChannelSorter
     {
         private readonly ILogger _log;
@@ -15,6 +16,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         }
 
 #pragma warning disable CA2017 // Parameter count mismatch
+        /// <inheritdoc/>
         public Task SortChannelsAsync(SocketCategoryChannel category, CancellationToken cancellationToken = default)
         {
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()

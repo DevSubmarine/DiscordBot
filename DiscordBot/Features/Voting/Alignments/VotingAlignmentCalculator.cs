@@ -1,5 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting.Services
 {
+    /// <inheritdoc/>
     internal class VotingAlignmentCalculator : IVotingAlignmentCalculator
     {
         private readonly VotingOptions _options;
@@ -9,6 +10,7 @@
             this._options = options.CurrentValue;
         }
 
+        /// <inheritdoc/>
         public VotingAlignment GetAlignment(double score)
         {
             VotingAlignmentLevel level = this.GetLevelForScore(score);
@@ -16,6 +18,7 @@
             return new VotingAlignment(score, level, imageURL);
         }
 
+        /// <inheritdoc/>
         public VotingAlignment CalculateAlignment(double goodPoints, double badPoints)
         {
             double totalPoints = goodPoints + badPoints;

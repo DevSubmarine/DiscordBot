@@ -1,5 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <inheritdoc/>
     internal class BlogChannelNameConverter : IBlogChannelNameConverter
     {
         private static readonly Regex _validationRegex = new Regex(@"^[a-z0-9\-]{3,15}$", 
@@ -12,9 +13,11 @@
             this._options = options.CurrentValue;
         }
 
+        /// <inheritdoc/>
         public bool IsUsernameAllowed(string username)
             => this.IsUsernameAllowedInternal(this.Normalize(username));
 
+        /// <inheritdoc/>
         public string ConvertUsername(string username)
         {
             string normalizedUsername = this.Normalize(username);

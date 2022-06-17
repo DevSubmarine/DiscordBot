@@ -1,5 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting.Services
 {
+    /// <inheritdoc/>
     internal class VotingCooldownManager : IVotingCooldownManager
     {
         private readonly ILogger _log;
@@ -16,6 +17,7 @@
             this._lastVotes = new Dictionary<CooldownKey, DateTime>();
         }
 
+        /// <inheritdoc/>
         public void AddCooldown(ulong voterID, ulong targetID)
         {
             lock (this._lock)
@@ -28,6 +30,7 @@
             }
         }
 
+        /// <inheritdoc/>
         public bool IsReady(ulong voterID, ulong targetID, out TimeSpan cooldownRemaining)
         {
             lock (this._lock)

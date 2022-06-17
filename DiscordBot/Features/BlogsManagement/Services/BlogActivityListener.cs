@@ -5,6 +5,7 @@ using Microsoft.Extensions.Hosting;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
+    /// <summary>Background service that will activate inactive blog channels whenever a new message has been posted.</summary>
     internal class BlogActivityListener : IHostedService, IDisposable
     {
         private readonly DiscordSocketClient _client;

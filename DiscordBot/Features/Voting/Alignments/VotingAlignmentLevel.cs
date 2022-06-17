@@ -1,5 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting
 {
+    /// <summary>DnD-style alignment level.</summary>
     public enum VotingAlignmentLevel
     {
         ChaoticEvil,
