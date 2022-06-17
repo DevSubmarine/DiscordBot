@@ -161,7 +161,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
 
                     if (builder.Length > 0)
                         builder.Append('\n');
-                    builder.AppendFormat("Top votes made:\n{0}", this.BuildTopVotersString(votesVoter));
+                    builder.AppendFormat("Top votes made:\n{0}", this.BuildTopTargetsString(votesVoter));
                     embed.AddField("As a Voter", builder.ToString());
                 }
                 else
