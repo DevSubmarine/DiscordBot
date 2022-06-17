@@ -18,6 +18,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IVotesStore, MongoVotesStore>();
             services.TryAddSingleton<IVotingCooldownManager, VotingCooldownManager>();
             services.TryAddTransient<IVotingService, VotingService>();
+            services.TryAddTransient<IVotingAlignmentCalculator, VotingAlignmentCalculator>();
 
             return services;
         }

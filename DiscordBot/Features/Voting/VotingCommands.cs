@@ -98,10 +98,12 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         public class VotingStatisticsCommands : DevSubInteractionModule
         {
             private readonly IVotesStore _store;
+            private readonly IVotingAlignmentCalculator _alignment;
 
-            public VotingStatisticsCommands(IVotingService voting, IVotesStore store, ILogger<VotingCommands> log)
+            public VotingStatisticsCommands(IVotesStore store, IVotingAlignmentCalculator alignment)
             {
                 this._store = store;
+                this._alignment = alignment;
             }
 
             [SlashCommand("check", "Check voting statistics for specific user")]
@@ -126,12 +128,17 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     .WithColor(user.GetUserColour())
                     .WithAuthor(user);
 
+                VotingAlignment voterAlignment = null;
+                VotingAlignment targetAlignment = null;
+                VotingAlignment totalAlignment = null;
+
                 StringBuilder builder = new StringBuilder();
                 if (votesVoter.Any())
                 {
                     builder.Clear();
                     IEnumerable<Vote> votesMod = votesVoter.Where(vote => vote.Type == VoteType.Mod);
                     IEnumerable<Vote> votesKickOrBan = votesVoter.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+                    voterAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
 
                     if (votesMod.Any())
                     {
@@ -147,17 +154,17 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (builder.Length > 0)
                         builder.Append('\n');
                     builder.AppendFormat("Top votes made:\n{0}", this.BuildTopVotersString(votesVoter));
-                    embed.AddField("As a Voter", builder.ToString(), inline: true);
+                    embed.AddField("As a Voter", builder.ToString());
                 }
                 else
                     embed.AddField("As a Voter", $"{user.Mention} didn't vote for anyone yet... what a boomer. {ResponseEmoji.FeelsDumbMan}");
-
 
                 if (votesTarget.Any())
                 {
                     builder.Clear();
                     IEnumerable<Vote> votesMod = votesTarget.Where(vote => vote.Type == VoteType.Mod);
                     IEnumerable<Vote> votesKickOrBan = votesTarget.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+                    targetAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
 
                     if (votesMod.Any())
                     {
@@ -178,8 +185,19 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 else
                     embed.AddField("As a Target", $"{user.Mention} hasn't been voted on yet? Huh?! {ResponseEmoji.FeelsBeanMan}");
 
+
                 if (votesAll.Any())
-                    embed.AddField($"Last Votes", this.BuildLastVotesString(votesAll, 10));
+                {
+                    if (voterAlignment != null)
+                        embed.AddField("Voter Rep", VotingAlignment.FormatScore(voterAlignment.Score), inline: true);
+                    if (targetAlignment != null)
+                        embed.AddField("Target Rep", VotingAlignment.FormatScore(targetAlignment.Score), inline: true);
+                    totalAlignment = this._alignment.CalculateAlignment(votesAll);
+                    embed.AddField("Alignment", totalAlignment.ToString(), inline: true);
+                    embed.WithThumbnailUrl(totalAlignment.ImageURL);
+
+                    embed.AddField("Last Votes", this.BuildLastVotesString(votesAll, 10));
+                }
 
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
