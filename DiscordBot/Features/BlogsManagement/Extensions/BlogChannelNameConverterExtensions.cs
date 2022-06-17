@@ -1,6 +1,6 @@
 ﻿namespace DevSubmarine.DiscordBot.BlogsManagement
 {
-    internal static class BlogChannelNameConverterExtensions
+    public static class BlogChannelNameConverterExtensions
     {
         /// <summary>Attempts to convert given username to blog channel name.</summary>
         /// <param name="converter">The service instance.</param>

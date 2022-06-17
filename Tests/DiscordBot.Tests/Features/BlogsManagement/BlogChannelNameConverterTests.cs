@@ -37,6 +37,22 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
         }
 
         [Test]
+        [TestCase("username", "blog-username")]
+        [TestCase("two words", "blog-two-words")]
+        [TestCase("with-dash", "blog-with-dash")]
+        [TestCase("number123", "blog-number123")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void ValidUsername_IsAllowedAndConverts(string username, string expectedResult)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeTrue();
+            result.Should().Be(expectedResult);
+        }
+
+        [Test]
         [TestCase("user'name", "blog-username")]
         [Category(nameof(BlogChannelNameConverter.ConvertUsername))]
         public void ValidUsername_WithAposthrope_ShouldRemoveApostrophe(string username, string expectedResult)
@@ -45,6 +61,19 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
 
             string result = service.ConvertUsername(username);
 
+            result.Should().Be(expectedResult);
+        }
+
+        [Test]
+        [TestCase("user'name", "blog-username")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void ValidUsername_WithAposthrope_ShouldSucceedAndRemoveApostrophe(string username, string expectedResult)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeTrue();
             result.Should().Be(expectedResult);
         }
 
@@ -62,6 +91,20 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
         }
 
         [Test]
+        [TestCase("UPPERCASE", "blog-uppercase")]
+        [TestCase("MixEDcaSE", "blog-mixedcase")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void ValidUsername_WithUpperCaseCharacters_ShouldSucceedAndLowerCase(string username, string expectedResult)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeTrue();
+            result.Should().Be(expectedResult);
+        }
+
+        [Test]
         [TestCase("trailingdash-", "blog-trailingdash")]
         [TestCase("trailingspace ", "blog-trailingspace")]
         [TestCase("-leadingdash", "blog-leadingdash")]
@@ -73,6 +116,22 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
 
             string result = service.ConvertUsername(username);
 
+            result.Should().Be(expectedResult);
+        }
+
+        [Test]
+        [TestCase("trailingdash-", "blog-trailingdash")]
+        [TestCase("trailingspace ", "blog-trailingspace")]
+        [TestCase("-leadingdash", "blog-leadingdash")]
+        [TestCase(" leadingspace", "blog-leadingspace")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void ValidUsername_WithSpacesOrDashes_ShouldSucceedAndTrim(string username, string expectedResult)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeTrue();
             result.Should().Be(expectedResult);
         }
 
@@ -103,6 +162,19 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
         }
 
         [Test]
+        [TestCase("a")]
+        [TestCase("ab")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void InvalidUsername_TooShort_ShouldFail(string username)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeFalse();
+        }
+
+        [Test]
         [TestCase("qwertyuiopasdfghjk")]
         [Category(nameof(BlogChannelNameConverter.IsUsernameAllowed))]
         public void InvalidUsername_TooLong_IsNotAllowed(string username)
@@ -124,6 +196,18 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
             Action act = () => service.ConvertUsername(username);
 
             act.Should().Throw<ArgumentException>();
+        }
+
+        [Test]
+        [TestCase("qwertyuiopasdfghjk")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void InvalidUsername_TooLong_ShouldFail(string username)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeFalse();
         }
 
         [Test]
@@ -150,6 +234,19 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
             Action act = () => service.ConvertUsername(username);
 
             act.Should().Throw<ArgumentException>();
+        }
+
+        [Test]
+        [TestCase("blog-something")]
+        [TestCase("chat-something")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void InvalidUsername_StartsWithForbiddenWord_ShouldFail(string username)
+        {
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeFalse();
         }
 
         [Test]
@@ -186,6 +283,24 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
             Action act = () => service.ConvertUsername(username);
 
             act.Should().Throw<ArgumentException>();
+        }
+
+        [Test]
+        [TestCase("foobar")]
+        [TestCase("abcfoobarabc")]
+        [TestCase("abcfOOBarabc")]
+        [TestCase("abc-foobar-abc")]
+        [TestCase("abc-fOOBar-abc")]
+        [Category(nameof(BlogChannelNameConverterExtensions.TryConvertUsername))]
+        public void InvalidUsername_WithForbiddenWord_ShouldFail(string username)
+        {
+            base.Fixture.Freeze<IOptionsMonitor<BlogsManagementOptions>>().CurrentValue.Returns(
+                new BlogsManagementOptions() { ForbiddenChannelNameWords = new string[] { "foobar" } });
+            BlogChannelNameConverter service = base.Fixture.Create<BlogChannelNameConverter>();
+
+            bool success = service.TryConvertUsername(username, out string result);
+
+            success.Should().BeFalse();
         }
     }
 }
