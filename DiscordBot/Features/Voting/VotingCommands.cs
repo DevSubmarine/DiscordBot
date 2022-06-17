@@ -196,10 +196,13 @@ namespace DevSubmarine.DiscordBot.Voting.Services
 
                 if (votesAll.Any())
                 {
-                    if (voterAlignment != null)
-                        embed.AddField("Voter Rep", VotingAlignment.FormatScore(voterAlignment.Score), inline: true);
-                    if (targetAlignment != null)
-                        embed.AddField("Survivor Rep", VotingAlignment.FormatScore(targetAlignment.Score), inline: true);
+                    embed.AddField("Voter Rep",
+                        voterAlignment != null ? VotingAlignment.FormatScore(voterAlignment.Score) : "N/A",
+                        inline: true);
+                    embed.AddField("Survivor Rep",
+                        targetAlignment != null ? VotingAlignment.FormatScore(targetAlignment.Score) : "N/A", 
+                        inline: true);
+
                     totalAlignment = this._alignment.CalculateAlignment(votesAll);
                     embed.AddField("Alignment", totalAlignment.ToString(), inline: true);
                     embed.WithThumbnailUrl(totalAlignment.ImageURL);
