@@ -1,7 +1,7 @@
 ﻿namespace DevSubmarine.DiscordBot.Voting.Services
 {
     /// <inheritdoc/>
-    internal class VotingAlignmentCalculator : IVotingAlignmentCalculator
+    public class VotingAlignmentCalculator : IVotingAlignmentCalculator
     {
         private readonly VotingOptions _options;
 
