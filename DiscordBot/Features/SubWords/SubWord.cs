@@ -1,5 +1,4 @@
 ﻿using DevSubmarine.DiscordBot.Caching;
-using DevSubmarine.DiscordBot.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace DevSubmarine.DiscordBot.SubWords
@@ -13,6 +12,9 @@ namespace DevSubmarine.DiscordBot.SubWords
         [BsonElement("Word")]
         [JsonProperty("word")]
         public string Word { get; }
+        [BsonElement("Description")]
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
+        public string Description { get; set; }
         [BsonElement("Author")]
         [JsonProperty("author")]
         public ulong AuthorID { get; }

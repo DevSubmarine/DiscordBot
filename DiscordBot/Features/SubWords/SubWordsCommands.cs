@@ -16,11 +16,13 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         [SlashCommand("add", "Adds a new word to DevSub Dictionary")]
         public async Task CmdAddAsync(
             [Summary("User", "User that said the silly word")] IUser user,
-            [Summary("Word", "The word that they said")] string word)
+            [Summary("Word", "The word that they said")] string word,
+            [Summary("Description", "Optional description of the word - for context, meaning or whatever")] string description = null)
         {
             SubWord result = new SubWord(word, user.Id, base.Context.User.Id);
             result.ChannelID = base.Context.Channel?.Id;
             result.GuildID = base.Context.Guild?.Id;
+            result.Description = description;
             result = await this._subwords.AddOrGetWordAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
 
             Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false); 
@@ -115,6 +117,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
 
             EmbedBuilder result = new EmbedBuilder()
                 .WithTitle(word.ToString())
+                .WithDescription(word.Description)
                 .AddField("Word By", $"{authorName}", true)
                 .AddField("Added By", addedByName, true)
                 .WithThumbnailUrl(authorAvatarUrl)
