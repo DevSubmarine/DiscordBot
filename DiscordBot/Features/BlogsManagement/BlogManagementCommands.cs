@@ -99,9 +99,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                         .Build();
                 }, base.GetRequestOptions());
             }
-            catch (HttpException ex) when (
-                (ex.DiscordCode == DiscordErrorCode.MissingPermissions || ex.DiscordCode == DiscordErrorCode.InsufficientPermissions)
-                && ex.LogAsError(this._log, "Exception when creating blog channel"))
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Exception when creating blog channel"))
             {
                 await base.ModifyOriginalResponseAsync(msg => msg.Content = $"Oops! {ResponseEmoji.Failure}\nI lack permissions to create a channel! {ResponseEmoji.FeelsBeanMan}",
                     base.GetRequestOptions()).ConfigureAwait(false);

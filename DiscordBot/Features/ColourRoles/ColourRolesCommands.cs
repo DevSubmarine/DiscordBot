@@ -69,7 +69,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
                     await user.AddRoleAsync(role, base.GetRequestOptions()).ConfigureAwait(false);
                 }
             }
-            catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions)
+            catch (HttpException ex) when (ex.IsMissingPermissions())
             {
                     await base.ModifyOriginalResponseAsync(msg => msg.Content = $"Oops! {ResponseEmoji.Failure}\nI lack permissions to change your role! {ResponseEmoji.FeelsBeanMan}",
                         base.GetRequestOptions()).ConfigureAwait(false);
@@ -134,7 +134,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
             {
                 await this.RemoveColourRolesAsync(user).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.DiscordCode == DiscordErrorCode.MissingPermissions)
+            catch (HttpException ex) when (ex.IsMissingPermissions())
             {
                 await base.ModifyOriginalResponseAsync(msg => msg.Content = $"Oops! {ResponseEmoji.Failure}\nI lack permissions to change your role! {ResponseEmoji.FeelsBeanMan}",
                     base.GetRequestOptions()).ConfigureAwait(false);

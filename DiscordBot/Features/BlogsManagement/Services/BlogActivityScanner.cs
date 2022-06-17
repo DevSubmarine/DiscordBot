@@ -75,9 +75,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 {
                     await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
                 }
-                catch (HttpException ex)
-                    when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                        && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
+                catch (HttpException ex) when (ex.IsMissingPermissions() &&
+                        ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
                 catch (Exception ex)
                     when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})")) { }
             }
@@ -105,9 +104,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                     .ConfigureAwait(false))
                     .FirstOrDefault();
             }
-            catch (HttpException ex) 
-                when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelID}) due to missing permissions")) { return false; }
+            catch (HttpException ex) when (ex.IsMissingPermissions() &&
+                    ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelID}) due to missing permissions")) { return false; }
             catch (Exception ex)
                 when (ex.LogAsError(this._log, "Failed reading messages from channel {ChannelName} ({ChannelID})")) { return false; }
 
@@ -132,9 +130,8 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 else
                     this._log.LogTrace("Channel {ChannelName} ({ChannelID}) requires no changes");
             }
-            catch (HttpException ex)
-                when (ex.DiscordCode == DiscordErrorCode.MissingPermissions
-                    && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions")) { }
+            catch (HttpException ex) when (ex.IsMissingPermissions() &&
+                    ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions")) { }
             catch (Exception ex)
                 when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelID})")) { }
 
