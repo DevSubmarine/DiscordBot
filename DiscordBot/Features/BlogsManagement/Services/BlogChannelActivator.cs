@@ -1,17 +1,18 @@
-﻿using Discord.WebSocket;
+﻿using Discord;
+using Discord.WebSocket;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
     /// <inheritdoc/>
-    internal class BlogChannelActivator : IBlogChannelActivator
+    public class BlogChannelActivator : IBlogChannelActivator
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IDiscordClient _client;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogChannelActivator(DiscordSocketClient client, ILogger<BlogChannelActivator> log, IOptionsMonitor<BlogsManagementOptions> options)
+        public BlogChannelActivator(IDiscordClient client, ILogger<BlogChannelActivator> log, IOptionsMonitor<BlogsManagementOptions> options)
         {
             this._client = client;
             this._log = log;
@@ -32,10 +33,11 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             if (channelID == default)
                 throw new ArgumentException($"{channelID} is not a valid channel ID", nameof(channelID));
 
-            SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
-            SocketTextChannel channel = guild.GetTextChannel(channelID);
-            SocketCategoryChannel sourceCategory = guild.GetCategoryChannel(targetCategoryID);
-            SocketCategoryChannel targetCategory = guild.GetCategoryChannel(targetCategoryID);
+            IGuild guild = await this._client.GetGuildAsync(this.Options.GuildID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions());
+            ITextChannel channel = await guild.GetTextChannelAsync(channelID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+            IEnumerable<ICategoryChannel> categories = await guild.GetCategoriesAsync(CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+            ICategoryChannel sourceCategory = categories.First(cat => cat.Id == sourceCategoryID);
+            ICategoryChannel targetCategory = categories.First(cat => cat.Id == targetCategoryID);
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
             {
                 { "GuildID", guild.Id },
