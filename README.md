@@ -8,6 +8,28 @@ To create the bot, go to [Discord Developer Portal](https://discord.com/develope
 
 To add the bot to the guild (server), go to `OAuth2` tab, and create a new link. Make sure to select both `bot` and `applications.commands` scopes.
 
+#### Intents
+Discord requires opt-in intents which can be enabled under `Bot` tab. Currently required intents:
+
+- Message Content Intent - required for automatic blog channels management.
+
+The bot can still run without required intents, but some of its features might not work correctly, or not work at all.
+
+#### Permissions
+Bot's role should be above any colour roles specified in [Colour Roles Feature](#changing-colour-roles).
+
+It is recommended that bot has an admin role. This makes setup painless.  
+If for some reason admin role for bot is not desirable, the minimum required permissions are:
+- Embed Links - for most features.
+- Manage Roles - for colour roles feature.
+- View Channels - for blog management feature (scanning and sorting channels).
+- View Message History - for blog management feature (scanning and sorting channels).
+- Manage Channels - for blog management feature (creating and sorting channels).
+- Manage Webhooks - for blog management feature (creating channels with webhook permission for channel owners).
+- Manage Messages - for blog management feature (creating channels with managing messages permission for channel owners).
+
+However this permission list might not be exhaustive - I gave up testing and simply gave the bot admin role, it's easier, trust me.
+
 ## Running
 Pre-requirements: 
 - [.NET 6](https://dotnet.microsoft.com/download/dotnet/6.0).
@@ -65,6 +87,12 @@ Of course you have to replace `<KEY>` with your DataDog API key. Also double che
 ## Planned Features
 - Blog channels management
 - Whatever else we neeed
+
+## Contributing
+Feel free to open a PR or submit an issue to contribute.
+
+Note that the bot has a set of unit tests, which need to pass in order to merge the PR. Run the unit tests before submitting the PR, pretty please.  
+The test coverage isn't full. Test are added when I feel like it. But hopefully coverage will grow over time.
 
 ## License
 Copyright (c) 2022 [DevSubmarine](https://github.com/DevSubmarine) & [TehGM](https://github.com/TehGM)
