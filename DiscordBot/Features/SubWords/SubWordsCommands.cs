@@ -16,11 +16,13 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         [SlashCommand("add", "Adds a new word to DevSub Dictionary")]
         public async Task CmdAddAsync(
             [Summary("User", "User that said the silly word")] IUser user,
-            [Summary("Word", "The word that they said")] string word)
+            [Summary("Word", "The word that they said")] string word,
+            [Summary("Description", "Optional description of the word - for context, meaning or whatever")] string description = null)
         {
             SubWord result = new SubWord(word, user.Id, base.Context.User.Id);
             result.ChannelID = base.Context.Channel?.Id;
             result.GuildID = base.Context.Guild?.Id;
+            result.Description = description;
             result = await this._subwords.AddOrGetWordAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
 
             Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false); 
@@ -78,7 +80,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         public async Task CmdListAsync(
             [Summary("User", "User that said the silly word")] IUser user)
         {
-            await base.DeferAsync(options: new RequestOptions() { CancelToken = base.Context.CancellationToken }).ConfigureAwait(false);
+            await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
             try
             {
                 string result = await this._subwords.UploadWordsListAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
@@ -108,17 +110,19 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             if (word == null)
                 throw new ArgumentNullException(nameof(word));
 
-            IUser author = await base.Context.Client.GetUserAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
+            IGuildUser author = base.Context.Guild.GetUser(word.AuthorID);
             string authorName = await this.GetUserNameAsync(author.Id, cancellationToken).ConfigureAwait(false);
             string addedByName = await this.GetUserNameAsync(word.AddedByUserID, cancellationToken).ConfigureAwait(false);
             string authorAvatarUrl = author.GetMaxAvatarUrl();
 
             EmbedBuilder result = new EmbedBuilder()
                 .WithTitle(word.ToString())
+                .WithDescription(word.Description)
                 .AddField("Word By", $"{authorName}", true)
                 .AddField("Added By", addedByName, true)
                 .WithThumbnailUrl(authorAvatarUrl)
                 .WithTimestamp(word.CreationTimeUTC)
+                .WithColor(author.GetUserColour())
                 .WithFooter($"This amazing word was invented by {author.GetUsernameWithDiscriminator()}", authorAvatarUrl);
             if (word.GuildID != null && word.ChannelID != null && word.MessageID != null)
                 result.WithUrl($"https://discord.com/channels/{word.GuildID}/{word.ChannelID}/{word.MessageID}");

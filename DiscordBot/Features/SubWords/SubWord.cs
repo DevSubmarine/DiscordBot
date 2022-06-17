@@ -1,10 +1,9 @@
 ﻿using DevSubmarine.DiscordBot.Caching;
-using DevSubmarine.DiscordBot.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace DevSubmarine.DiscordBot.SubWords
 {
-    /// <summary>Represents Luke's misspelled word + metadata.</summary>
+    /// <summary>Represents a word invented by a dev sub member + metadata.</summary>
     public class SubWord : IEquatable<SubWord>, IEquatable<string>, ICacheable
     {
         [BsonId]
@@ -13,6 +12,9 @@ namespace DevSubmarine.DiscordBot.SubWords
         [BsonElement("Word")]
         [JsonProperty("word")]
         public string Word { get; }
+        [BsonElement("Description")]
+        [JsonProperty("description", NullValueHandling = NullValueHandling.Ignore)]
+        public string Description { get; set; }
         [BsonElement("Author")]
         [JsonProperty("author")]
         public ulong AuthorID { get; }
@@ -21,7 +23,6 @@ namespace DevSubmarine.DiscordBot.SubWords
         public ulong AddedByUserID { get; }
         [BsonElement("CreationTime")]
         [JsonProperty("creationTime")]
-        [JsonConverter(typeof(UnixTimestampConverter))]
         public DateTime CreationTimeUTC { get; }
 
         // additional metadata, in case needed in future?

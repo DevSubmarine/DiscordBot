@@ -13,7 +13,7 @@ namespace DevSubmarine.DiscordBot
             => this.RespondAsync(null, embed, cancellationToken);
 
         protected RequestOptions GetRequestOptions(CancellationToken cancellationToken)
-            => new RequestOptions() { CancelToken = cancellationToken };
+            => cancellationToken.ToRequestOptions();
     }
 
     public class DevSubInteractionModule : DevSubInteractionModule<DevSubInteractionContext>

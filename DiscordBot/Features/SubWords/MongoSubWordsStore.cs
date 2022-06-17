@@ -4,6 +4,7 @@ using MongoDB.Driver.Linq;
 
 namespace DevSubmarine.DiscordBot.SubWords.Services
 {
+    /// <inheritdoc/>
     public class MongoSubWordsStore : ISubWordsStore
     {
         private readonly ILogger _log;
@@ -15,6 +16,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             this._collection = client.GetCollection<SubWord>(databaseOptions.Value.SubWordsCollectionName);
         }
 
+        /// <inheritdoc/>
         public async Task AddWordAsync(SubWord word, CancellationToken cancellationToken = default)
         {
             if (word == null)
@@ -24,6 +26,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             await this._collection.InsertOneAsync(word, null, cancellationToken).ConfigureAwait(false);
         }
 
+        /// <inheritdoc/>
         public async Task<SubWord> GetWordAsync(string word, ulong authorID, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(word))
@@ -34,6 +37,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             return await this._collection.Find(db => db.Word == wordLowercase && db.AuthorID == authorID).FirstOrDefaultAsync(cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<IEnumerable<SubWord>> GetAllWordsAsync(ulong? authorID, CancellationToken cancellationToken = default)
         {
             this._log.LogTrace("Bulk retrieving DevSub words from DB");
@@ -44,6 +48,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             return await words.ToListAsync(cancellationToken).ConfigureAwait(false);    // ToList because ToEnumerable complains when iterated more than once
         }
 
+        /// <inheritdoc/>
         public Task<SubWord> GetRandomWordAsync(ulong? authorID, CancellationToken cancellationToken = default)
         {
             this._log.LogTrace("Retrieving document sample from DB");
@@ -53,6 +58,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             return query.Sample(1).FirstOrDefaultAsync(cancellationToken);
         }
 
+        /// <inheritdoc/>
         public Task<long> GetWordsCountAsync(ulong? authorID, CancellationToken cancellationToken = default)
         {
             this._log.LogTrace("Counting documents in DB");

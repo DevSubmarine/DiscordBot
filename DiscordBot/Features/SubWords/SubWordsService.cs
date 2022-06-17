@@ -6,6 +6,7 @@ using System.Net.Http;
 
 namespace DevSubmarine.DiscordBot.SubWords.Services
 {
+    /// <inheritdoc/>
     internal class SubWordsService : ISubWordsService
     {
         private readonly ISubWordsStore _store;
@@ -26,6 +27,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             this._log = log;
         }
 
+        /// <inheritdoc/>
         public async Task<SubWord> GetSubWordAsync(string word, ulong authorID, CancellationToken cancellationToken = default)
         {
             word = SubWord.Trim(word);
@@ -47,6 +49,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             return result;
         }
 
+        /// <inheritdoc/>
         public async Task<SubWord> AddOrGetWordAsync(SubWord word, CancellationToken cancellationToken = default)
         {
             SubWord result = await this.GetSubWordAsync(word.Word, word.AuthorID, cancellationToken).ConfigureAwait(false);
@@ -59,12 +62,14 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             return word;
         }
 
+        /// <inheritdoc/>
         public Task<SubWord> GetRandomWordAsync(ulong? authorID, CancellationToken cancellationToken = default)
         {
             this._log.LogDebug("Retrieving random SubWord; Author ID = {AuthorID}", authorID?.ToString() ?? "null");
             return this._store.GetRandomWordAsync(authorID, cancellationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<string> UploadWordsListAsync(ulong authorID, CancellationToken cancellationToken = default)
         {
             if (authorID <= 0)

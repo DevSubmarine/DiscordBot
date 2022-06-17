@@ -68,6 +68,7 @@ namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper
 
             // COLLECTION CREATORS
             services.AddCollectionCreator<SubWordsCollectionCreator>();
+            services.AddCollectionCreator<VotesCollectionCreator>();
 
             return services;
         }

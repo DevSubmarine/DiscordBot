@@ -10,10 +10,9 @@ namespace DevSubmarine.DiscordBot
 
         public static async Task<IUser> GetUserAsync(this DiscordSocketClient client, ulong id, CacheMode mode, CancellationToken cancellationToken = default)
         {
-            RequestOptions requestOptions = new RequestOptions() { CancelToken = cancellationToken };
-            IUser user = await client.GetUserAsync(id, requestOptions);
+            IUser user = await client.GetUserAsync(id, cancellationToken.ToRequestOptions());
             if (user == null && mode == CacheMode.AllowDownload)
-                return await client.Rest.GetUserAsync(id, requestOptions);
+                return await client.Rest.GetUserAsync(id, cancellationToken.ToRequestOptions());
             return user;
         }
     }

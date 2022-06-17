@@ -50,6 +50,7 @@ namespace DevSubmarine.DiscordBot.Database.Services
             // custom conventions
             conventions.Add(new MapReadOnlyPropertiesConvention());
             conventions.Add(new GuidAsStandardRepresentationConvention());
+            conventions.Add(new EnumRepresentationConvention(BsonType.String));
             ConventionRegistry.Register(packName, conventions, _ => true);
 
             // guid serialization

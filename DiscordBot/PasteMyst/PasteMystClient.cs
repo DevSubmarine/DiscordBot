@@ -3,6 +3,7 @@ using System.Text;
 
 namespace DevSubmarine.DiscordBot.PasteMyst.Services
 {
+    /// <inheritdoc/>
     public class PasteMystClient : IPasteMystClient
     {
         private readonly HttpClient _client;
@@ -18,6 +19,7 @@ namespace DevSubmarine.DiscordBot.PasteMyst.Services
                 this._client.DefaultRequestHeaders.Add("Authorization", options.CurrentValue.AuthorizationToken);
         }
 
+        /// <inheritdoc/>
         public async Task<Paste> CreatePasteAsync(Paste paste, CancellationToken cancellationToken = default)
         {
             if (paste == null)
