@@ -20,5 +20,7 @@
         public static string BlobHearts => "<a:blobhearts:526810634650779688>";
         public static string Reeeeee => "<:reeeeee:741760373274837042>";
         public static string BlobHug => "<:blobHug:776368699216494631>";
+        public static string Zoop => "<:zoop:816001754125566003>";
+        public static string PandaSip => "<:pandSip:844291740441509909>";
     }
 }
