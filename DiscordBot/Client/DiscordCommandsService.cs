@@ -1,4 +1,5 @@
 ﻿using Discord.Interactions;
+using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
 
@@ -69,7 +70,23 @@ namespace DevSubmarine.DiscordBot.Client
         {
             DevSubInteractionContext ctx = new DevSubInteractionContext(this._client, interaction, this._cts.Token);
             using IDisposable logScope = this._log.BeginCommandScope(ctx, null, null);
-            await this._interactions.ExecuteCommandAsync(ctx, this._services);
+            try
+            {
+                await this._interactions.ExecuteCommandAsync(ctx, this._services);
+            }
+            catch (HttpException ex) when (ex.IsMissingPermissions())
+            {
+                try
+                {
+                    await interaction.RespondAsync(
+                        text: $"{ResponseEmoji.Failure} Bot missing permissions. Please contact guild admin.",
+                        ephemeral: true,
+                        options: ctx.CancellationToken.ToRequestOptions())
+                        .ConfigureAwait(false);
+                }
+                catch { }
+                throw;
+            }
         }
 
         private Task OnLog(Discord.LogMessage logMessage)
