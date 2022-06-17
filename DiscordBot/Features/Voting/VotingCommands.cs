@@ -62,6 +62,14 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         {
             Vote vote = new Vote(VoteType.Mod, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
 
+            if (vote.VoterID == vote.TargetID)
+            {
+                await base.RespondAsync(
+                    text: $"You cannot vote to mod yourself, dumbo. {ResponseEmoji.FeelsDumbMan}",
+                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                return;
+            }
+
             IVotingResult result = await this._voting.VoteAsync(vote, base.Context.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
