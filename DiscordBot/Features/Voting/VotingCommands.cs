@@ -8,14 +8,10 @@ namespace DevSubmarine.DiscordBot.Voting.Services
     public class VotingCommands : DevSubInteractionModule
     {
         private readonly IVotingService _voting;
-        private readonly IVotesStore _store;
-        private readonly ILogger _log;
 
-        public VotingCommands(IVotingService voting, IVotesStore store, ILogger<VotingCommands> log)
+        public VotingCommands(IVotingService voting)
         {
             this._voting = voting;
-            this._store = store;
-            this._log = log;
         }
 
         [SlashCommand("kick", "Vote to kick someone")]
