@@ -36,11 +36,11 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 ? Builders<Vote>.Filter.Empty
                 : Builders<Vote>.Filter.Eq(db => db.Type, type.Value);
 
-            using IAsyncCursor<Vote> words =
+            using IAsyncCursor<Vote> results =
                 await this._collection
                 .Find(Builders<Vote>.Filter.And(targetFilter, voterFilter, typeFilter))
                 .ToCursorAsync(cancellationToken).ConfigureAwait(false);
-            return await words.ToListAsync(cancellationToken).ConfigureAwait(false);
+            return await results.ToListAsync(cancellationToken).ConfigureAwait(false);
         }
     }
 }
