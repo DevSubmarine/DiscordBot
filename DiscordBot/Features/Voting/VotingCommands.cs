@@ -90,8 +90,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
 
         private Embed BuildResultEmbed(SuccessVotingResult vote, IGuildUser target)
         {
+            string targetName = target.Nickname ?? target.Username;
             return new EmbedBuilder()
-                .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {target.Nickname}")
+                .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {targetName}")
                 .WithThumbnailUrl(target.GetSafeAvatarUrl())
                 .WithAuthor(base.Context.User)
                 .AddField($"Votes by {base.Context.User.Username}", vote.VotesAgainstTarget.ToString())
