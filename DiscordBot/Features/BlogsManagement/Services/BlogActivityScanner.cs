@@ -46,14 +46,25 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 });
 
                 this._log.LogInformation("Scanning guild {GuildName} ({GuildID}) blog channels");
-                await this.ScanCategoryAsync(guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID), cancellationToken).ConfigureAwait(false);
-                await this.ScanCategoryAsync(guild.GetCategoryChannel(this.Options.InactiveBlogsCategoryID), cancellationToken).ConfigureAwait(false);
+                SocketCategoryChannel activeCategory = guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
+                SocketCategoryChannel inactiveCategory = guild.GetCategoryChannel(this.Options.InactiveBlogsCategoryID);
+                bool anyActiveMoved = await this.ScanCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
+                bool anyInactiveMoved = await this.ScanCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
+
+                if (anyActiveMoved)
+                    await this.SortCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
+                if (anyInactiveMoved)
+                    await this.SortCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
 
                 await Task.Delay(this.Options.ActivityScanningRate, cancellationToken).ConfigureAwait(false);
             }
         }
 
-        private async Task ScanCategoryAsync(SocketCategoryChannel category, CancellationToken cancellationToken)
+        /// <summary>Scans category, automatically moving channels as needed.</summary>
+        /// <param name="category">Category to scan.</param>
+        /// <param name="cancellationToken">Token to cancel operation.</param>
+        /// <returns>Whether any channel has been moved.</returns>
+        private async Task<bool> ScanCategoryAsync(SocketCategoryChannel category, CancellationToken cancellationToken)
         {
             using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>() 
             { 
@@ -65,21 +76,25 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 .Where(c => c is SocketTextChannel)
                 .Cast<SocketTextChannel>();
 
-            bool needsSorting = false;
+            bool anyMoved = false;
             foreach (SocketTextChannel channel in channels)
-                needsSorting |= await this.ScanChannelAsync(channel, cancellationToken).ConfigureAwait(false);
+                anyMoved |= await this.ScanChannelAsync(channel, cancellationToken).ConfigureAwait(false);
 
-            if (needsSorting)
+            return anyMoved;
+        }
+
+        private async Task SortCategoryAsync(SocketCategoryChannel category, CancellationToken cancellationToken)
+        {
+            try
             {
-                try
-                {
-                    await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
-                }
-                catch (HttpException ex) when (ex.IsMissingPermissions() &&
-                        ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
-                catch (Exception ex)
-                    when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})")) { }
+                await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
             }
+            catch (HttpException ex) when (ex.IsMissingPermissions() &&
+                    ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions"))
+            { }
+            catch (Exception ex)
+                when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})"))
+            { }
         }
 
         private async Task<bool> ScanChannelAsync(SocketTextChannel channel, CancellationToken cancellationToken)
@@ -137,6 +152,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
             return false;
         }
+
 #pragma warning restore CA2017 // Parameter count mismatch
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
