@@ -14,6 +14,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         }
 
         [SlashCommand("add", "Adds a new word to DevSub Dictionary")]
+        [EnabledInDm(false)]
         public async Task CmdAddAsync(
             [Summary("User", "User that said the silly word")] IUser user,
             [Summary("Word", "The word that they said")] string word,

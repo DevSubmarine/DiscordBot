@@ -5,6 +5,7 @@ using Discord.Net;
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
     [Group("blog", "Commands for managing blog channels")]
+    [EnabledInDm(false)]
     public class BlogManagementCommands : DevSubInteractionModule
     {
         private readonly IBlogChannelManager _manager;

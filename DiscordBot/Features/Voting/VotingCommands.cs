@@ -15,6 +15,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         }
 
         [SlashCommand("kick", "Vote to kick someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteKickAsync(
             [Summary("User", "User to vote kick")] IGuildUser user)
         {
@@ -34,6 +35,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         }
 
         [SlashCommand("ban", "Vote to ban someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteBanAsync(
             [Summary("User", "User to vote ban")] IGuildUser user)
         {
@@ -53,6 +55,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         }
 
         [SlashCommand("mod", "Vote to mod someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteModAsync(
             [Summary("User", "User to vote mod")] IGuildUser user)
         {
