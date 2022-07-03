@@ -172,7 +172,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (votesKickOrBan.Any())
                     {
                         IGrouping<ulong, Vote> topTarget = this.GetTop(votesKickOrBan, vote => vote.TargetID, 1).First();
-                        builder.Append($"*{user.Mention} is on a crusade against {MentionUtils.MentionUser(topTarget.Key)} - `{topTarget.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.JerryWhat}*\n");
+                        builder.Append($"*{user.Mention} is on a crusade against {MentionUtils.MentionUser(topTarget.Key)} - `{topTarget.LongCount()}` votes for {VoteType.Kick.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.JerryWhat}*\n");
                     }
 
                     if (builder.Length > 0)
@@ -198,7 +198,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (votesKickOrBan.Any())
                     {
                         IGrouping<ulong, Vote> topVoter = this.GetTop(votesKickOrBan, vote => vote.VoterID, 1).First();
-                        builder.Append($"*{MentionUtils.MentionUser(topVoter.Key)} is harassing {user.Mention} - `{topVoter.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.Reeeeee}*\n");
+                        builder.Append($"*{MentionUtils.MentionUser(topVoter.Key)} is harassing {user.Mention} - `{topVoter.LongCount()}` votes for {VoteType.Kick.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.Reeeeee}*\n");
                     }
 
                     if (builder.Length > 0)
