@@ -6,6 +6,7 @@ using Discord.WebSocket;
 namespace DevSubmarine.DiscordBot.ColourRoles
 {
     [Group("colour", "Commands for changing your nickname colour")]
+    [EnabledInDm(false)]
     public class ColourRolesCommands : DevSubInteractionModule
     {
         private readonly IOptionsMonitor<ColourRolesOptions> _options;

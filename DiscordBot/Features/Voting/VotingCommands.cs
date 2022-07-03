@@ -15,6 +15,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         }
 
         [SlashCommand("kick", "Vote to kick someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteKickAsync(
             [Summary("User", "User to vote kick")] IGuildUser user)
         {
@@ -29,11 +30,13 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
         [SlashCommand("ban", "Vote to ban someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteBanAsync(
             [Summary("User", "User to vote ban")] IGuildUser user)
         {
@@ -48,11 +51,13 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
         [SlashCommand("mod", "Vote to mod someone")]
+        [EnabledInDm(false)]
         public async Task CmdVoteModAsync(
             [Summary("User", "User to vote mod")] IGuildUser user)
         {
@@ -75,7 +80,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
@@ -87,15 +93,35 @@ namespace DevSubmarine.DiscordBot.Voting.Services
 
         private Embed BuildResultEmbed(SuccessVotingResult vote, IGuildUser target)
         {
+            string voterName = base.Context.Guild.GetUser(base.Context.User.Id)?.Nickname ?? base.Context.User.Username;
+            string targetName = target.Nickname ?? target.Username;
             return new EmbedBuilder()
-                .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {target.Nickname}")
+                .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {targetName}")
                 .WithThumbnailUrl(target.GetSafeAvatarUrl())
-                .WithAuthor(base.Context.User)
-                .AddField($"Votes by {base.Context.User.Username}", vote.VotesAgainstTarget.ToString())
                 .AddField($"Total votes", vote.TotalVotesAgainstTarget.ToString())
                 .WithTimestamp(vote.CreatedVote.Timestamp)
+                .WithFooter($"By {voterName} for the {this.FormatOrdinal(vote.VotesAgainstTarget)} time", base.Context.User.GetSafeAvatarUrl())
                 .WithColor(target.GetUserColour())
                 .Build();
+        }
+
+        private AllowedMentions GetMentionOptions()
+            => AllowedMentions.None;
+
+        private string FormatOrdinal(ulong number)
+        {
+            ulong remainder = number % 100;
+            if (remainder != 11 && remainder != 12 && remainder != 13)
+            {
+                remainder = number % 10;
+                if (remainder == 1)
+                    return $"{number}st";
+                if (remainder == 2)
+                    return $"{number}nd";
+                if (remainder == 3)
+                    return $"{number}rd";
+            }
+            return $"{number}th";
         }
 
         [Group("statistics", "Check various voting statistics")]
@@ -152,7 +178,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (votesKickOrBan.Any())
                     {
                         IGrouping<ulong, Vote> topTarget = this.GetTop(votesKickOrBan, vote => vote.TargetID, 1).First();
-                        builder.Append($"*{user.Mention} is on a crusade against {MentionUtils.MentionUser(topTarget.Key)} - `{topTarget.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.JerryWhat}*\n");
+                        builder.Append($"*{user.Mention} is on a crusade against {MentionUtils.MentionUser(topTarget.Key)} - `{topTarget.LongCount()}` votes for {VoteType.Kick.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.JerryWhat}*\n");
                     }
 
                     if (builder.Length > 0)
@@ -178,7 +204,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (votesKickOrBan.Any())
                     {
                         IGrouping<ulong, Vote> topVoter = this.GetTop(votesKickOrBan, vote => vote.VoterID, 1).First();
-                        builder.Append($"*{MentionUtils.MentionUser(topVoter.Key)} is harassing {user.Mention} - `{topVoter.LongCount()}` votes for {VoteType.Mod.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.Reeeeee}*\n");
+                        builder.Append($"*{MentionUtils.MentionUser(topVoter.Key)} is harassing {user.Mention} - `{topVoter.LongCount()}` votes for {VoteType.Kick.GetText()} or {VoteType.Ban.GetText()}. {ResponseEmoji.Reeeeee}*\n");
                     }
 
                     if (builder.Length > 0)

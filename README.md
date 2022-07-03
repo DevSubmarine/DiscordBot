@@ -85,8 +85,7 @@ The bot is set up to support logging to DataDog without any further code changes
 Of course you have to replace `<KEY>` with your DataDog API key. Also double check if you don't accidentally push it to GitHub. `appsecrets.json` or `appsecrets.Development.json` should be both git-ignored, but better safe than sorry.
 
 ## Planned Features
-- Blog channels management
-- Whatever else we neeed
+- Whatever we neeed
 
 ## Contributing
 Feel free to open a PR or submit an issue to contribute.
