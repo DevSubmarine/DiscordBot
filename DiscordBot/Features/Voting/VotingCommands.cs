@@ -30,7 +30,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
@@ -50,7 +51,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
@@ -78,7 +80,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}",
                     embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions(),
+                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
             }
         }
 
@@ -101,6 +104,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 .WithColor(target.GetUserColour())
                 .Build();
         }
+
+        private AllowedMentions GetMentionOptions()
+            => AllowedMentions.None;
 
         private string FormatOrdinal(ulong number)
         {
