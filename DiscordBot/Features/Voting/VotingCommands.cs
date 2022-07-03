@@ -96,8 +96,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {targetName}")
                 .WithThumbnailUrl(target.GetSafeAvatarUrl())
                 .WithAuthor(base.Context.User)
-                .AddField($"Total votes by {voterName}", vote.VotesAgainstTarget.ToString())
                 .AddField($"Total votes", vote.TotalVotesAgainstTarget.ToString())
+                .AddField($"Total votes by {voterName}", vote.VotesAgainstTarget.ToString())
                 .WithTimestamp(vote.CreatedVote.Timestamp)
                 .WithColor(target.GetUserColour())
                 .Build();
