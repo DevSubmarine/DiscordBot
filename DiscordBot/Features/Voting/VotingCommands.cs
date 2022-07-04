@@ -5,6 +5,7 @@ using System.Text;
 namespace DevSubmarine.DiscordBot.Voting.Services
 {
     [Group("vote", "Vote to kick others... or something")]
+    [EnabledInDm(false)]
     public class VotingCommands : DevSubInteractionModule
     {
         private readonly IVotingService _voting;
@@ -137,6 +138,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             }
 
             [SlashCommand("check", "Check voting statistics for specific user")]
+            [EnabledInDm(false)]
             public async Task CmdCheckAsync(
                 [Summary("User", "User to check statistics for")] IGuildUser user = null)
             {
@@ -241,6 +243,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             }
 
             [SlashCommand("search", "Query for statistics using specified search criteria")]
+            [EnabledInDm(true)]
             public async Task CmdFindAsync(
                 [Summary("Target", "User the vote was sent against")] IUser target = null,
                 [Summary("Voter", "User that sent the vote")] IUser voter = null,
