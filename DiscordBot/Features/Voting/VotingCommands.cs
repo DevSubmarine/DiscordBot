@@ -29,15 +29,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: mentions).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}");
         }
 
         [SlashCommand("ban", "Vote to ban someone")]
@@ -51,15 +43,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: mentions).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}");
         }
 
         [SlashCommand("mod", "Vote to mod someone")]
@@ -81,15 +65,28 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: mentions).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}");
+        }
+
+        private async Task RespondConfirmAsync(IVotingResult result, string message)
+        {
+            SuccessVotingResult voteResult = (SuccessVotingResult)result;
+            const string settingsCmd = "`/user-settings vote-ping`";
+
+            IGuildUser user = await base.Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.Context.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            AllowedMentions mentions = settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
+
+            Embed embed = this.BuildResultEmbed(voteResult, user);
+            if (settings.PingOnVote)
+                message += $"\n*You can disable pings on vote by using {settingsCmd} command.*";
+
+            await base.RespondAsync(
+                text: message,
+                embed: embed,
+                options: base.GetRequestOptions(),
+                allowedMentions: mentions)
+                .ConfigureAwait(false);
         }
 
         private Task RespondCooldownAsync(TimeSpan cooldown, IGuildUser user)
