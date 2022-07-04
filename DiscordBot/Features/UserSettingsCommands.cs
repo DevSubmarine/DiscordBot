@@ -26,8 +26,8 @@ namespace DevSubmarine.DiscordBot.Features
                 base.Context.CancellationToken).ConfigureAwait(false);
 
             string confirmationText = enabled
-                ? $"{ResponseEmoji.Success} You'll now be pinged whenever someone casts a vote against you."
-                : $"{ResponseEmoji.Success} You'll no longer be notified when someone votes against you.";
+                ? $"You'll now be pinged whenever someone casts a vote against you. {ResponseEmoji.Success}"
+                : $"You'll no longer be notified when someone votes against you. {ResponseEmoji.Success}";
             await base.ModifyOriginalResponseAsync(msg => msg.Content = confirmationText, base.GetRequestOptions()).ConfigureAwait(false);
         }
     }
