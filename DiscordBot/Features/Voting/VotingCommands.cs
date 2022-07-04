@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using DevSubmarine.DiscordBot.Settings;
+using Discord;
 using Discord.Interactions;
 using System.Text;
 
@@ -9,10 +10,12 @@ namespace DevSubmarine.DiscordBot.Voting.Services
     public class VotingCommands : DevSubInteractionModule
     {
         private readonly IVotingService _voting;
+        private readonly IUserSettingsProvider _userSettings;
 
-        public VotingCommands(IVotingService voting)
+        public VotingCommands(IVotingService voting, IUserSettingsProvider userSettings)
         {
             this._voting = voting;
+            this._userSettings = userSettings;
         }
 
         [SlashCommand("kick", "Vote to kick someone")]
@@ -28,11 +31,12 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             else
             {
                 SuccessVotingResult voteResult = (SuccessVotingResult)result;
+                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}",
                     embed: this.BuildResultEmbed(voteResult, user),
                     options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
+                    allowedMentions: mentions).ConfigureAwait(false);
             }
         }
 
@@ -49,11 +53,12 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             else
             {
                 SuccessVotingResult voteResult = (SuccessVotingResult)result;
+                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}",
                     embed: this.BuildResultEmbed(voteResult, user),
                     options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
+                    allowedMentions: mentions).ConfigureAwait(false);
             }
         }
 
@@ -78,11 +83,12 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             else
             {
                 SuccessVotingResult voteResult = (SuccessVotingResult)result;
+                AllowedMentions mentions = await this.GetMentionOptionsAsync(vote.TargetID).ConfigureAwait(false);
                 await base.RespondAsync(
                     text: $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}",
                     embed: this.BuildResultEmbed(voteResult, user),
                     options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
+                    allowedMentions: mentions).ConfigureAwait(false);
             }
         }
 
@@ -106,8 +112,11 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 .Build();
         }
 
-        private AllowedMentions GetMentionOptions()
-            => AllowedMentions.None;
+        private async Task<AllowedMentions> GetMentionOptionsAsync(ulong userID)
+        {
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, base.Context.CancellationToken).ConfigureAwait(false);
+            return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
+        }
 
         private string FormatOrdinal(ulong number)
         {
