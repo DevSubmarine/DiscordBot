@@ -50,11 +50,11 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
             this._log.LogInformation("Message received from inactive blog channel {ChannelName} ({ChannelID})", channel.Name, channel.Id);
             CancellationToken cancellationToken = this._cts.Token;
-            SocketCategoryChannel category = channel.Guild.GetCategoryChannel(channel.CategoryId.Value);
+            SocketCategoryChannel categoryToSort = channel.Guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
             try
             {
                 await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
-                await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
+                await this._sorter.SortChannelsAsync(categoryToSort, cancellationToken).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.IsMissingPermissions() &&
                     ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions", channel.Name, channel.Id)) { }

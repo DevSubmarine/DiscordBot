@@ -1,17 +1,21 @@
-﻿using Discord;
+﻿using DevSubmarine.DiscordBot.Settings;
+using Discord;
 using Discord.Interactions;
 using System.Text;
 
 namespace DevSubmarine.DiscordBot.Voting.Services
 {
     [Group("vote", "Vote to kick others... or something")]
+    [EnabledInDm(false)]
     public class VotingCommands : DevSubInteractionModule
     {
         private readonly IVotingService _voting;
+        private readonly IUserSettingsProvider _userSettings;
 
-        public VotingCommands(IVotingService voting)
+        public VotingCommands(IVotingService voting, IUserSettingsProvider userSettings)
         {
             this._voting = voting;
+            this._userSettings = userSettings;
         }
 
         [SlashCommand("kick", "Vote to kick someone")]
@@ -25,14 +29,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be kicked! {ResponseEmoji.KekYu}");
         }
 
         [SlashCommand("ban", "Vote to ban someone")]
@@ -46,14 +43,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be banned! {ResponseEmoji.KekPoint}");
         }
 
         [SlashCommand("mod", "Vote to mod someone")]
@@ -75,14 +65,28 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
-            {
-                SuccessVotingResult voteResult = (SuccessVotingResult)result;
-                await base.RespondAsync(
-                    text: $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}",
-                    embed: this.BuildResultEmbed(voteResult, user),
-                    options: base.GetRequestOptions(),
-                    allowedMentions: this.GetMentionOptions()).ConfigureAwait(false);
-            }
+                await this.RespondConfirmAsync(result, $"{user.Mention} you've been voted to be modded! {ResponseEmoji.EyesBlurry}");
+        }
+
+        private async Task RespondConfirmAsync(IVotingResult result, string message)
+        {
+            SuccessVotingResult voteResult = (SuccessVotingResult)result;
+            const string settingsCmd = "`/user-settings vote-ping`";
+
+            IGuildUser user = await base.Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.Context.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            AllowedMentions mentions = settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
+
+            Embed embed = this.BuildResultEmbed(voteResult, user);
+            if (settings.PingOnVote)
+                message += $"\n*You can disable pings on vote by using {settingsCmd} command.*";
+
+            await base.RespondAsync(
+                text: message,
+                embed: embed,
+                options: base.GetRequestOptions(),
+                allowedMentions: mentions)
+                .ConfigureAwait(false);
         }
 
         private Task RespondCooldownAsync(TimeSpan cooldown, IGuildUser user)
@@ -105,8 +109,11 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 .Build();
         }
 
-        private AllowedMentions GetMentionOptions()
-            => AllowedMentions.None;
+        private async Task<AllowedMentions> GetMentionOptionsAsync(ulong userID)
+        {
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, base.Context.CancellationToken).ConfigureAwait(false);
+            return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
+        }
 
         private string FormatOrdinal(ulong number)
         {
@@ -137,6 +144,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             }
 
             [SlashCommand("check", "Check voting statistics for specific user")]
+            [EnabledInDm(false)]
             public async Task CmdCheckAsync(
                 [Summary("User", "User to check statistics for")] IGuildUser user = null)
             {
@@ -241,6 +249,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             }
 
             [SlashCommand("search", "Query for statistics using specified search criteria")]
+            [EnabledInDm(true)]
             public async Task CmdFindAsync(
                 [Summary("Target", "User the vote was sent against")] IUser target = null,
                 [Summary("Voter", "User that sent the vote")] IUser voter = null,

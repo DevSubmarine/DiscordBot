@@ -66,6 +66,11 @@ For this reason, it's okay to add roles from different Discord guilds if necessa
 
 Note that for roles that are testing only, I recommend adding them to [appsettings.Development.json](DiscordBot/appsettings.Development.json) instead, just so the main config file is not polluted with testing configuration.
 
+#### Random Statuses
+The bot will automatically change its status on login, and also on a timer. This can be configured in [appsettings.json](DiscordBot/appsettings.json), `RandomStatus` section.
+
+The statuses themselves are in `RandomStatus:Statuses` array. Each status is JSON object, and should have `Text` and `ActivityType` property. Currently supported Activity Types are "Playing", "Watching", "Listening" and "Streaming". Additionally you can add `Link` property.
+
 #### In-Development Commands
 Development Environment Commands shouldn't be registered globally for numerous reasons. For this reason you should set your test server ID in [appsettings.Development.json](DiscordBot/appsettings.Development.json) using `CommandsGuildID` property. This config will be used only during debugging, and your in-dev commands will be registered in one server only.
 
@@ -86,6 +91,9 @@ Of course you have to replace `<KEY>` with your DataDog API key. Also double che
 
 ## Planned Features
 - Whatever we neeed
+
+## Known issues
+- Due to a Discord backend bug, global slash commands do not appear in devsub guild on PC clients. As a *potential* workaround, currently [appsettings.json](DiscordBot/appsettings.json) is set to register only in that guild. This might not work and is less than optimal, but as bot is used currently, this is acceptable and won't hurt.
 
 ## Contributing
 Feel free to open a PR or submit an issue to contribute.

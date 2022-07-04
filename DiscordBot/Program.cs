@@ -48,17 +48,21 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<ColourRoles.ColourRolesOptions>(context.Configuration.GetSection("ColourRoles"));
                     services.Configure<BlogsManagement.BlogsManagementOptions>(context.Configuration.GetSection("BlogsManagement"));
                     services.Configure<Voting.VotingOptions>(context.Configuration.GetSection("Voting"));
+                    services.Configure<RandomStatus.RandomStatusOptions>(context.Configuration.GetSection("RandomStatus"));
 
                     // dependencies
                     services.AddDiscordClient();
+                    services.AddRandomizer();
                     services.AddMongoDB();
                     services.AddPasteMyst();
                     services.AddCaching();
+                    services.AddUserSettings();
 
                     // features
                     services.AddSubWords();
                     services.AddBlogsManagement();
                     services.AddVoting();
+                    services.AddRandomStatus();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);

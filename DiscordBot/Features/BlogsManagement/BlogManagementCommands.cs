@@ -1,6 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.Net;
+using TehGM.Utilities.Randomization;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
@@ -10,14 +11,16 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     {
         private readonly IBlogChannelManager _manager;
         private readonly IBlogChannelNameConverter _nameConverter;
+        private readonly IRandomizer _randomizer;
         private readonly BlogsManagementOptions _options;
         private readonly ILogger _log;
 
-        public BlogManagementCommands(IBlogChannelManager manager, IBlogChannelNameConverter nameConverter, 
+        public BlogManagementCommands(IBlogChannelManager manager, IBlogChannelNameConverter nameConverter, IRandomizer randomizer,
             IOptionsMonitor<BlogsManagementOptions> options, ILogger<BlogManagementCommands> log)
         {
             this._manager = manager;
             this._nameConverter = nameConverter;
+            this._randomizer = randomizer;
             this._options = options.CurrentValue;
             this._log = log;
         }
@@ -71,7 +74,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             if (CreatingForSelf() && memberAge < this._options.MinMemberAge)
             {
                 string[] emojis = new string[] { ResponseEmoji.FeelsBeanMan, ResponseEmoji.FeelsDumbMan, ResponseEmoji.EyesBlurry, ResponseEmoji.BlobSweatAnimated };
-                await RespondFailureAsync($"{ResponseEmoji.Failure} You need to be here for at least {this._options.MinMemberAge.ToDisplayString()} to create a blog channel.\nYou've been here for {memberAge.ToDisplayString()} so far. {emojis[new Random().Next(emojis.Length)]}");
+                await RespondFailureAsync($"{ResponseEmoji.Failure} You need to be here for at least {this._options.MinMemberAge.ToDisplayString()} to create a blog channel.\nYou've been here for {memberAge.ToDisplayString()} so far. {this._randomizer.GetRandomValue(emojis)}");
                 return;
             }
 
