@@ -88,7 +88,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
                 options: base.GetRequestOptions());
         }
 
-        [SlashCommand("clear", "Clears your role colour")]
+        [SlashCommand("clear", "Clears your colour role")]
         [EnabledInDm(false)]
         public async Task CmdClearAsync(
             [Summary("User", "Which user to apply the role to; can only be used by administrators")] IGuildUser user = null)
