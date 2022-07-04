@@ -51,6 +51,7 @@ namespace DevSubmarine.DiscordBot
 
                     // dependencies
                     services.AddDiscordClient();
+                    services.AddRandomizer();
                     services.AddMongoDB();
                     services.AddPasteMyst();
                     services.AddCaching();
