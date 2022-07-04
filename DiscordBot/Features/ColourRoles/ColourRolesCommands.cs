@@ -25,8 +25,6 @@ namespace DevSubmarine.DiscordBot.ColourRoles
         {
             ColourRolesOptions options = this._options.CurrentValue;
 
-            await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
-
             if (!this.GetAvailableRoles().Any(r => r.Id == role.Id))
             {
                 await base.RespondAsync(
@@ -35,6 +33,8 @@ namespace DevSubmarine.DiscordBot.ColourRoles
                     options: base.GetRequestOptions()).ConfigureAwait(false);
                 return;
             }
+
+            await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             // if changing role of the other user, it should be only possible for user with specific permissions (admins basically)
             IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken).ConfigureAwait(false);
