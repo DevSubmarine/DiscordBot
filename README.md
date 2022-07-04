@@ -87,6 +87,9 @@ Of course you have to replace `<KEY>` with your DataDog API key. Also double che
 ## Planned Features
 - Whatever we neeed
 
+## Known issues
+- Due to a Discord backend bug, global slash commands do not appear in devsub guild on PC clients. As a *potential* workaround, currently [appsettings.json](DiscordBot/appsettings.json) is set to register only in that guild. This might not work and is less than optimal, but as bot is used currently, this is acceptable and won't hurt.
+
 ## Contributing
 Feel free to open a PR or submit an issue to contribute.
 
