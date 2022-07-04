@@ -12,5 +12,6 @@
 
         public string SubWordsCollectionName { get; set; } = "SubWords";
         public string VotesCollectionName { get; set; } = "Votes";
+        public string UserSettingsCollectionName { get; set; } = "UserSettings";
     }
 }

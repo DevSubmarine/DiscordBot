@@ -55,6 +55,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddMongoDB();
                     services.AddPasteMyst();
                     services.AddCaching();
+                    services.AddUserSettings();
 
                     // features
                     services.AddSubWords();
