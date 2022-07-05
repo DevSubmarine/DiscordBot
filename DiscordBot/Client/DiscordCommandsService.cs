@@ -37,6 +37,12 @@ namespace DevSubmarine.DiscordBot.Client
 
         private async Task OnClientReady()
         {
+            if (this._options.PurgeGlobalCommands)
+            {
+                this._log.LogDebug("Purging global commands");
+                await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+            }
+
             this._log.LogTrace("Loading all command modules");
             await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
 
