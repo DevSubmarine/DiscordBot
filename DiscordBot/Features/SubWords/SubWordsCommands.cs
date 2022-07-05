@@ -111,8 +111,8 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             if (word == null)
                 throw new ArgumentNullException(nameof(word));
 
-            IGuildUser author = base.Context.Guild.GetUser(word.AuthorID);
-            string authorName = await this.GetUserNameAsync(author.Id, cancellationToken).ConfigureAwait(false);
+            IUser author = await base.Context.Client.GetUserAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
+            string authorName = await this.GetUserNameAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
             string addedByName = await this.GetUserNameAsync(word.AddedByUserID, cancellationToken).ConfigureAwait(false);
             string authorAvatarUrl = author.GetMaxAvatarUrl();
 
@@ -123,8 +123,12 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
                 .AddField("Added By", addedByName, true)
                 .WithThumbnailUrl(authorAvatarUrl)
                 .WithTimestamp(word.CreationTimeUTC)
-                .WithColor(author.GetUserColour())
                 .WithFooter($"This amazing word was invented by {author.GetUsernameWithDiscriminator()}", authorAvatarUrl);
+            if (base.Context.Guild != null)
+            {
+                IGuildUser guildMember = await base.Context.Guild.GetGuildUserAsync(word.AuthorID, cancellationToken).ConfigureAwait(false);
+                result.WithColor(guildMember?.GetUserColour() ?? Color.Default);
+            }
             if (word.GuildID != null && word.ChannelID != null && word.MessageID != null)
                 result.WithUrl($"https://discord.com/channels/{word.GuildID}/{word.ChannelID}/{word.MessageID}");
             return result.Build();
