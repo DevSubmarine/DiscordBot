@@ -174,6 +174,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 if (votesVoter.Any())
                 {
                     builder.Clear();
+                    builder.AppendFormat("Votes made: `{0}`", votesVoter.LongCount());
+                    builder.Append('\n');
+
                     IEnumerable<Vote> votesMod = votesVoter.Where(vote => vote.IsPositive);
                     IEnumerable<Vote> votesKickOrBan = votesVoter.Where(vote => vote.IsNegative);
                     voterAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
@@ -192,7 +195,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     if (builder.Length > 0)
                         builder.Append('\n');
                     builder.AppendFormat("Top votes made:\n{0}", this.BuildTopTargetsString(votesVoter));
-                    embed.AddField("As a Voter", builder.ToString());
+                    embed.AddField($"As a Voter", builder.ToString());
                 }
                 else
                     embed.AddField("As a Voter", $"{user.Mention} didn't vote for anyone yet... what a boomer. {ResponseEmoji.FeelsDumbMan}");
@@ -200,6 +203,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 if (votesTarget.Any())
                 {
                     builder.Clear();
+                    builder.AppendFormat("Votes received: `{0}`", votesTarget.LongCount());
+                    builder.Append('\n');
+
                     IEnumerable<Vote> votesMod = votesTarget.Where(vote => vote.IsPositive);
                     IEnumerable<Vote> votesKickOrBan = votesTarget.Where(vote => vote.IsNegative);
                     targetAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
