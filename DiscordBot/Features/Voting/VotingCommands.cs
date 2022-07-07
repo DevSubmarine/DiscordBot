@@ -174,8 +174,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 if (votesVoter.Any())
                 {
                     builder.Clear();
-                    IEnumerable<Vote> votesMod = votesVoter.Where(vote => vote.Type == VoteType.Mod);
-                    IEnumerable<Vote> votesKickOrBan = votesVoter.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+                    IEnumerable<Vote> votesMod = votesVoter.Where(vote => vote.IsPositive);
+                    IEnumerable<Vote> votesKickOrBan = votesVoter.Where(vote => vote.IsNegative);
                     voterAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
 
                     if (votesMod.Any())
@@ -200,8 +200,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 if (votesTarget.Any())
                 {
                     builder.Clear();
-                    IEnumerable<Vote> votesMod = votesTarget.Where(vote => vote.Type == VoteType.Mod);
-                    IEnumerable<Vote> votesKickOrBan = votesTarget.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+                    IEnumerable<Vote> votesMod = votesTarget.Where(vote => vote.IsPositive);
+                    IEnumerable<Vote> votesKickOrBan = votesTarget.Where(vote => vote.IsNegative);
                     targetAlignment = this._alignment.CalculateAlignment(votesMod, votesKickOrBan);
 
                     if (votesMod.Any())
