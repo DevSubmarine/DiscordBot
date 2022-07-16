@@ -10,7 +10,7 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Placeholders
 
         private int _count;
 
-        public DevSubMemberCount(IDiscordClient client, IOptions<DevSubOptions> options)
+        public DevSubMemberCount(IDiscordClient client, IOptionsSnapshot<DevSubOptions> options)
         {
             this._client = client;
             this._options = options.Value;
