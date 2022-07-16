@@ -8,20 +8,16 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
     {
         protected override Type PlaceholderType => typeof(DevSubBlogCount);
 
-        private DevSubOptions _options;
         private BlogsManagementOptions _blogOptions;
 
         public override void SetUp()
         {
             base.SetUp();
 
-            this._options = new DevSubOptions();
             this._blogOptions = new BlogsManagementOptions();
-            this._options.GuildID = base.Fixture.Create<ulong>();
             this._blogOptions.ActiveBlogsCategoryID = base.Fixture.Create<ulong>();
             this._blogOptions.InactiveBlogsCategoryID = base.Fixture.Create<ulong>();
 
-            base.Fixture.Freeze<IOptionsSnapshot<DevSubOptions>>().Value.Returns(this._options);
             base.Fixture.Freeze<IOptionsSnapshot<BlogsManagementOptions>>().Value.Returns(this._blogOptions);
         }
 
@@ -125,7 +121,6 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         private IGuild BuildGuild(int activeCount, int inactiveCount, int ignoredActiveCount, int ignoredInactiveCount)
         {
             IGuild guild = Substitute.For<IGuild>();
-            guild.Id.Returns(this._options.GuildID);
             List<ITextChannel> channels = new List<ITextChannel>(activeCount + inactiveCount + ignoredActiveCount + ignoredInactiveCount);
             List<ITextChannel> ignoredChannels = new List<ITextChannel>(ignoredActiveCount + ignoredInactiveCount);
 
