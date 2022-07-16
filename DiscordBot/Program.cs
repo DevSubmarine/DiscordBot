@@ -42,6 +42,7 @@ namespace DevSubmarine.DiscordBot
                 .ConfigureServices((context, services) =>
                 {
                     // options
+                    services.Configure<DevSubOptions>(context.Configuration);
                     services.Configure<Client.DiscordOptions>(context.Configuration);
                     services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));

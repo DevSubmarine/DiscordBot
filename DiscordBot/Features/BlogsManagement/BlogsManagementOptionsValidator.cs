@@ -6,8 +6,6 @@
         /// <inheritdoc/>
         public ValidateOptionsResult Validate(string name, BlogsManagementOptions options)
         {
-            if (options.GuildID == default)
-                return ValidateOptionsResult.Fail($"{nameof(options.GuildID)} is required.");
             if (options.ActiveBlogsCategoryID == default)
                 return ValidateOptionsResult.Fail($"{nameof(options.ActiveBlogsCategoryID)} is required.");
             if (options.InactiveBlogsCategoryID == default)

@@ -9,14 +9,17 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         private readonly IDiscordClient _client;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
+        private readonly IOptionsMonitor<DevSubOptions> _devsubOptions;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogChannelActivator(IDiscordClient client, ILogger<BlogChannelActivator> log, IOptionsMonitor<BlogsManagementOptions> options)
+        public BlogChannelActivator(IDiscordClient client, ILogger<BlogChannelActivator> log, 
+            IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._client = client;
             this._log = log;
             this._options = options;
+            this._devsubOptions = devsubOptions;
         }
 
         /// <inheritdoc/>
@@ -33,7 +36,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             if (channelID == default)
                 throw new ArgumentException($"{channelID} is not a valid channel ID", nameof(channelID));
 
-            IGuild guild = await this._client.GetGuildAsync(this.Options.GuildID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions());
+            IGuild guild = await this._client.GetGuildAsync(this._devsubOptions.CurrentValue.GuildID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions());
             ITextChannel channel = await guild.GetTextChannelAsync(channelID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
             IEnumerable<ICategoryChannel> categories = await guild.GetCategoriesAsync(CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
             ICategoryChannel sourceCategory = categories.First(cat => cat.Id == sourceCategoryID);

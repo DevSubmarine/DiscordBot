@@ -13,18 +13,20 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         private readonly IBlogChannelSorter _sorter;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
+        private readonly IOptionsMonitor<DevSubOptions> _devsubOptions;
         private CancellationTokenSource _cts;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
         public BlogActivityScanner(IBlogChannelActivator activator, IBlogChannelSorter sorter, DiscordSocketClient client,
-            ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options)
+            ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._activator = activator;
             this._sorter = sorter;
             this._client = client;
             this._log = log;
             this._options = options;
+            this._devsubOptions = devsubOptions;
         }
 
 #pragma warning disable CA2017 // Parameter count mismatch
@@ -38,7 +40,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                     await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
                 }
 
-                SocketGuild guild = this._client.GetGuild(this.Options.GuildID);
+                SocketGuild guild = this._client.GetGuild(this._devsubOptions.CurrentValue.GuildID);
                 using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>() 
                 { 
                     { "GuildID", guild.Id },

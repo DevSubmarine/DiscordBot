@@ -2,9 +2,6 @@
 {
     public class BlogsManagementOptions
     {
-        /// <summary>ID of the guild where guild channels are in.</summary>
-        public ulong GuildID { get; set; }
-
         /// <summary>ID of category that contains active blog channels.</summary>
         public ulong ActiveBlogsCategoryID { get; set; }
         /// <summary>ID of category that contains inactive blog channels.</summary>
