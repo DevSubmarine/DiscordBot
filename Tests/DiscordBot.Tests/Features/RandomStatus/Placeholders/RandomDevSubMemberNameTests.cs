@@ -21,7 +21,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(ChannelName.GetReplacementAsync))]
         public async Task GetReplacement_WithNicknames_ReturnsRandomUsername(IDictionary<string, string> users)
         {
-            this.CreateGuild(users);
+            this.BuildGuild(users);
             IEnumerable<string> validResults = users.Values;
 
             RandomDevSubMemberName placeholder = base.Fixture.Create<RandomDevSubMemberName>();
@@ -35,7 +35,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(ChannelName.GetReplacementAsync))]
         public async Task GetReplacement_WithoutNicknames_ReturnsRandomUsername(IEnumerable<string> users)
         {
-            this.CreateGuild(users.ToDictionary<string, string, string>(u => u, _ => null));
+            this.BuildGuild(users.ToDictionary<string, string, string>(u => u, _ => null));
             IEnumerable<string> validResults = users;
 
             RandomDevSubMemberName placeholder = base.Fixture.Create<RandomDevSubMemberName>();
@@ -48,7 +48,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(ChannelName.GetReplacementAsync))]
         public async Task GetReplacement_NoUsersFound_Throws()
         {
-            this.CreateGuild(Enumerable.Empty<KeyValuePair<string, string>>());
+            this.BuildGuild(Enumerable.Empty<KeyValuePair<string, string>>());
 
             RandomDevSubMemberName placeholder = base.Fixture.Create<RandomDevSubMemberName>();
             Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
@@ -60,16 +60,16 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(ChannelName.GetReplacementAsync))]
         public async Task GetReplacement_CalledMultipleTimes(IDictionary<string, string> users)
         {
-            IGuild guild = this.CreateGuild(users);
+            IGuild guild = this.BuildGuild(users);
 
             RandomDevSubMemberName placeholder = base.Fixture.Create<RandomDevSubMemberName>();
             await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
             await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
-            await guild.Received(2).GetUsersAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
+            await guild.ReceivedWithAnyArgs(2).GetUsersAsync();
         }
 
-        private IGuild CreateGuild(IEnumerable<KeyValuePair<string, string>> usernamesAndNicknames)
+        private IGuild BuildGuild(IEnumerable<KeyValuePair<string, string>> usernamesAndNicknames)
         {
             IGuild guild = Substitute.For<IGuild>();
             guild.GetUsersAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>())
@@ -80,7 +80,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
                     user.Nickname.Returns(u.Value);
                     return user;
                 }).ToArray());
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(guild);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(guild);
             return guild;
         }
     }

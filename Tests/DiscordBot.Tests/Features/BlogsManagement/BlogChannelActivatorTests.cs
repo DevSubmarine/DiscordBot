@@ -1,6 +1,5 @@
 ﻿using DevSubmarine.DiscordBot.BlogsManagement;
 using DevSubmarine.DiscordBot.BlogsManagement.Services;
-using Discord;
 
 namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
 {
@@ -33,12 +32,12 @@ namespace DevSubmarine.DiscordBot.Tests.Features.BlogsManagement
             };
             base.Fixture.Freeze<IOptionsMonitor<BlogsManagementOptions>>().CurrentValue.Returns(options);
 
-            guild.GetTextChannelAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>())
-                .Returns(Task.FromResult(channel));
-            guild.GetCategoriesAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>())
-                .Returns(Task.FromResult((IReadOnlyCollection<ICategoryChannel>)new[] { activeCategory, inactiveCategory }));
+            guild.GetTextChannelAsync(default)
+                .ReturnsForAnyArgs(Task.FromResult(channel));
+            guild.GetCategoriesAsync()
+                .ReturnsForAnyArgs(new[] { activeCategory, inactiveCategory });
 
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(guild);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(guild);
         }
 
         [Test]

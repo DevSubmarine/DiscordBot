@@ -18,8 +18,8 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
 
             this._guild = Substitute.For<IGuild>();
             IReadOnlyCollection<IGuildUser> users = base.Fixture.CreateMany<IGuildUser>(this._expectedCount).ToArray();
-            this._guild.GetUsersAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(users);
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(this._guild);
+            this._guild.GetUsersAsync().ReturnsForAnyArgs(users);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(this._guild);
         }
 
         [Test]
@@ -28,7 +28,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public async Task GetReplacement_ReturnsCorrectCount()
         {
             DevSubMemberCount placeholder = base.Fixture.Create<DevSubMemberCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
             result.Should().Be(this._expectedCount.ToString());
         }
@@ -39,10 +39,10 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public async Task GetReplacement_OnlyCalledOnce()
         {
             DevSubMemberCount placeholder = base.Fixture.Create<DevSubMemberCount>();
-            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
-            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
-            await this._guild.Received(1).GetUsersAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
+            await this._guild.ReceivedWithAnyArgs(1).GetUsersAsync();
         }
     }
 }

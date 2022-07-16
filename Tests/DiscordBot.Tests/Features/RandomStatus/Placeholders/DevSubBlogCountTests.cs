@@ -31,7 +31,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount + inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -45,7 +45,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount + inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -59,7 +59,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"));
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -73,7 +73,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"));
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -87,7 +87,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"));
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -101,7 +101,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"));
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -113,10 +113,10 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             IGuild guild = this.BuildGuild(activeCount, inactiveCount, ignoredActiveCount, ignoredInactiveCount);
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
-            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch());
 
-            await guild.Received(1).GetTextChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
+            await guild.ReceivedWithAnyArgs(1).GetTextChannelsAsync();
         }
 
         private IGuild BuildGuild(int activeCount, int inactiveCount, int ignoredActiveCount, int ignoredInactiveCount)
@@ -130,11 +130,11 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             CreateChannels(active: false, ignored: false, inactiveCount);
             CreateChannels(active: false, ignored: true, ignoredInactiveCount);
 
-            guild.GetChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(channels);
-            guild.GetTextChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(channels);
+            guild.GetChannelsAsync().ReturnsForAnyArgs(channels);
+            guild.GetTextChannelsAsync().ReturnsForAnyArgs(channels);
             this._blogOptions.IgnoredChannelsIDs = ignoredChannels.Select(ch => ch.Id);
 
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(guild);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(guild);
             return guild;
 
             void CreateChannels(bool active, bool ignored, int count)

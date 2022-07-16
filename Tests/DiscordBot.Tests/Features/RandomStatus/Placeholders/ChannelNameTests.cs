@@ -12,7 +12,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         {
             base.SetUp();
 
-            base.Fixture.Freeze<IDiscordClient>().GetChannelAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns((IChannel)null);
+            base.Fixture.Freeze<IDiscordClient>().GetChannelAsync(default).ReturnsForAnyArgs((IChannel)null);
         }
 
         [Test, AutoNSubstituteData]
@@ -20,7 +20,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(ChannelName.GetReplacementAsync))]
         public async Task GetReplacement_ReturnsChannelName(ulong id, string name)
         {
-            this.CreateChannel(id, name);
+            this.BuildChannel(id, name);
 
             ChannelName placeholder = base.Fixture.Create<ChannelName>();
             string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, id));
@@ -62,7 +62,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
                 .WithMessage($"Discord channel with ID {id} not found");
         }
 
-        private IChannel CreateChannel(ulong id, string name)
+        private IChannel BuildChannel(ulong id, string name)
         {
             IChannel channel = Substitute.For<IChannel>();
             channel.Id.Returns(id);

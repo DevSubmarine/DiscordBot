@@ -34,7 +34,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             IEnumerable<string> validResults = activeChannels.Union(inactiveChannels);
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName));
 
             result.Should().BeOneOf(validResults);
         }
@@ -47,7 +47,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             this.BuildGuild(Enumerable.Empty<string>(), Enumerable.Empty<string>(), ignoredActiveChannels, ignoredInactiveChannels);
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName));
 
             await act.Should().ThrowAsync<InvalidOperationException>();
         }
@@ -60,7 +60,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             this.BuildGuild(activeChannels, inactiveChannels, Enumerable.Empty<string>(), Enumerable.Empty<string>());
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"));
 
             result.Should().BeOneOf(activeChannels);
         }
@@ -73,7 +73,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             this.BuildGuild(Enumerable.Empty<string>(), Enumerable.Empty<string>(), ignoredActiveChannels, ignoredInactiveChannels);
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"));
 
             await act.Should().ThrowAsync<InvalidOperationException>();
         }
@@ -86,7 +86,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             this.BuildGuild(activeChannels, inactiveChannels, Enumerable.Empty<string>(), Enumerable.Empty<string>());
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"));
 
             result.Should().BeOneOf(inactiveChannels);
         }
@@ -99,7 +99,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             this.BuildGuild(Enumerable.Empty<string>(), Enumerable.Empty<string>(), ignoredActiveChannels, ignoredInactiveChannels);
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"));
 
             await act.Should().ThrowAsync<InvalidOperationException>();
         }
@@ -111,8 +111,8 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             IGuild guild = this.BuildGuild(activeChannels, inactiveChannels, ignoredActiveChannels, ignoredInactiveChannels);
 
             RandomDevSubBlogName placeholder = base.Fixture.Create<RandomDevSubBlogName>();
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName), default);
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName), default);
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName));
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName));
 
             await guild.Received(2).GetTextChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
         }
@@ -128,11 +128,11 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             CreateChannels(active: false, ignored: false, inactiveChannels);
             CreateChannels(active: false, ignored: true, ignoredInactiveChannels);
 
-            guild.GetChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(channels);
-            guild.GetTextChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(channels);
+            guild.GetChannelsAsync().ReturnsForAnyArgs(channels);
+            guild.GetTextChannelsAsync().ReturnsForAnyArgs(channels);
             this._blogOptions.IgnoredChannelsIDs = ignoredChannels.Select(ch => ch.Id);
 
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(guild);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(guild);
             return guild;
 
             void CreateChannels(bool active, bool ignored, IEnumerable<string> names)

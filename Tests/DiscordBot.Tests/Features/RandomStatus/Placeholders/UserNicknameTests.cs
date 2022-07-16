@@ -15,8 +15,8 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             base.SetUp();
 
             this._guild = Substitute.For<IGuild>();
-            this._guild.GetUserAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns((IGuildUser)null);
-            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(Arg.Any<ulong>(), Arg.Any<CacheMode>(), Arg.Any<RequestOptions>()).Returns(this._guild);
+            this._guild.GetUserAsync(default).ReturnsForAnyArgs((IGuildUser)null);
+            base.Fixture.Freeze<IDiscordClient>().GetGuildAsync(default).ReturnsForAnyArgs(this._guild);
         }
 
         [Test, AutoNSubstituteData]
@@ -24,10 +24,10 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(UserNickname.GetReplacementAsync))]
         public async Task GetReplacement_GuildMember_WithNickname_ReturnsNickname(ulong userID, string username, string nickname)
         {
-            this.CreateGuildUser(userID, username, nickname);
+            this.BuildGuildUser(userID, username, nickname);
 
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
             result.Should().Be(nickname);
         }
@@ -37,10 +37,10 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(UserNickname.GetReplacementAsync))]
         public async Task GetReplacement_GuildMember_WithoutNickname_ReturnsUsername(ulong userID, string username)
         {
-            this.CreateGuildUser(userID, username, null);
+            this.BuildGuildUser(userID, username, null);
 
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
             result.Should().Be(username);
         }
@@ -50,10 +50,10 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(UserNickname.GetReplacementAsync))]
         public async Task GetReplacement_NotGuildMember_ReturnsUsername(ulong userID, string username)
         {
-            this.CreateUser(userID, username);
+            this.BuildUser(userID, username);
 
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
             result.Should().Be(username);
         }
@@ -63,7 +63,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public void GetReplacement_NoID_Throws()
         {
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName));
 
             act.Should().ThrowAsync<ArgumentException>()
                 .WithMessage($"Placeholder requires a valid user ID to be provided");
@@ -74,7 +74,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public void GetReplacement_InvalidID_Throws()
         {
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "foobar"), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "foobar"));
 
             act.Should().ThrowAsync<ArgumentException>()
                 .WithMessage($"Placeholder: foobar is not a valid user ID");
@@ -85,7 +85,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public void GetReplacement_UserNotFound_Throws(ulong userID)
         {
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            Func<Task> act = async () => await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
             act.Should().ThrowAsync<InvalidOperationException>()
                 .WithMessage($"Discord user with ID {userID} not found");
@@ -95,29 +95,29 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Category(nameof(UserNickname.GetReplacementAsync))]
         public async Task GetReplacement_GuildMember_OnlyCalledOnce(ulong userID, string username, string nickname)
         {
-            this.CreateGuildUser(userID, username, nickname);
+            this.BuildGuildUser(userID, username, nickname);
 
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
-            await this._guild.Received(1).GetUserAsync(userID, Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
+            await this._guild.ReceivedWithAnyArgs(1).GetUserAsync(default);
         }
 
         [Test, AutoNSubstituteData]
         [Category(nameof(UserNickname.GetReplacementAsync))]
         public async Task GetReplacement_NotGuildMember_OnlyCalledOnce(ulong userID, string username)
         {
-            this.CreateUser(userID, username);
+            this.BuildUser(userID, username);
 
             UserNickname placeholder = base.Fixture.Create<UserNickname>();
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID), default);
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
+            await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, userID));
 
-            await this._guild.Received(1).GetUserAsync(userID, Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
+            await this._guild.ReceivedWithAnyArgs(1).GetUserAsync(default);
         }
 
-        private IUser CreateUser(ulong userID, string username)
+        private IUser BuildUser(ulong userID, string username)
         {
             IUser user = Substitute.For<IUser>();
             user.Id.Returns(userID);
@@ -126,9 +126,9 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             return user;
         }
 
-        private IGuildUser CreateGuildUser(ulong userID, string username, string nickname)
+        private IGuildUser BuildGuildUser(ulong userID, string username, string nickname)
         {
-            this.CreateUser(userID, username);
+            this.BuildUser(userID, username);
 
             IGuildUser user = Substitute.For<IGuildUser>();
             user.Id.Returns(userID);
