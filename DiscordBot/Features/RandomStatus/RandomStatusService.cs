@@ -64,18 +64,19 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
 
             try
             {
+                string text = status.Text;
                 if (this._client.CurrentUser == null || this._client.ConnectionState != ConnectionState.Connected)
                     return null;
                 if (status == null)
                     return null;
                 if (!string.IsNullOrWhiteSpace(status.Text))
                 {
-                    string text = await this._placeholders.ConvertPlaceholdersAsync(status.Text, cancellationToken).ConfigureAwait(false);
+                    text = await this._placeholders.ConvertPlaceholdersAsync(status.Text, cancellationToken).ConfigureAwait(false);
                     this._log.LogDebug("Changing status to `{Status}`", text);
                 }
                 else
                     this._log.LogDebug("Clearing status");
-                await this._client.SetGameAsync(status.Text, status.Link, status.ActivityType).ConfigureAwait(false);
+                await this._client.SetGameAsync(text, status.Link, status.ActivityType).ConfigureAwait(false);
                 return status;
             }
             catch (Exception ex) when (options.IsEnabled && ex.LogAsError(this._log, "Failed changing status to {Status}", status))
