@@ -46,6 +46,6 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Placeholders
         }
 
         private bool HasTag(Match placeholder, string tag)
-            => placeholder.Groups.Count > 0 && placeholder.Groups[1].Value == tag;
+            => placeholder.Groups[1].Success && placeholder.Groups[1].Value == tag;
     }
 }
