@@ -6,40 +6,53 @@ using System.Text;
 
 namespace DevSubmarine.DiscordBot.RandomStatus.Services
 {
+    /// <inheritdoc/>
     internal class StatusPlaceholderEngine : IStatusPlaceholderEngine
     {
-        private readonly IReadOnlyDictionary<StatusPlaceholderAttribute, Type> _placeholders;
-        private readonly IServiceProvider _services;
+        private readonly IDictionary<StatusPlaceholderAttribute, Type> _placeholders;
+        private readonly IServiceScopeFactory _services;
         private readonly ILogger _log;
 
-        public StatusPlaceholderEngine(IServiceProvider services, ILogger<StatusPlaceholderEngine> log)
+        public StatusPlaceholderEngine(IServiceScopeFactory services, ILogger<StatusPlaceholderEngine> log)
         {
+            this._placeholders = new Dictionary<StatusPlaceholderAttribute, Type>();
             this._services = services;
             this._log = log;
-
-            this._placeholders = this.LoadPlaceholders();
         }
 
-        private IReadOnlyDictionary<StatusPlaceholderAttribute, Type> LoadPlaceholders()
+        /// <inheritdoc/>
+        public bool AddPlaceholder(Type type)
         {
-            this._log.LogDebug("Loading all placeholder definitions");
+            this._log.LogTrace("Adding status placeholder type {Type}", type);
 
-            Assembly asm = Assembly.GetEntryAssembly();
-            IEnumerable<Type> types = asm.GetTypes()
-                .Where(t =>
-                    !t.IsAbstract &&
-                    typeof(IStatusPlaceholder).IsAssignableFrom(t) &&
-                    !Attribute.IsDefined(t, typeof(CompilerGeneratedAttribute)) &&
-                    Attribute.IsDefined(t, typeof(StatusPlaceholderAttribute), true));
+            if (!type.IsClass)
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it's not a class.");
+            if (type.IsAbstract)
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it's abstract.");
+            if (type.IsGenericType)
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it's generic.");
+            if (!typeof(IStatusPlaceholder).IsAssignableFrom(type))
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it doesn't implement {nameof(IStatusPlaceholder)} interface.");
+            if (Attribute.IsDefined(type, typeof(CompilerGeneratedAttribute)))
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it's compiler-generated.");
 
-            this._log.LogDebug("Found {Count} placeholder definitions", types.Count());
-            return types.ToDictionary(t => t.GetCustomAttribute<StatusPlaceholderAttribute>());
+            StatusPlaceholderAttribute placeholder = type.GetCustomAttribute<StatusPlaceholderAttribute>();
+            if (placeholder == null)
+                throw new InvalidOperationException($"Cannot add status placeholder type {type.FullName} because it isn't decorated with {nameof(StatusPlaceholderAttribute)}.");
+
+            if (this._placeholders.TryAdd(placeholder, type))
+            {
+                this._log.LogDebug("Added status placeholder {Placeholder}", placeholder.Placeholder);
+                return true;
+            }
+            else
+            {
+                this._log.LogWarning("Cannot add status placeholder {Placeholder} as it was already added before", placeholder.Placeholder);
+                return false;
+            }
         }
 
-        // this method is designed to support placeholders that can take args in form of regex groups 
-        // placeholder instance will only be created if needed, and will always be transient
-        // almost a full blown placeholder engine lol. Shout over-engineered, I dare you!
-        // (I know, it actually is, but hey - likely will rarely need to be touched, just create new placeholders away!)
+        /// <inheritdoc/>
         public async Task<string> ConvertPlaceholdersAsync(string status, CancellationToken cancellationToken = default)
         {
             this._log.LogDebug("Running placeholders engine for status {Status}", status);
@@ -49,7 +62,7 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
             foreach (KeyValuePair<StatusPlaceholderAttribute, Type> placeholderInfo in this._placeholders)
             {
                 IEnumerable<Match> matches = placeholderInfo.Key.PlaceholderRegex
-                    .Matches(status)
+                    .Matches(builder.ToString())
                     .Where(m => m != null && m.Success);
 
                 if (!matches.Any())
