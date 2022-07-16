@@ -14,6 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (configureOptions != null)
                 services.Configure(configureOptions);
 
+            services.AddSingleton<IStatusPlaceholderEngine, StatusPlaceholderEngine>();
             services.AddHostedService<RandomStatusService>();
 
             return services;
