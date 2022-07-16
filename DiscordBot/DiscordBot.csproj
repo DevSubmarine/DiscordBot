@@ -28,6 +28,11 @@
     <None Remove="dockerscript.sh" />
   </ItemGroup>
 
+	<ItemGroup>
+		<InternalsVisibleTo Include="DiscordBot.Tests" />
+		<InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+	</ItemGroup>
+
   <ItemGroup>
 	<Content Include=".dockerignore" Condition="Exists('.dockerignore')">
 	 <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -76,10 +81,6 @@
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
     <PackageReference Include="TehGM.Utilities.Randomization" Version="0.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Features\RandomStatus\Placeholders\" />
   </ItemGroup>
 
 </Project>

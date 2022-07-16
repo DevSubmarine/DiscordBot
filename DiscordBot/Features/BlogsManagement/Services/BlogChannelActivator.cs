@@ -4,7 +4,7 @@ using Discord.WebSocket;
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
     /// <inheritdoc/>
-    public class BlogChannelActivator : IBlogChannelActivator
+    internal class BlogChannelActivator : IBlogChannelActivator
     {
         private readonly IDiscordClient _client;
         private readonly ILogger _log;
