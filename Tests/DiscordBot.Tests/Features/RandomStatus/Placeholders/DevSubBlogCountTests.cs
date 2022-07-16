@@ -25,7 +25,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Test, AutoNSubstituteData]
         [Repeat(3)]
         [Category(nameof(DevSubBlogCount.GetReplacementAsync))]
-        public async Task GetReplacement_NoTag_ReturnsCorrectCount(int activeCount, int inactiveCount, int ignoredActiveCount, int ignoredInactiveCount)
+        public async Task GetReplacement_NoTag_ReturnsCorrectCount(int activeCount, int inactiveCount)
         {
             this.BuildGuild(activeCount, inactiveCount, 0, 0);
             int expectedResult = activeCount + inactiveCount;
@@ -53,7 +53,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Test, AutoNSubstituteData]
         [Repeat(3)]
         [Category(nameof(DevSubBlogCount.GetReplacementAsync))]
-        public async Task GetReplacement_ActiveTag_ReturnsCorrectCount(int activeCount, int inactiveCount, int ignoredActiveCount, int ignoredInactiveCount)
+        public async Task GetReplacement_ActiveTag_ReturnsCorrectCount(int activeCount, int inactiveCount)
         {
             this.BuildGuild(activeCount, inactiveCount, 0, 0);
             int expectedResult = activeCount;
@@ -81,7 +81,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         [Test, AutoNSubstituteData]
         [Repeat(3)]
         [Category(nameof(DevSubBlogCount.GetReplacementAsync))]
-        public async Task GetReplacement_InactiveTag_ReturnsCorrectCount(int activeCount, int inactiveCount, int ignoredActiveCount, int ignoredInactiveCount)
+        public async Task GetReplacement_InactiveTag_ReturnsCorrectCount(int activeCount, int inactiveCount)
         {
             this.BuildGuild(activeCount, inactiveCount, 0, 0);
             int expectedResult = inactiveCount;
