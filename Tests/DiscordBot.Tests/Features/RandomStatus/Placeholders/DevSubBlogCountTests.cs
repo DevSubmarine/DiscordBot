@@ -7,6 +7,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
     public class DevSubBlogCountTests : PlaceholderTestBase
     {
         protected override Type PlaceholderType => typeof(DevSubBlogCount);
+        private const string _placeholderName = "DevSubBlogCount";
 
         private BlogsManagementOptions _blogOptions;
 
@@ -30,7 +31,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount + inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -44,7 +45,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount + inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -58,7 +59,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch("{{DevSubBlogCount:active}}"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -72,7 +73,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = activeCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch("{{DevSubBlogCount:active}}"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "active"), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -86,7 +87,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch("{{DevSubBlogCount:inactive}}"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -100,7 +101,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             int expectedResult = inactiveCount;
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch("{{DevSubBlogCount:inactive}}"), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(_placeholderName, "inactive"), default);
 
             result.Should().Be(expectedResult.ToString());
         }
@@ -112,8 +113,8 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
             IGuild guild = this.BuildGuild(activeCount, inactiveCount, ignoredActiveCount, ignoredInactiveCount);
 
             DevSubBlogCount placeholder = base.Fixture.Create<DevSubBlogCount>();
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
 
             await guild.Received(1).GetTextChannelsAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
         }

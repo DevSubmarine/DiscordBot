@@ -28,7 +28,7 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public async Task GetReplacement_ReturnsCorrectCount()
         {
             DevSubMemberCount placeholder = base.Fixture.Create<DevSubMemberCount>();
-            string result = await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
+            string result = await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
 
             result.Should().Be(this._expectedCount.ToString());
         }
@@ -39,8 +39,8 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         public async Task GetReplacement_OnlyCalledOnce()
         {
             DevSubMemberCount placeholder = base.Fixture.Create<DevSubMemberCount>();
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
-            await placeholder.GetReplacementAsync(base.CreateTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
+            await placeholder.GetReplacementAsync(base.CreateDefaultTestMatch(), default);
 
             await this._guild.Received(1).GetUsersAsync(Arg.Any<CacheMode>(), Arg.Any<RequestOptions>());
         }

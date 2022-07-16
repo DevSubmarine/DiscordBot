@@ -14,10 +14,16 @@ namespace DevSubmarine.DiscordBot.Tests.Features.RandomStatus.Placeholders
         protected Regex PlaceholderRegex => this.PlaceholderAttribute.PlaceholderRegex;
 
 
-        protected Match CreateTestMatch(string placeholder)
-            => this.PlaceholderRegex.Match($"{base.Fixture.Create<string>()} {placeholder} {base.Fixture.Create<string>()}");
-        protected Match CreateTestMatch()
-            => this.CreateTestMatch(this.PlaceholderText);
+        protected Match CreateTestMatch(string placeholderName, params object[] tags)
+        {
+            if (!tags.Any())
+                return this.CreateTextMatchForRawText($"{{{{{placeholderName}}}}}");
+            return this.CreateTextMatchForRawText($"{{{{{placeholderName}:{string.Join(':', tags)}}}}}");
+        }
+        protected Match CreateDefaultTestMatch()
+            => this.CreateTextMatchForRawText(this.PlaceholderText);
+        protected Match CreateTextMatchForRawText(string text)
+            => this.PlaceholderRegex.Match($"{base.Fixture.Create<string>()} {text} {base.Fixture.Create<string>()}");
 
 
         public override void SetUp()
