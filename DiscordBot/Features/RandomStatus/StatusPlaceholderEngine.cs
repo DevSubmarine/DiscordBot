@@ -24,11 +24,11 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
         {
             this._log.LogDebug("Loading all placeholder definitions");
 
-            Assembly asm = this.GetType().Assembly;
+            Assembly asm = Assembly.GetEntryAssembly();
             IEnumerable<Type> types = asm.GetTypes()
                 .Where(t =>
                     !t.IsAbstract &&
-                    !typeof(IStatusPlaceholder).IsAssignableFrom(t) &&
+                    typeof(IStatusPlaceholder).IsAssignableFrom(t) &&
                     !Attribute.IsDefined(t, typeof(CompilerGeneratedAttribute)) &&
                     Attribute.IsDefined(t, typeof(StatusPlaceholderAttribute), true));
 
