@@ -21,38 +21,39 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
 
-            context.RegisterSyntaxNodeAction(AnalyzeMissingInterface, SyntaxKind.ClassDeclaration);
-            context.RegisterSyntaxNodeAction(AnalyzeMissingAttribute, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
         }
 
-        private static void AnalyzeMissingInterface(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
         {
             if (!context.TryGetClassDeclaration(out ClassDeclarationSyntax declaration))
                 return;
 
-            if (!declaration.HasRequiredAttribute())
+            bool hasRequiredAttribute = declaration.HasRequiredAttribute();
+            bool hasRequiredInterface = declaration.HasRequiredInterface();
+
+            if (!hasRequiredAttribute && !hasRequiredInterface)
                 return;
 
-            if (!declaration.HasRequiredInterface())
-            {
-                INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), declaration.Identifier.ToString()));
-            }
+            INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
+            AnalyzeMissingInterface(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
+            AnalyzeMissingAttribute(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
         }
 
-        private static void AnalyzeMissingAttribute(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeMissingInterface(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
         {
-            if (!context.TryGetClassDeclaration(out ClassDeclarationSyntax declaration))
+            if (!hasRequiredAttribute || hasRequiredInterface)
                 return;
 
-            if (!declaration.HasRequiredInterface())
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), declaration.Identifier.ToString()));
+        }
+
+        private static void AnalyzeMissingAttribute(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
+        {
+            if (!hasRequiredInterface || hasRequiredAttribute)
                 return;
 
-            if (!declaration.HasRequiredAttribute())
-            {
-                INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingAttribute, symbol.Locations.First(), declaration.Identifier.ToString()));
-            }
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingAttribute, symbol.Locations.First(), declaration.Identifier.ToString()));
         }
     }
 }
