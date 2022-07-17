@@ -20,27 +20,18 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
     public class MissingInterfaceCodeFixProvider : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds
-        {
-            get { return ImmutableArray.Create(DiagnosticID.MissingInterface); }
-        }
+            => ImmutableArray.Create(DiagnosticID.MissingInterface);
 
         public sealed override FixAllProvider GetFixAllProvider()
-        {
-            return WellKnownFixAllProviders.BatchFixer;
-        }
+            => WellKnownFixAllProviders.BatchFixer;
 
         public sealed override async Task RegisterCodeFixesAsync(CodeFixContext context)
         {
-            var root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            SyntaxNode root = await context.Document.GetSyntaxRootAsync(context.CancellationToken).ConfigureAwait(false);
+            Diagnostic diagnostic = context.Diagnostics.First();
+            TextSpan diagnosticSpan = diagnostic.Location.SourceSpan;
+            TypeDeclarationSyntax declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
 
-            // TODO: Replace the following code with your own analysis, generating a CodeAction for each fix to suggest
-            var diagnostic = context.Diagnostics.First();
-            var diagnosticSpan = diagnostic.Location.SourceSpan;
-
-            // Find the type declaration identified by the diagnostic.
-            var declaration = root.FindToken(diagnosticSpan.Start).Parent.AncestorsAndSelf().OfType<TypeDeclarationSyntax>().First();
-
-            // Register a code action that will invoke the fix.
             context.RegisterCodeFix(
                 CodeAction.Create(
                     title: CodeFixResources.MissingInterface_CodeFixTitle,
