@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="StatusPlaceholder.85725e0e-65cc-4827-bf3e-247eb7ed3773" Version="0.1.0.0013" Language="en-US" Publisher="TehGM"/>
+    <Identity Id="StatusPlaceholder.85725e0e-65cc-4827-bf3e-247eb7ed3773" Version="0.1.0.0025" Language="en-US" Publisher="TehGM"/>
     <DisplayName>DevSub Discord Bot Status Placeholder Analyzer</DisplayName>
     <Description xml:space="preserve">Analyzers verifying that DevSubmarine's Discord Bot Status Placeholders are defined correctly.</Description>
   </Metadata>

@@ -61,6 +61,15 @@ namespace StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Add [StatusPlaceholder] attribute.
+        /// </summary>
+        internal static string MissingAttribute_CodeFixTitle {
+            get {
+                return ResourceManager.GetString("MissingAttribute_CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add IStatusPlaceholder interface.
         /// </summary>
         internal static string MissingInterface_CodeFixTitle {

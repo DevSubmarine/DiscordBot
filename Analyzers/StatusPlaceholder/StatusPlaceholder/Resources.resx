@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="MissingAttribute_AnalyzerDescription" xml:space="preserve">
-    <value />
+    <value>Status placeholder needs to be decorated with [StatusPlaceholder] attribute</value>
   </data>
   <data name="MissingAttribute_AnalyzerMessageFormat" xml:space="preserve">
-    <value />
+    <value>Type name '{0}' doesn't have [StatusPlaceholder] attribute</value>
   </data>
   <data name="MissingAttribute_AnalyzerTitle" xml:space="preserve">
-    <value />
+    <value>Status placeholder needs to be decorated with [StatusPlaceholder] attribute</value>
   </data>
   <data name="MissingInterface_AnalyzerDescription" xml:space="preserve">
     <value>Status placeholder needs to implement IStatusPlaceholder interface</value>

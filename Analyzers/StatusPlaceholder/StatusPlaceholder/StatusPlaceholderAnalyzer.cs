@@ -14,7 +14,7 @@ namespace StatusPlaceholder
     public class StatusPlaceholderAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-            => ImmutableArray.Create(DiagnosticRule.MissingInterface);
+            => ImmutableArray.Create(DiagnosticRule.MissingInterface, DiagnosticRule.MissingAttribute);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -22,30 +22,36 @@ namespace StatusPlaceholder
             context.EnableConcurrentExecution();
 
             context.RegisterSyntaxNodeAction(AnalyzeMissingInterface, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeMissingAttribute, SyntaxKind.ClassDeclaration);
         }
 
         private static void AnalyzeMissingInterface(SyntaxNodeAnalysisContext context)
         {
-            if (!(context.Node is ClassDeclarationSyntax classDeclaration))
+            if (!context.TryGetClassDeclaration(out ClassDeclarationSyntax declaration))
                 return;
 
-            bool containsAttribute = false;
-            foreach (AttributeListSyntax attributeList in classDeclaration.AttributeLists)
+            if (!declaration.HasRequiredAttribute())
+                return;
+
+            if (!declaration.HasRequiredInterface())
             {
-                if (attributeList.Attributes.Any(attr => attr.Name.ToString() == "StatusPlaceholder" || attr.Name.ToString() == "StatusPlaceholderAttribute"))
-                {
-                    containsAttribute = true;
-                    break;
-                }
+                INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), declaration.Identifier.ToString()));
             }
-            if (!containsAttribute)
+        }
+
+        private static void AnalyzeMissingAttribute(SyntaxNodeAnalysisContext context)
+        {
+            if (!context.TryGetClassDeclaration(out ClassDeclarationSyntax declaration))
                 return;
 
-            bool hasInterface = classDeclaration.BaseList?.Types.Any(t => t.Type.ToString() == "IStatusPlaceholder") == true;
-            if (!hasInterface)
+            if (!declaration.HasRequiredInterface())
+                return;
+
+            if (!declaration.HasRequiredAttribute())
             {
-                INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(classDeclaration);
-                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), classDeclaration.Identifier.ToString()));
+                INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
+                context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingAttribute, symbol.Locations.First(), declaration.Identifier.ToString()));
             }
         }
     }

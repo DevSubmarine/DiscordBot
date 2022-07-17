@@ -16,8 +16,8 @@ using System.Threading.Tasks;
 
 namespace StatusPlaceholder
 {
-    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(StatusPlaceholderCodeFixProvider)), Shared]
-    public class StatusPlaceholderCodeFixProvider : CodeFixProvider
+    [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MissingInterfaceCodeFixProvider)), Shared]
+    public class MissingInterfaceCodeFixProvider : CodeFixProvider
     {
         public sealed override ImmutableArray<string> FixableDiagnosticIds
         {
@@ -26,7 +26,6 @@ namespace StatusPlaceholder
 
         public sealed override FixAllProvider GetFixAllProvider()
         {
-            // See https://github.com/dotnet/roslyn/blob/main/docs/analyzers/FixAllProvider.md for more information on Fix All Providers
             return WellKnownFixAllProviders.BatchFixer;
         }
 

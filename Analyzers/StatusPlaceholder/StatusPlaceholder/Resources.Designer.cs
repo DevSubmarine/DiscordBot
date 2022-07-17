@@ -61,7 +61,7 @@ namespace StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Status placeholder needs to be decorated with [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerDescription {
             get {
@@ -70,7 +70,7 @@ namespace StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Type name &apos;{0}&apos; doesn&apos;t have [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerMessageFormat {
             get {
@@ -79,7 +79,7 @@ namespace StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to .
+        ///   Looks up a localized string similar to Status placeholder needs to be decorated with [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerTitle {
             get {

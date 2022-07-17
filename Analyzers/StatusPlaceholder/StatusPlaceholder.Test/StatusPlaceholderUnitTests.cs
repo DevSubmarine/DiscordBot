@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using VerifyCS = StatusPlaceholder.Test.CSharpCodeFixVerifier<
     StatusPlaceholder.StatusPlaceholderAnalyzer,
-    StatusPlaceholder.StatusPlaceholderCodeFixProvider>;
+    StatusPlaceholder.MissingInterfaceCodeFixProvider>;
 
 namespace StatusPlaceholder.Test
 {
