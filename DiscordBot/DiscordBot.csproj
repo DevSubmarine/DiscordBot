@@ -87,4 +87,8 @@
     <PackageReference Include="TehGM.Utilities.Randomization" Version="0.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Analyzers\StatusPlaceholder\StatusPlaceholder\StatusPlaceholder.csproj" PrivateAssets="all" ReferenceOutputAssembly="false" OutputItemType="Analyzer" />
+  </ItemGroup>
+
 </Project>
