@@ -126,6 +126,12 @@
   <data name="IsClass_ChangeToClassTitle" xml:space="preserve">
     <value>Convert to class</value>
   </data>
+  <data name="IsGeneric_MakeAbstractTitle" xml:space="preserve">
+    <value>Convert to abstract base class</value>
+  </data>
+  <data name="IsGeneric_RemoveGenericTitle" xml:space="preserve">
+    <value>Remove generic arguments</value>
+  </data>
   <data name="MissingAttribute_AddAbstractKeywordTitle" xml:space="preserve">
     <value>Make class abstract</value>
   </data>

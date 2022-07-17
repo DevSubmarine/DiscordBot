@@ -115,6 +115,33 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Generic placeholders with [StatusPlaceholder] attribute are not supported.
+        /// </summary>
+        internal static string IsGeneric_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("IsGeneric_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Placeholder &apos;{0}&apos; is generic which is not supported. Please note that abstract base classes can be generic..
+        /// </summary>
+        internal static string IsGeneric_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("IsGeneric_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Generic placeholders are not supported.
+        /// </summary>
+        internal static string IsGeneric_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("IsGeneric_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Non-abstract status placeholder should be decorated with [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerDescription {

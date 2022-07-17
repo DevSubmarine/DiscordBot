@@ -88,6 +88,24 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Convert to abstract base class.
+        /// </summary>
+        internal static string IsGeneric_MakeAbstractTitle {
+            get {
+                return ResourceManager.GetString("IsGeneric_MakeAbstractTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove generic arguments.
+        /// </summary>
+        internal static string IsGeneric_RemoveGenericTitle {
+            get {
+                return ResourceManager.GetString("IsGeneric_RemoveGenericTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make class abstract.
         /// </summary>
         internal static string MissingAttribute_AddAbstractKeywordTitle {

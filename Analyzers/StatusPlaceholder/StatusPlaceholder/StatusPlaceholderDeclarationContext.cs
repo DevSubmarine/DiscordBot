@@ -16,6 +16,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
         public bool HasRequiredInterface { get; }
         public SyntaxToken AbstractToken { get; }
 
+        public bool IsGeneric => this.Symbol.IsGenericType;
         public bool IsAbstract => this.AbstractToken != default;
         public bool IsClass => this.Declaration is ClassDeclarationSyntax;
 

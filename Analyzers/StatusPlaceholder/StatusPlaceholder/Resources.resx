@@ -135,6 +135,15 @@
   <data name="IsClass_AnalyzerTitle" xml:space="preserve">
     <value>Status placeholder needs to be a class</value>
   </data>
+  <data name="IsGeneric_AnalyzerDescription" xml:space="preserve">
+    <value>Generic placeholders with [StatusPlaceholder] attribute are not supported</value>
+  </data>
+  <data name="IsGeneric_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Placeholder '{0}' is generic which is not supported. Please note that abstract base classes can be generic.</value>
+  </data>
+  <data name="IsGeneric_AnalyzerTitle" xml:space="preserve">
+    <value>Generic placeholders are not supported</value>
+  </data>
   <data name="MissingAttribute_AnalyzerDescription" xml:space="preserve">
     <value>Non-abstract status placeholder should be decorated with [StatusPlaceholder] attribute</value>
   </data>
