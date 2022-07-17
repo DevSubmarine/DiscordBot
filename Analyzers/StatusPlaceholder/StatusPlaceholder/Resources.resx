@@ -117,6 +117,15 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="IsAbstract_AnalyzerDescription" xml:space="preserve">
+    <value>Status placeholder cannot be abstract</value>
+  </data>
+  <data name="IsAbstract_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Type name '{0}' is abstract</value>
+  </data>
+  <data name="IsAbstract_AnalyzerTitle" xml:space="preserve">
+    <value>Status placeholder cannot be abstract</value>
+  </data>
   <data name="MissingAttribute_AnalyzerDescription" xml:space="preserve">
     <value>Status placeholder needs to be decorated with [StatusPlaceholder] attribute</value>
   </data>

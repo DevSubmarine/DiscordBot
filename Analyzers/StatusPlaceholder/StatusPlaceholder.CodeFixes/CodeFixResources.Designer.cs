@@ -61,6 +61,15 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Remove abstract keyword.
+        /// </summary>
+        internal static string IsAbstract_CodeFixTitle {
+            get {
+                return ResourceManager.GetString("IsAbstract_CodeFixTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Add [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_CodeFixTitle {

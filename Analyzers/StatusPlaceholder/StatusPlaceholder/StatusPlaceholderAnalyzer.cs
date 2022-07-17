@@ -14,7 +14,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
     public class StatusPlaceholderAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-            => ImmutableArray.Create(DiagnosticRule.MissingInterface, DiagnosticRule.MissingAttribute);
+            => ImmutableArray.Create(DiagnosticRule.MissingInterface, DiagnosticRule.MissingAttribute, DiagnosticRule.IsAbstract);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -38,11 +38,12 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
             INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
             AnalyzeMissingInterface(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
             AnalyzeMissingAttribute(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
+            AnalyzeAbstract(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
         }
 
         private static void AnalyzeMissingInterface(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
         {
-            if (!hasRequiredAttribute || hasRequiredInterface)
+            if (hasRequiredInterface)
                 return;
 
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), declaration.Identifier.ToString()));
@@ -50,10 +51,18 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
         private static void AnalyzeMissingAttribute(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
         {
-            if (!hasRequiredInterface || hasRequiredAttribute)
+            if (hasRequiredAttribute)
                 return;
 
             context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingAttribute, symbol.Locations.First(), declaration.Identifier.ToString()));
+        }
+
+        private static void AnalyzeAbstract(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
+        {
+            if (!declaration.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AbstractKeyword)))
+                return;
+
+            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.IsAbstract, symbol.Locations.First(), declaration.Identifier.ToString()));
         }
     }
 }

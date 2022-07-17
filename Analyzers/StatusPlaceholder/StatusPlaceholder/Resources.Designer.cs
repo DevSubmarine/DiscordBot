@@ -61,6 +61,33 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Status placeholder cannot be abstract.
+        /// </summary>
+        internal static string IsAbstract_AnalyzerDescription {
+            get {
+                return ResourceManager.GetString("IsAbstract_AnalyzerDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type name &apos;{0}&apos; is abstract.
+        /// </summary>
+        internal static string IsAbstract_AnalyzerMessageFormat {
+            get {
+                return ResourceManager.GetString("IsAbstract_AnalyzerMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status placeholder cannot be abstract.
+        /// </summary>
+        internal static string IsAbstract_AnalyzerTitle {
+            get {
+                return ResourceManager.GetString("IsAbstract_AnalyzerTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Status placeholder needs to be decorated with [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerDescription {

@@ -4,5 +4,6 @@
     {
         public const string MissingInterface = "DS001";
         public const string MissingAttribute = "DS002";
+        public const string IsAbstract = "DS003";
     }
 }
