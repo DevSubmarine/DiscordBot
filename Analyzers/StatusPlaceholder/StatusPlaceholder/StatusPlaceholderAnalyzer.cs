@@ -8,7 +8,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Threading;
 
-namespace StatusPlaceholder
+namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class StatusPlaceholderAnalyzer : DiagnosticAnalyzer

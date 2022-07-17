@@ -6,7 +6,7 @@ using Microsoft.CodeAnalysis.VisualBasic.Testing;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StatusPlaceholder.Test
+namespace DevSubmarine.Analyzers.StatusPlaceholder.Tests
 {
     public static partial class VisualBasicAnalyzerVerifier<TAnalyzer>
         where TAnalyzer : DiagnosticAnalyzer, new()

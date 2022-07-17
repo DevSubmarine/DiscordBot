@@ -5,6 +5,7 @@
 
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
+    <RootNamespace>DevSubmarine.Analyzers.StatusPlaceholder.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

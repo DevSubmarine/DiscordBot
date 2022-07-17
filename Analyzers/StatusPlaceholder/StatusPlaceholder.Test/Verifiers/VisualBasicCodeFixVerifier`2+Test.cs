@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using Microsoft.CodeAnalysis.Testing.Verifiers;
 using Microsoft.CodeAnalysis.VisualBasic.Testing;
 
-namespace StatusPlaceholder.Test
+namespace DevSubmarine.Analyzers.StatusPlaceholder.Tests
 {
     public static partial class VisualBasicCodeFixVerifier<TAnalyzer, TCodeFix>
         where TAnalyzer : DiagnosticAnalyzer, new()

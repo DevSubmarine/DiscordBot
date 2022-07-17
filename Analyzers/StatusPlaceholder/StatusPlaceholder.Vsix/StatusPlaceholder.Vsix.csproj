@@ -4,7 +4,7 @@
 
   <PropertyGroup>
     <TargetFramework>net472</TargetFramework>
-    <RootNamespace>StatusPlaceholder.Vsix</RootNamespace>
+    <RootNamespace>DevSubmarine.Analyzers.StatusPlaceholder.Vsix</RootNamespace>
     <AssemblyName>StatusPlaceholder.Vsix</AssemblyName>
   </PropertyGroup>
 

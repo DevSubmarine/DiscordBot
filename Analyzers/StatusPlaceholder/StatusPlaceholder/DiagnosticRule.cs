@@ -1,6 +1,6 @@
 ﻿using Microsoft.CodeAnalysis;
 
-namespace StatusPlaceholder
+namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     internal static class DiagnosticRule
     {

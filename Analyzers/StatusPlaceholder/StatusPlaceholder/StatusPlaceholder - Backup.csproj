@@ -6,7 +6,6 @@
 
     <!-- Avoid ID conflicts with the package project. -->
     <PackageId>*$(MSBuildProjectFile)*</PackageId>
-    <RootNamespace>DevSubmarine.Analyzers.StatusPlaceholder</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

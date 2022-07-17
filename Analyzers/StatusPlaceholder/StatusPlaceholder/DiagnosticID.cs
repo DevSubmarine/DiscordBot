@@ -1,4 +1,4 @@
-﻿namespace StatusPlaceholder
+﻿namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     public static class DiagnosticID
     {

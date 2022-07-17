@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Testing;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StatusPlaceholder.Test
+namespace DevSubmarine.Analyzers.StatusPlaceholder.Tests
 {
     public static partial class VisualBasicCodeRefactoringVerifier<TCodeRefactoring>
         where TCodeRefactoring : CodeRefactoringProvider, new()

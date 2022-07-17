@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Linq;
 
-namespace StatusPlaceholder
+namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     internal static class PlaceholderAnalysisHelper
     {

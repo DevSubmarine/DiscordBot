@@ -3,7 +3,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using System;
 using System.Collections.Immutable;
 
-namespace StatusPlaceholder.Test
+namespace DevSubmarine.Analyzers.StatusPlaceholder.Tests
 {
     internal static class CSharpVerifierHelper
     {

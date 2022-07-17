@@ -14,7 +14,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace StatusPlaceholder
+namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     [ExportCodeFixProvider(LanguageNames.CSharp, Name = nameof(MissingAttributeCodeFixProvider)), Shared]
     public class MissingAttributeCodeFixProvider : CodeFixProvider

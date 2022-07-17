@@ -3,7 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <IsPackable>false</IsPackable>
-    <RootNamespace>StatusPlaceholder</RootNamespace>
+    <RootNamespace>DevSubmarine.Analyzers.StatusPlaceholder</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
