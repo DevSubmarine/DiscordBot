@@ -24,45 +24,35 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
             context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
         }
 
-        private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext context)
+        private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext nodeContext)
         {
-            if (!context.TryGetClassDeclaration(out ClassDeclarationSyntax declaration))
+            if (!StatusPlaceholderDeclarationContext.TryGetFromContext(nodeContext, out StatusPlaceholderDeclarationContext context))
                 return;
 
-            bool hasRequiredAttribute = declaration.HasRequiredAttribute();
-            bool hasRequiredInterface = declaration.HasRequiredInterface();
-
-            if (!hasRequiredAttribute && !hasRequiredInterface)
-                return;
-
-            INamedTypeSymbol symbol = context.SemanticModel.GetDeclaredSymbol(declaration);
-            AnalyzeMissingInterface(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
-            AnalyzeMissingAttribute(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
-            AnalyzeAbstract(context, declaration, symbol, hasRequiredAttribute, hasRequiredInterface);
+            AnalyzeMissingInterface(context);
+            AnalyzeMissingAttribute(context);
+            AnalyzeAbstract(context);
         }
 
-        private static void AnalyzeMissingInterface(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
+        private static void AnalyzeMissingInterface(StatusPlaceholderDeclarationContext context)
         {
-            if (hasRequiredInterface)
+            if (context.HasRequiredInterface)
                 return;
-
-            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingInterface, symbol.Locations.First(), declaration.Identifier.ToString()));
+            context.ReportDiagnostic(DiagnosticRule.MissingInterface);
         }
 
-        private static void AnalyzeMissingAttribute(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
+        private static void AnalyzeMissingAttribute(StatusPlaceholderDeclarationContext context)
         {
-            if (hasRequiredAttribute)
+            if (context.HasRequiredAttribute)
                 return;
-
-            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.MissingAttribute, symbol.Locations.First(), declaration.Identifier.ToString()));
+            context.ReportDiagnostic(DiagnosticRule.MissingAttribute);
         }
 
-        private static void AnalyzeAbstract(SyntaxNodeAnalysisContext context, ClassDeclarationSyntax declaration, INamedTypeSymbol symbol, bool hasRequiredAttribute, bool hasRequiredInterface)
+        private static void AnalyzeAbstract(StatusPlaceholderDeclarationContext context)
         {
-            if (!declaration.Modifiers.Any(modifier => modifier.IsKind(SyntaxKind.AbstractKeyword)))
+            if (!context.IsAbstract)
                 return;
-
-            context.ReportDiagnostic(Diagnostic.Create(DiagnosticRule.IsAbstract, symbol.Locations.First(), declaration.Identifier.ToString()));
+            context.ReportDiagnostic(DiagnosticRule.IsAbstract);
         }
     }
 }
