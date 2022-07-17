@@ -43,14 +43,14 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
         private static void AnalyzeMissingAttribute(StatusPlaceholderDeclarationContext context)
         {
-            if (context.HasRequiredAttribute)
+            if (context.HasRequiredAttribute || context.IsAbstract)
                 return;
             context.ReportDiagnostic(DiagnosticRule.MissingAttribute);
         }
 
         private static void AnalyzeAbstract(StatusPlaceholderDeclarationContext context)
         {
-            if (!context.IsAbstract)
+            if (!context.IsAbstract || !context.HasRequiredAttribute)
                 return;
             context.ReportDiagnostic(DiagnosticRule.IsAbstract);
         }

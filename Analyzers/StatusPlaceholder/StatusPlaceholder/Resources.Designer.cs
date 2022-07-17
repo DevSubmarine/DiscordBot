@@ -88,7 +88,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Status placeholder needs to be decorated with [StatusPlaceholder] attribute.
+        ///   Looks up a localized string similar to Status placeholder should be decorated with [StatusPlaceholder] attribute, unless it&apos;s abstract.
         /// </summary>
         internal static string MissingAttribute_AnalyzerDescription {
             get {
@@ -97,7 +97,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Type name &apos;{0}&apos; doesn&apos;t have [StatusPlaceholder] attribute.
+        ///   Looks up a localized string similar to Non-abstract type name &apos;{0}&apos; doesn&apos;t have [StatusPlaceholder] attribute.
         /// </summary>
         internal static string MissingAttribute_AnalyzerMessageFormat {
             get {
@@ -106,7 +106,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Status placeholder needs to be decorated with [StatusPlaceholder] attribute.
+        ///   Looks up a localized string similar to Status placeholder should be decorated with [StatusPlaceholder] attribute, unless it&apos;s abstract.
         /// </summary>
         internal static string MissingAttribute_AnalyzerTitle {
             get {

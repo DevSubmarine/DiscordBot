@@ -34,18 +34,33 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: CodeFixResources.MissingAttribute_CodeFixTitle,
-                    createChangedDocument: c => this.AddRequiredAttribute(context.Document, declaration, c),
-                    equivalenceKey: nameof(CodeFixResources.MissingAttribute_CodeFixTitle)),
+                    title: CodeFixResources.MissingAttribute_AddAttributeTitle,
+                    createChangedDocument: c => this.AddAttribute(context.Document, declaration, c),
+                    equivalenceKey: nameof(CodeFixResources.MissingAttribute_AddAttributeTitle)),
+                diagnostic);
+            context.RegisterCodeFix(
+                CodeAction.Create(
+                    title: CodeFixResources.MissingAttribute_AddAbstractKeywordTitle,
+                    createChangedDocument: c => this.AddAbstractKeyword(context.Document, declaration, c),
+                    equivalenceKey: nameof(CodeFixResources.MissingAttribute_AddAbstractKeywordTitle)),
                 diagnostic);
         }
 
-        private async Task<Document> AddRequiredAttribute(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
+        private async Task<Document> AddAttribute(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
         {
             AttributeSyntax attribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(RequiredTypeName.StatusPlaceholderAttribute))
                 .WithArgumentList(SyntaxFactory.AttributeArgumentList());
             SyntaxNode node = declaration.WithAttributeLists(declaration.AttributeLists.Add(
                 SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(attribute))));
+            SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken);
+            return document.WithSyntaxRoot(root.ReplaceNode(declaration, node));
+        }
+
+        private async Task<Document> AddAbstractKeyword(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
+        {
+            SyntaxToken keyword = SyntaxFactory.Token(SyntaxKind.AbstractKeyword);
+            SyntaxTokenList modifiers = declaration.Modifiers.Add(keyword);
+            SyntaxNode node = declaration.WithModifiers(modifiers);
             SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken);
             return document.WithSyntaxRoot(root.ReplaceNode(declaration, node));
         }

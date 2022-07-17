@@ -63,27 +63,45 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         /// <summary>
         ///   Looks up a localized string similar to Remove abstract keyword.
         /// </summary>
-        internal static string IsAbstract_CodeFixTitle {
+        internal static string IsAbstract_RemoveAbstractKeywordTitle {
             get {
-                return ResourceManager.GetString("IsAbstract_CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("IsAbstract_RemoveAbstractKeywordTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Remove [StatusPlaceholder] attribute.
+        /// </summary>
+        internal static string IsAbstract_RemoveAttributeTitle {
+            get {
+                return ResourceManager.GetString("IsAbstract_RemoveAttributeTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Make class abstract.
+        /// </summary>
+        internal static string MissingAttribute_AddAbstractKeywordTitle {
+            get {
+                return ResourceManager.GetString("MissingAttribute_AddAbstractKeywordTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add [StatusPlaceholder] attribute.
         /// </summary>
-        internal static string MissingAttribute_CodeFixTitle {
+        internal static string MissingAttribute_AddAttributeTitle {
             get {
-                return ResourceManager.GetString("MissingAttribute_CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("MissingAttribute_AddAttributeTitle", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Add IStatusPlaceholder interface.
         /// </summary>
-        internal static string MissingInterface_CodeFixTitle {
+        internal static string MissingInterface_AddInterfaceTitle {
             get {
-                return ResourceManager.GetString("MissingInterface_CodeFixTitle", resourceCulture);
+                return ResourceManager.GetString("MissingInterface_AddInterfaceTitle", resourceCulture);
             }
         }
     }

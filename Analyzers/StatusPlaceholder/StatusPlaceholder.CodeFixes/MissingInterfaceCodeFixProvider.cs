@@ -34,13 +34,13 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    title: CodeFixResources.MissingInterface_CodeFixTitle,
-                    createChangedDocument: c => this.ImplementRequiredInterface(context.Document, declaration, c),
-                    equivalenceKey: nameof(CodeFixResources.MissingInterface_CodeFixTitle)),
+                    title: CodeFixResources.MissingInterface_AddInterfaceTitle,
+                    createChangedDocument: c => this.AddInterface(context.Document, declaration, c),
+                    equivalenceKey: nameof(CodeFixResources.MissingInterface_AddInterfaceTitle)),
                 diagnostic);
         }
 
-        private async Task<Document> ImplementRequiredInterface(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
+        private async Task<Document> AddInterface(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
         {
             SyntaxGenerator generator = SyntaxGenerator.GetGenerator(document);
             SyntaxNode node = generator.AddBaseType(declaration, SyntaxFactory.ParseTypeName(RequiredTypeName.StatusPlaceholderInterface));
