@@ -14,6 +14,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
         public bool HasRequiredAttribute { get; }
         public bool HasRequiredInterface { get; }
         public bool IsAbstract { get; }
+        public bool IsClass => this.Declaration is ClassDeclarationSyntax;
 
         public StatusPlaceholderDeclarationContext(SyntaxNodeAnalysisContext context, BaseTypeDeclarationSyntax declaration, INamedTypeSymbol symbol,
             bool hasRequiredAttribute, bool hasRequiredInterface, bool isAbstract)

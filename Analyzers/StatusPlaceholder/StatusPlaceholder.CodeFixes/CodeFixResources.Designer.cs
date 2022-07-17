@@ -79,6 +79,15 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Convert to class.
+        /// </summary>
+        internal static string IsClass_ChangeToClassTitle {
+            get {
+                return ResourceManager.GetString("IsClass_ChangeToClassTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make class abstract.
         /// </summary>
         internal static string MissingAttribute_AddAbstractKeywordTitle {

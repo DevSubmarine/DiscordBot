@@ -123,6 +123,9 @@
   <data name="IsAbstract_RemoveAttributeTitle" xml:space="preserve">
     <value>Remove [StatusPlaceholder] attribute</value>
   </data>
+  <data name="IsClass_ChangeToClassTitle" xml:space="preserve">
+    <value>Convert to class</value>
+  </data>
   <data name="MissingAttribute_AddAbstractKeywordTitle" xml:space="preserve">
     <value>Make class abstract</value>
   </data>

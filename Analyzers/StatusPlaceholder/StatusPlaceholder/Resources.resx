@@ -126,6 +126,15 @@
   <data name="IsAbstract_AnalyzerTitle" xml:space="preserve">
     <value>Status placeholder cannot be abstract</value>
   </data>
+  <data name="IsClass_AnalyzerDescription" xml:space="preserve">
+    <value>Status placeholder needs to be a class</value>
+  </data>
+  <data name="IsClass_AnalyzerMessageFormat" xml:space="preserve">
+    <value>Status placeholder needs to be a class. Struct and interface placeholders aren't supported.</value>
+  </data>
+  <data name="IsClass_AnalyzerTitle" xml:space="preserve">
+    <value>Status placeholder needs to be a class</value>
+  </data>
   <data name="MissingAttribute_AnalyzerDescription" xml:space="preserve">
     <value>Non-abstract status placeholder should be decorated with [StatusPlaceholder] attribute</value>
   </data>

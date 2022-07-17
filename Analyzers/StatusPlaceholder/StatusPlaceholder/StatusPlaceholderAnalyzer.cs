@@ -14,14 +14,15 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
     public class StatusPlaceholderAnalyzer : DiagnosticAnalyzer
     {
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics
-            => ImmutableArray.Create(DiagnosticRule.MissingInterface, DiagnosticRule.MissingAttribute, DiagnosticRule.IsAbstract);
+            => ImmutableArray.Create(DiagnosticRule.MissingInterface, DiagnosticRule.MissingAttribute, DiagnosticRule.IsAbstract, DiagnosticRule.IsClass);
 
         public override void Initialize(AnalysisContext context)
         {
             context.ConfigureGeneratedCodeAnalysis(GeneratedCodeAnalysisFlags.None);
             context.EnableConcurrentExecution();
 
-            context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration);
+            context.RegisterSyntaxNodeAction(AnalyzeClassDeclaration, SyntaxKind.ClassDeclaration, 
+                SyntaxKind.StructDeclaration, SyntaxKind.InterfaceDeclaration, SyntaxKind.EnumDeclaration);
         }
 
         private static void AnalyzeClassDeclaration(SyntaxNodeAnalysisContext nodeContext)
@@ -31,7 +32,8 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
             AnalyzeMissingInterface(context);
             AnalyzeMissingAttribute(context);
-            AnalyzeAbstract(context);
+            AnalyzeIsAbstract(context);
+            AnalyzeIsClass(context);
         }
 
         private static void AnalyzeMissingInterface(StatusPlaceholderDeclarationContext context)
@@ -48,11 +50,18 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
             context.ReportDiagnostic(DiagnosticRule.MissingAttribute);
         }
 
-        private static void AnalyzeAbstract(StatusPlaceholderDeclarationContext context)
+        private static void AnalyzeIsAbstract(StatusPlaceholderDeclarationContext context)
         {
             if (!context.IsAbstract || !context.HasRequiredAttribute)
                 return;
             context.ReportDiagnostic(DiagnosticRule.IsAbstract);
+        }
+
+        private static void AnalyzeIsClass(StatusPlaceholderDeclarationContext context)
+        {
+            if (context.IsClass)
+                return;
+            context.ReportDiagnostic(DiagnosticRule.IsClass);
         }
     }
 }
