@@ -54,14 +54,14 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
         {
             if (!context.IsAbstract || !context.HasRequiredAttribute)
                 return;
-            context.ReportDiagnostic(DiagnosticRule.IsAbstract);
+            context.ReportDiagnostic(DiagnosticRule.IsAbstract, context.AbstractToken);
         }
 
         private static void AnalyzeIsClass(StatusPlaceholderDeclarationContext context)
         {
             if (context.IsClass)
                 return;
-            context.ReportDiagnostic(DiagnosticRule.IsClass);
+            context.ReportDiagnostic(DiagnosticRule.IsClass, context.Declaration.Keyword);
         }
     }
 }
