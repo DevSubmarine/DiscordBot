@@ -42,7 +42,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 
         private async Task<Document> AddRequiredAttribute(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
         {
-            AttributeSyntax attribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName("StatusPlaceholder"))
+            AttributeSyntax attribute = SyntaxFactory.Attribute(SyntaxFactory.IdentifierName(RequiredTypeName.StatusPlaceholderAttribute))
                 .WithArgumentList(SyntaxFactory.AttributeArgumentList());
             SyntaxNode node = declaration.WithAttributeLists(declaration.AttributeLists.Add(
                 SyntaxFactory.AttributeList(SyntaxFactory.SingletonSeparatedList<AttributeSyntax>(attribute))));

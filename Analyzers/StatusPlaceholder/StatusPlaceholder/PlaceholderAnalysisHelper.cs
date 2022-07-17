@@ -7,18 +7,18 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
 {
     internal static class PlaceholderAnalysisHelper
     {
-        public static bool HasRequiredInterface(this ClassDeclarationSyntax declaration, string name = "IStatusPlaceholder")
+        public static bool HasRequiredInterface(this ClassDeclarationSyntax declaration, string name = RequiredTypeName.StatusPlaceholderInterface)
             => declaration.BaseList?.Types.Any(t => t.Type.ToString() == name) == true;
-        public static bool HasRequiredInterface(this SyntaxNodeAnalysisContext context, string name = "IStatusPlaceholder")
+        public static bool HasRequiredInterface(this SyntaxNodeAnalysisContext context, string name = RequiredTypeName.StatusPlaceholderInterface)
             => HasRequiredInterface(GetClassDeclaration(context), name);
 
-        public static bool HasRequiredAttribute(this ClassDeclarationSyntax declaration, string name = "StatusPlaceholder")
+        public static bool HasRequiredAttribute(this ClassDeclarationSyntax declaration, string name = RequiredTypeName.StatusPlaceholderAttribute)
         {
             string alternateName = name + "Attribute";
             return declaration.AttributeLists.SelectMany(list => list.Attributes)
                 .Any(attr => attr.Name.ToString() == name || attr.Name.ToString() == alternateName);
         }
-        public static bool HasRequiredAttribute(this SyntaxNodeAnalysisContext context, string name = "StatusPlaceholder")
+        public static bool HasRequiredAttribute(this SyntaxNodeAnalysisContext context, string name = RequiredTypeName.StatusPlaceholderAttribute)
             => HasRequiredAttribute(GetClassDeclaration(context), name);
 
         public static bool TryGetClassDeclaration(this SyntaxNodeAnalysisContext context, out ClassDeclarationSyntax declaration)

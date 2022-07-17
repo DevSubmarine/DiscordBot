@@ -43,7 +43,7 @@ namespace DevSubmarine.Analyzers.StatusPlaceholder
         private async Task<Document> ImplementRequiredInterface(Document document, TypeDeclarationSyntax declaration, CancellationToken cancellationToken)
         {
             SyntaxGenerator generator = SyntaxGenerator.GetGenerator(document);
-            SyntaxNode node = generator.AddBaseType(declaration, SyntaxFactory.ParseTypeName("IStatusPlaceholder"));
+            SyntaxNode node = generator.AddBaseType(declaration, SyntaxFactory.ParseTypeName(RequiredTypeName.StatusPlaceholderInterface));
             SyntaxNode root = await document.GetSyntaxRootAsync(cancellationToken);
             return document.WithSyntaxRoot(root.ReplaceNode(declaration, node));
         }
