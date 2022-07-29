@@ -11,7 +11,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
         public MongoUserBirthdayStore(IMongoDatabaseClient client, IOptions<MongoOptions> databaseOptions, ILogger<MongoUserBirthdayStore> log)
         {
             this._log = log;
-            this._collection = client.GetCollection<UserBirthday>(databaseOptions.Value.SubWordsCollectionName);
+            this._collection = client.GetCollection<UserBirthday>(databaseOptions.Value.UserBirthdaysCollectionName);
         }
 
         public async Task<IEnumerable<UserBirthday>> GetAllAsync(CancellationToken cancellationToken = default)
