@@ -5,7 +5,7 @@ using TehGM.Utilities.Randomization;
 namespace DevSubmarine.DiscordBot.Birthdays.Commands
 {
     [Group("birthday", "Access user birthdays")]
-    public class UserBirthdaysCommands : DevSubInteractionModule
+    public class UserBirthdaysSlashCommands : DevSubInteractionModule
     {
         private readonly IUserBirthdaysProvider _provider;
         private readonly IUserBirthdayEmbedBuilder _embedBuilder;
@@ -13,7 +13,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
 
         private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug };
 
-        public UserBirthdaysCommands(IUserBirthdaysProvider provider, IRandomizer randomizer, IUserBirthdayEmbedBuilder embedBuilder)
+        public UserBirthdaysSlashCommands(IUserBirthdaysProvider provider, IRandomizer randomizer, IUserBirthdayEmbedBuilder embedBuilder)
         {
             this._provider = provider;
             this._randomizer = randomizer;
