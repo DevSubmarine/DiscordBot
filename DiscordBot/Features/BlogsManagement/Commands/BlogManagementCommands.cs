@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.Net;
 using TehGM.Utilities.Randomization;
 
-namespace DevSubmarine.DiscordBot.BlogsManagement.Services
+namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
 {
     [Group("blog", "Commands for managing blog channels")]
     [EnabledInDm(false)]

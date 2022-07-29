@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 
-namespace DevSubmarine.DiscordBot.SubWords.Services
+namespace DevSubmarine.DiscordBot.SubWords.Commands
 {
     [Group("dictionary", "Commands for managing dictionary of dev sub invented words.")]
     public class SubWordsCommands : DevSubInteractionModule

@@ -3,7 +3,7 @@ using Discord;
 using Discord.Interactions;
 using System.Text;
 
-namespace DevSubmarine.DiscordBot.Voting.Services
+namespace DevSubmarine.DiscordBot.Voting.Commands
 {
     [Group("vote", "Vote to kick others... or something")]
     [EnabledInDm(false)]
@@ -23,9 +23,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         public async Task CmdVoteKickAsync(
             [Summary("User", "User to vote kick")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Kick, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Kick, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
 
-            IVotingResult result = await this._voting.VoteAsync(vote, base.Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -37,9 +37,9 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         public async Task CmdVoteBanAsync(
             [Summary("User", "User to vote ban")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Ban, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Ban, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
 
-            IVotingResult result = await this._voting.VoteAsync(vote, base.Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -51,17 +51,17 @@ namespace DevSubmarine.DiscordBot.Voting.Services
         public async Task CmdVoteModAsync(
             [Summary("User", "User to vote mod")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Mod, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Mod, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
 
             if (vote.VoterID == vote.TargetID)
             {
                 await base.RespondAsync(
                     text: $"You cannot vote to mod yourself, dumbo. {ResponseEmoji.FeelsDumbMan}",
-                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                    options: GetRequestOptions()).ConfigureAwait(false);
                 return;
             }
 
-            IVotingResult result = await this._voting.VoteAsync(vote, base.Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -73,8 +73,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             SuccessVotingResult voteResult = (SuccessVotingResult)result;
             const string settingsCmd = "`/user-settings vote-ping`";
 
-            IGuildUser user = await base.Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.Context.CancellationToken).ConfigureAwait(false);
-            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            IGuildUser user = await Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, Context.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, Context.CancellationToken).ConfigureAwait(false);
             AllowedMentions mentions = settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
 
             Embed embed = this.BuildResultEmbed(voteResult, user);
@@ -84,7 +84,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             await base.RespondAsync(
                 text: message,
                 embed: embed,
-                options: base.GetRequestOptions(),
+                options: GetRequestOptions(),
                 allowedMentions: mentions)
                 .ConfigureAwait(false);
         }
@@ -93,25 +93,25 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             => base.RespondAsync(
                 text: $"You need to wait {cooldown.ToDisplayString()} more to vote against {user.Mention}. {ResponseEmoji.FeelsDumbMan}",
                 allowedMentions: AllowedMentions.None,
-                options: base.GetRequestOptions());
+                options: GetRequestOptions());
 
         private Embed BuildResultEmbed(SuccessVotingResult vote, IGuildUser target)
         {
-            string voterName = base.Context.Guild.GetUser(base.Context.User.Id)?.Nickname ?? base.Context.User.Username;
+            string voterName = Context.Guild.GetUser(Context.User.Id)?.Nickname ?? Context.User.Username;
             string targetName = target.Nickname ?? target.Username;
             return new EmbedBuilder()
                 .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {targetName}")
                 .WithThumbnailUrl(target.GetSafeAvatarUrl())
                 .AddField($"Total votes", vote.TotalVotesAgainstTarget.ToString())
                 .WithTimestamp(vote.CreatedVote.Timestamp)
-                .WithFooter($"By {voterName} for the {this.FormatOrdinal(vote.VotesAgainstTarget)} time", base.Context.User.GetSafeAvatarUrl())
+                .WithFooter($"By {voterName} for the {this.FormatOrdinal(vote.VotesAgainstTarget)} time", Context.User.GetSafeAvatarUrl())
                 .WithColor(target.GetUserColour())
                 .Build();
         }
 
         private async Task<AllowedMentions> GetMentionOptionsAsync(ulong userID)
         {
-            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, base.Context.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, Context.CancellationToken).ConfigureAwait(false);
             return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
         }
 
@@ -148,18 +148,18 @@ namespace DevSubmarine.DiscordBot.Voting.Services
             public async Task CmdCheckAsync(
                 [Summary("User", "User to check statistics for")] IGuildUser user = null)
             {
-                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
+                await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
 
                 if (user == null)
-                    user = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken); 
+                    user = await Context.Guild.GetGuildUserAsync(Context.User.Id, Context.CancellationToken);
 
-                Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, base.Context.CancellationToken);
-                Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, base.Context.CancellationToken);
+                Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, Context.CancellationToken);
+                Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, Context.CancellationToken);
                 await Task.WhenAll(votesTargetTask, votesVoterTask).ConfigureAwait(false);
 
                 IEnumerable<Vote> votesTarget = votesTargetTask.Result;
                 IEnumerable<Vote> votesVoter = votesVoterTask.Result;
-                IEnumerable<Vote> votesAll = Enumerable.Union(votesTarget, votesVoter);
+                IEnumerable<Vote> votesAll = votesTarget.Union(votesVoter);
 
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithTitle($"Voting stats for {user.GetUsernameWithDiscriminator()}")
@@ -236,7 +236,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                         voterAlignment != null ? VotingAlignment.FormatScore(voterAlignment.Score) : "N/A",
                         inline: true);
                     embed.AddField("Survivor Rep",
-                        targetAlignment != null ? VotingAlignment.FormatScore(targetAlignment.Score) : "N/A", 
+                        targetAlignment != null ? VotingAlignment.FormatScore(targetAlignment.Score) : "N/A",
                         inline: true);
 
                     totalAlignment = this._alignment.CalculateAlignment(votesAll);
@@ -251,7 +251,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                     msg.Embed = embed.Build();
                     msg.AllowedMentions = AllowedMentions.None;
                 },
-                    base.GetRequestOptions()).ConfigureAwait(false);
+                    GetRequestOptions()).ConfigureAwait(false);
             }
 
             [SlashCommand("search", "Query for statistics using specified search criteria")]
@@ -261,8 +261,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 [Summary("Voter", "User that sent the vote")] IUser voter = null,
                 [Summary("VoteType", "Type of the vote")] VoteType? voteType = null)
             {
-                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
-                IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, base.Context.CancellationToken).ConfigureAwait(false);
+                await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
+                IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, Context.CancellationToken).ConfigureAwait(false);
 
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithTitle($"Found {results.LongCount()} votes")
@@ -277,7 +277,7 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                             .WithDescription($"No votes matching your criteria found. {ResponseEmoji.FeelsBeanMan}")
                             .Build();
                         msg.AllowedMentions = AllowedMentions.None;
-                    }, base.GetRequestOptions()).ConfigureAwait(false);
+                    }, GetRequestOptions()).ConfigureAwait(false);
                     return;
                 }
 
@@ -296,8 +296,8 @@ namespace DevSubmarine.DiscordBot.Voting.Services
                 {
                     msg.Embed = embed.Build();
                     msg.AllowedMentions = AllowedMentions.None;
-                }, 
-                    base.GetRequestOptions()).ConfigureAwait(false);
+                },
+                    GetRequestOptions()).ConfigureAwait(false);
             }
 
             private IEnumerable<IGrouping<TKey, Vote>> GetTop<TKey>(IEnumerable<Vote> votes, Func<Vote, TKey> keySelector, int count)
