@@ -12,8 +12,10 @@ namespace DevSubmarine.DiscordBot.Birthdays
         [BsonElement("year"), BsonDefaultValue(null)]
         public int? Year { get; }
 
+        [BsonIgnore]
         public bool IsToday
             => this.Day == DateTime.UtcNow.Day && this.Month == DateTime.UtcNow.Month;
+        [BsonIgnore]
         public static BirthdayDate Today
             => new BirthdayDate(DateTime.UtcNow.Date);
 
