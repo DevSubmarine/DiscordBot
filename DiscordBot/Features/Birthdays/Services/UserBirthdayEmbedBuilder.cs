@@ -94,8 +94,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     embed.WithDescription($"Today! It's today! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
             }
             else
-                embed.WithDescription($"{TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})")
-                    .WithTimestamp(new DateTimeOffset(date));
+                embed.WithDescription($"{TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})");
 
             return embed.Build();
         }
