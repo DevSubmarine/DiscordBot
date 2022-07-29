@@ -8,14 +8,16 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
     public class UserBirthdaysCommands : DevSubInteractionModule
     {
         private readonly IUserBirthdaysProvider _provider;
+        private readonly IUserBirthdayEmbedBuilder _embedBuilder;
         private readonly IRandomizer _randomizer;
 
         private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug };
 
-        public UserBirthdaysCommands(IUserBirthdaysProvider provider, IRandomizer randomizer)
+        public UserBirthdaysCommands(IUserBirthdaysProvider provider, IRandomizer randomizer, IUserBirthdayEmbedBuilder embedBuilder)
         {
             this._provider = provider;
             this._randomizer = randomizer;
+            this._embedBuilder = embedBuilder;
         }
 
         [SlashCommand("get", "Gets birthday for user")]
@@ -36,7 +38,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
                 return;
             }
 
-            Embed embed = await this.GetUserBirthdayEmbedAsync(birthday).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.Context.CancellationToken).ConfigureAwait(false);
             await base.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Embed = embed;
@@ -51,44 +53,18 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
 
             IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(base.Context.CancellationToken).ConfigureAwait(false);
-            IEnumerable<UserBirthday> todayBirthdays = GetTodayBirthdays(allBirthdays);
-            IEnumerable<UserBirthday> upcomingBirthdays = GetUpcomingBirthdays(allBirthdays);
+            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, base.Context.CancellationToken).ConfigureAwait(false);
 
-            if (!todayBirthdays.Any() && !upcomingBirthdays.Any())
+            if (embed == null)
             {
                 await base.ModifyOriginalResponseAsync(msg => msg.Content = $"No upcoming birthdays found! {ResponseEmoji.FeelsDumbMan}",
                     base.GetRequestOptions());
                 return;
             }
 
-            EmbedBuilder embed = new EmbedBuilder()
-                .WithCurrentTimestamp()
-                .WithColor(this._randomizer.GetRandomDiscordColor());
-            if (todayBirthdays.Any())
-            {
-                List<string> entries = new List<string>(todayBirthdays.Count());
-                foreach (UserBirthday bday in todayBirthdays)
-                {
-                    IUser user = await base.Context.Client.GetUserAsync(bday.UserID, base.Context.CancellationToken).ConfigureAwait(false);
-                    entries.Add($"Happy birthday {user.Mention} (`{user.GetUsernameWithDiscriminator()}`)! {this._randomizer.GetRandomValue(_emotes)}");
-                }
-                embed.AddField("Today's Birthdays!", string.Join('\n', entries));
-            }
-            if (upcomingBirthdays.Any())
-            {
-                List<string> entries = new List<string>(todayBirthdays.Count());
-                foreach (UserBirthday bday in upcomingBirthdays)
-                {
-                    IUser user = await base.Context.Client.GetUserAsync(bday.UserID, base.Context.CancellationToken).ConfigureAwait(false);
-                    DateTime date = (DateTime)bday.Date;
-                    entries.Add($"{user.Mention} (`{user.GetUsernameWithDiscriminator()}`) - {TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})");
-                }
-                embed.AddField("Upcoming Birthdays", string.Join('\n', entries));
-            }
-
             await base.ModifyOriginalResponseAsync(msg =>
             {
-                msg.Embed = embed.Build();
+                msg.Embed = embed;
                 msg.AllowedMentions = AllowedMentions.None;
             },
                 base.GetRequestOptions());
@@ -113,7 +89,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             UserBirthday birthday = new UserBirthday(user.Id, date);
             await this._provider.AddAsync(birthday, base.Context.CancellationToken).ConfigureAwait(false);
 
-            Embed embed = await this.GetUserBirthdayEmbedAsync(birthday).ConfigureAwait(false); ;
+            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.Context.CancellationToken).ConfigureAwait(false);
             await base.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Content = $"Birthday for user {user.Mention} (`{user.GetUsernameWithDiscriminator()}`) saved. {ResponseEmoji.Success}";
@@ -121,38 +97,6 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
                 msg.AllowedMentions = AllowedMentions.None;
             },
                 base.GetRequestOptions());
-        }
-
-        private async Task<Embed> GetUserBirthdayEmbedAsync(UserBirthday birthday)
-        {
-            DateTime date = (DateTime)birthday.Date;
-            IGuildUser guildUser = await base.Context.Guild.GetGuildUserAsync(birthday.UserID, base.Context.CancellationToken).ConfigureAwait(false);
-            IUser user = guildUser ?? await base.Context.Client.GetUserAsync(birthday.UserID, base.Context.CancellationToken).ConfigureAwait(false);
-            EmbedBuilder embed = new EmbedBuilder()
-                .WithColor(guildUser != null ? guildUser.GetUserColour() : Color.Default)
-                .WithTitle($"{user.GetName()}'s Birthday")
-                .WithThumbnailUrl(user.GetMaxAvatarUrl())
-                .WithAuthor(user);
-            if (birthday.Date.IsToday)
-                embed.WithDescription($"Today! It's today! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
-            else
-                embed.WithDescription($"{TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})")
-                    .WithTimestamp(new DateTimeOffset(date));
-           return embed.Build();
-        }
-
-        private static IEnumerable<UserBirthday> GetTodayBirthdays(IEnumerable<UserBirthday> birthdays)
-            => birthdays.Where(birthday => birthday.Date.IsToday);
-
-        private static IEnumerable<UserBirthday> GetUpcomingBirthdays(IEnumerable<UserBirthday> birthdays, int days = 7)
-        {
-            DateTime startDate = (DateTime)BirthdayDate.Today.AddDays(1);
-            DateTime endDate = startDate.AddDays(days);
-            return birthdays.Where(birthday
-                => !birthday.Date.IsToday
-                && (DateTime)birthday.Date >= startDate
-                && (DateTime)birthday.Date <= endDate)
-                .OrderBy(birthday => (DateTime)birthday.Date);
         }
 
         public enum Month
