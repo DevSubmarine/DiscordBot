@@ -1,6 +1,5 @@
 ﻿using Discord;
 using Discord.Interactions;
-using TehGM.Utilities.Randomization;
 
 namespace DevSubmarine.DiscordBot.Birthdays.Commands
 {
@@ -9,14 +8,10 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
     {
         private readonly IUserBirthdaysProvider _provider;
         private readonly IUserBirthdayEmbedBuilder _embedBuilder;
-        private readonly IRandomizer _randomizer;
 
-        private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug };
-
-        public UserBirthdaysSlashCommands(IUserBirthdaysProvider provider, IRandomizer randomizer, IUserBirthdayEmbedBuilder embedBuilder)
+        public UserBirthdaysSlashCommands(IUserBirthdaysProvider provider, IUserBirthdayEmbedBuilder embedBuilder)
         {
             this._provider = provider;
-            this._randomizer = randomizer;
             this._embedBuilder = embedBuilder;
         }
 
