@@ -2,7 +2,8 @@
 
 namespace DevSubmarine.DiscordBot.Birthdays
 {
-    public struct BirthdayDate : IEquatable<BirthdayDate>, IEquatable<DateTime>
+    // this should be struct but mongodb doesn't like deserializing them
+    public class BirthdayDate : IEquatable<BirthdayDate>, IEquatable<DateTime>
     {
         [BsonElement("day")]
         public int Day { get; }
@@ -10,17 +11,16 @@ namespace DevSubmarine.DiscordBot.Birthdays
         public int Month { get; }
 
         [BsonConstructor(nameof(Day), nameof(Month))]
-        private BirthdayDate(int day, int month)
+        public BirthdayDate(int day, int month)
         {
+            if (!Validate(day, month))
+                throw new ArgumentException($"Day {day} and month {month} is not a valid date.");
             this.Day = day;
             this.Month = month;
         }
 
         public BirthdayDate(DateTime date)
             : this(date.Day, date.Month) { }
-
-        public BirthdayDate()
-            : this(DateTime.UnixEpoch) { }
 
         public BirthdayDate AddDays(int days)
         {
@@ -54,6 +54,21 @@ namespace DevSubmarine.DiscordBot.Birthdays
 
         public static BirthdayDate Today
             => new BirthdayDate(DateTime.UtcNow.Date);
+
+        public static bool Validate(int day, int month)
+        {
+            // validate that the date is valid
+            // using 2020 as it's a leap year, so validation of 29th feb won't fail
+            try
+            {
+                DateTime date = new DateTime(2020, month, day, 0, 0, 0, DateTimeKind.Utc);
+                return true;
+            }
+            catch (ArgumentOutOfRangeException)
+            {
+                return false;
+            }
+        }
 
         public static explicit operator DateTime(BirthdayDate date)
         {
