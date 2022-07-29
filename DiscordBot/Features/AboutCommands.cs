@@ -32,6 +32,7 @@ namespace DevSubmarine.DiscordBot.Features
             this.AddFeatureInfo(features, "Colour Roles", $"You can change the colour of your nickname using `/colour` commands! {ResponseEmoji.ParrotParty}");
             this.AddFeatureInfo(features, "Blog Channels", $"I'll automatically manage active and inactive blog channels. You can get your own using `/blog create` command, too! {ResponseEmoji.Zoop}");
             this.AddFeatureInfo(features, "DevSub Dictionary", $"DevSubmarine members are notorious for ~~bad spelling~~ inventing new amazing words. Find out more using `/dictionary` set of commands! {ResponseEmoji.PandaSip}");
+            this.AddFeatureInfo(features, "Birthdays", $"As DevSub fam, we like to celebrate birthdays of others *(and especially our own ones)*. `/birthday` provides a way to keep track of everyone's birthday, do we can all can party! {ResponseEmoji.FastParrot}");
             this.AddFeatureInfo(features, "Voting", $"Want to vote kick someone, or check their reputation? Go ahead, `/vote` away! {ResponseEmoji.BlobSweatAnimated} \n*Disclaimer: these votes are just for jokes. No one's gonna get banned or kicked because of them.*");
 
             EmbedBuilder embed = new EmbedBuilder()
