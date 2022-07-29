@@ -31,5 +31,12 @@ namespace DevSubmarine.DiscordBot
 
         public static string GetUsernameWithDiscriminator(this IUser user)
             => $"{user.Username}#{user.Discriminator}";
+
+        public static string GetName(this IUser user)
+        {
+            if (user is IGuildUser guildUser && guildUser.Nickname != null)
+                return guildUser.Nickname;
+            return user.Username;
+        }
     }
 }

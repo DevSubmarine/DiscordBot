@@ -10,6 +10,11 @@ namespace DevSubmarine.DiscordBot.Birthdays
         [BsonElement("month")]
         public int Month { get; }
 
+        public bool IsToday
+            => this.Day == DateTime.UtcNow.Day && this.Month == DateTime.UtcNow.Month;
+        public static BirthdayDate Today
+            => new BirthdayDate(DateTime.UtcNow.Date);
+
         [BsonConstructor(nameof(Day), nameof(Month))]
         public BirthdayDate(int day, int month)
         {
@@ -51,9 +56,6 @@ namespace DevSubmarine.DiscordBot.Birthdays
             DateTime dt = (DateTime)this;
             return HashCode.Combine(dt.Day, dt.Month);
         }
-
-        public static BirthdayDate Today
-            => new BirthdayDate(DateTime.UtcNow.Date);
 
         public static bool Validate(int day, int month)
         {
