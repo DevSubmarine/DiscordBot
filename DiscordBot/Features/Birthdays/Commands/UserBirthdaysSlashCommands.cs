@@ -69,18 +69,37 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
         public async Task CmdSetAsync(
             [Summary("User", "User to set birthday of")] IUser user,
             [Summary("Day", "Day of the month"), MinValue(1), MaxValue(31)] int day,
-            [Summary("Month", "Month")] Month month)
+            [Summary("Month", "Month of birth")] Month month,
+            [Summary("Year", "Year of birth"), MinValue(0)] int? year = null)
         {
+            if (year != null)
+            {
+                // for 31 dec allow year + 1 cause of timezones
+                // this is primitive way to handle it, but really, who cares
+                DateTime now = DateTime.UtcNow;
+                int maxYear = now.Year;
+                if (now.Day == 31 && now.Month == 12)
+                    maxYear++;
+                if (year > maxYear)
+                {
+                    await base.RespondAsync($"How tf would {user.Mention} be born in {year}? {ResponseEmoji.FeelsBeanMan} {ResponseEmoji.FeelsBeanMan} {ResponseEmoji.FeelsDumbMan}",
+                        ephemeral: true,
+                        allowedMentions: AllowedMentions.None,
+                        options: base.GetRequestOptions()).ConfigureAwait(false);
+                    return;
+                }
+            }
+
             if (!BirthdayDate.Validate(day, (int)month))
             {
-                await base.RespondAsync($"{day} {month} is not a valid date. {ResponseEmoji.Failure}",
+                await base.RespondAsync($"{day}.{month} is not a valid date. {ResponseEmoji.Failure}",
                     ephemeral: true,
                     options: base.GetRequestOptions()).ConfigureAwait(false);
                 return;
             }
 
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
-            BirthdayDate date = new BirthdayDate(day, (int)month);
+            BirthdayDate date = new BirthdayDate(day, (int)month, year);
             UserBirthday birthday = new UserBirthday(user.Id, date);
             await this._provider.AddAsync(birthday, base.Context.CancellationToken).ConfigureAwait(false);
 

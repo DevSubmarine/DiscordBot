@@ -104,7 +104,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 .WithThumbnailUrl(target.GetSafeAvatarUrl())
                 .AddField($"Total votes", vote.TotalVotesAgainstTarget.ToString())
                 .WithTimestamp(vote.CreatedVote.Timestamp)
-                .WithFooter($"By {voterName} for the {this.FormatOrdinal(vote.VotesAgainstTarget)} time", Context.User.GetSafeAvatarUrl())
+                .WithFooter($"By {voterName} for the {vote.VotesAgainstTarget.GetOrdinalString()} time", Context.User.GetSafeAvatarUrl())
                 .WithColor(target.GetUserColour())
                 .Build();
         }
@@ -113,22 +113,6 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
         {
             UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, Context.CancellationToken).ConfigureAwait(false);
             return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
-        }
-
-        private string FormatOrdinal(ulong number)
-        {
-            ulong remainder = number % 100;
-            if (remainder != 11 && remainder != 12 && remainder != 13)
-            {
-                remainder = number % 10;
-                if (remainder == 1)
-                    return $"{number}st";
-                if (remainder == 2)
-                    return $"{number}nd";
-                if (remainder == 3)
-                    return $"{number}rd";
-            }
-            return $"{number}th";
         }
 
         [Group("statistics", "Check various voting statistics")]

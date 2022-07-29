@@ -9,23 +9,26 @@ namespace DevSubmarine.DiscordBot.Birthdays
         public int Day { get; }
         [BsonElement("month")]
         public int Month { get; }
+        [BsonElement("year"), BsonDefaultValue(null)]
+        public int? Year { get; }
 
         public bool IsToday
             => this.Day == DateTime.UtcNow.Day && this.Month == DateTime.UtcNow.Month;
         public static BirthdayDate Today
             => new BirthdayDate(DateTime.UtcNow.Date);
 
-        [BsonConstructor(nameof(Day), nameof(Month))]
-        public BirthdayDate(int day, int month)
+        [BsonConstructor(nameof(Day), nameof(Month), nameof(Year))]
+        public BirthdayDate(int day, int month, int? year)
         {
             if (!Validate(day, month))
-                throw new ArgumentException($"Day {day} and month {month} is not a valid date.");
+                throw new ArgumentException($"{day}.{month} is not a valid date.");
             this.Day = day;
             this.Month = month;
+            this.Year = year;
         }
 
         public BirthdayDate(DateTime date)
-            : this(date.Day, date.Month) { }
+            : this(date.Day, date.Month, date.Year) { }
 
         public BirthdayDate AddDays(int days)
         {
