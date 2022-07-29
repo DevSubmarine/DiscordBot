@@ -39,7 +39,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     IUser user = await this._client.GetUserAsync(birthday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
                     entryBuilder.Append("Happy ");
                     if (birthday.Date.Year != null)
-                        entryBuilder.Append($"{GetAge(birthday).GetOrdinalString()} ");
+                        entryBuilder.Append($"**{GetAge(birthday).GetOrdinalString()}** ");
                     entryBuilder.Append($"birthday {user.Mention} (`{user.GetUsernameWithDiscriminator()}`)! {emote}");
                     entries.Add(entryBuilder.ToString());
                 }
@@ -53,9 +53,9 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     entryBuilder.Clear();
                     IUser user = await this._client.GetUserAsync(birthday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
                     DateTime date = (DateTime)birthday.Date;
-                    entryBuilder.Append($"{user.Mention} (`{user.GetUsernameWithDiscriminator()}`) - {TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})");
+                    entryBuilder.Append($"{user.Mention} (`{user.GetUsernameWithDiscriminator()}`) - **{birthday.Date}** {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}");
                     if (birthday.Date.Year != null)
-                        entryBuilder.Append($" (will be {(GetAge(birthday) + 1)})");
+                        entryBuilder.Append($" (will be **{(GetAge(birthday) + 1)}**)");
                     entries.Add(entryBuilder.ToString());
                 }
                 embed.AddField("Upcoming Birthdays", string.Join('\n', entries));
@@ -95,13 +95,13 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 if (birthday.Date.Year != null)
                 {
                     int age = GetAge(birthday);
-                    embed.WithDescription($"Today! It's today! They're {age} now! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
+                    embed.WithDescription($"Today! It's today! They're **{age}** now! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
                 }
                 else
                     embed.WithDescription($"Today! It's today! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
             }
             else
-                embed.WithDescription($"{TimestampTag.FromDateTime(date, TimestampTagStyles.LongDate)} ({TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)})");
+                embed.WithDescription($"**{birthday.Date}** {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}");
 
             return embed.Build();
         }

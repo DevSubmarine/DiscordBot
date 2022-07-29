@@ -104,5 +104,8 @@ namespace DevSubmarine.DiscordBot.Birthdays
 
         public static bool operator !=(BirthdayDate left, BirthdayDate right)
             => !(left == right);
+
+        public override string ToString()
+            => $"{this.Day} {(Month)this.Month}";
     }
 }
