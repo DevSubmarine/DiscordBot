@@ -2,10 +2,10 @@
 {
     public static class DiagnosticID
     {
-        public const string MissingInterface = "DS001";
-        public const string MissingAttribute = "DS002";
-        public const string IsAbstract = "DS003";
-        public const string IsClass = "DS004";
-        public const string IsGeneric = "DS005";
+        public const string MissingInterface = "DS0001";
+        public const string MissingAttribute = "DS0002";
+        public const string IsAbstract = "DS0003";
+        public const string IsClass = "DS0004";
+        public const string IsGeneric = "DS0005";
     }
 }
