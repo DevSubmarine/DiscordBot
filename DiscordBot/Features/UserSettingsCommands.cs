@@ -23,7 +23,7 @@ namespace DevSubmarine.DiscordBot.Features
             await this._provider.UpdateUserSettingsAsync(
                 base.Context.User.Id,
                 settings => settings.PingOnVote = enabled, 
-                base.Context.CancellationToken).ConfigureAwait(false);
+                base.CancellationToken).ConfigureAwait(false);
 
             string confirmationText = enabled
                 ? $"You'll now be pinged whenever someone casts a vote against you. {ResponseEmoji.Success}"

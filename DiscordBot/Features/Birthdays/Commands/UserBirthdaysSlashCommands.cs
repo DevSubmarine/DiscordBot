@@ -21,7 +21,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
         {
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
 
-            UserBirthday birthday = await this._provider.GetAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            UserBirthday birthday = await this._provider.GetAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
             if (birthday == null)
             {
                 await base.ModifyOriginalResponseAsync(msg =>
@@ -33,7 +33,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
                 return;
             }
 
-            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.CancellationToken).ConfigureAwait(false);
             await base.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Embed = embed;
@@ -47,8 +47,8 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
         {
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
 
-            IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(base.Context.CancellationToken).ConfigureAwait(false);
-            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, true, base.Context.CancellationToken).ConfigureAwait(false);
+            IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(base.CancellationToken).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, true, base.CancellationToken).ConfigureAwait(false);
 
             if (embed == null)
             {
@@ -101,9 +101,9 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
             BirthdayDate date = new BirthdayDate(day, (int)month, year);
             UserBirthday birthday = new UserBirthday(user.Id, date);
-            await this._provider.AddAsync(birthday, base.Context.CancellationToken).ConfigureAwait(false);
+            await this._provider.AddAsync(birthday, base.CancellationToken).ConfigureAwait(false);
 
-            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUserBirthdayEmbedAsync(birthday, base.Context.Guild?.Id, base.CancellationToken).ConfigureAwait(false);
             await base.ModifyOriginalResponseAsync(msg =>
             {
                 msg.Content = $"Birthday for user {user.Mention} (`{user.GetUsernameWithDiscriminator()}`) saved. {ResponseEmoji.Success}";

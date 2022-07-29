@@ -23,9 +23,9 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
         public async Task CmdVoteKickAsync(
             [Summary("User", "User to vote kick")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Kick, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Kick, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
 
-            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, base.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -37,9 +37,9 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
         public async Task CmdVoteBanAsync(
             [Summary("User", "User to vote ban")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Ban, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Ban, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
 
-            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, base.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -51,7 +51,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
         public async Task CmdVoteModAsync(
             [Summary("User", "User to vote mod")] IGuildUser user)
         {
-            Vote vote = new Vote(VoteType.Mod, Context.User.Id, user.Id, Context.Interaction.CreatedAt);
+            Vote vote = new Vote(VoteType.Mod, base.Context.User.Id, user.Id, base.Context.Interaction.CreatedAt);
 
             if (vote.VoterID == vote.TargetID)
             {
@@ -61,7 +61,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 return;
             }
 
-            IVotingResult result = await this._voting.VoteAsync(vote, Context.CancellationToken).ConfigureAwait(false);
+            IVotingResult result = await this._voting.VoteAsync(vote, base.CancellationToken).ConfigureAwait(false);
             if (result is CooldownVotingResult cooldown)
                 await this.RespondCooldownAsync(cooldown.CooldownRemaining, user).ConfigureAwait(false);
             else
@@ -73,8 +73,8 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             SuccessVotingResult voteResult = (SuccessVotingResult)result;
             const string settingsCmd = "`/user-settings vote-ping`";
 
-            IGuildUser user = await Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, Context.CancellationToken).ConfigureAwait(false);
-            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, Context.CancellationToken).ConfigureAwait(false);
+            IGuildUser user = await Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
             AllowedMentions mentions = settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
 
             Embed embed = this.BuildResultEmbed(voteResult, user);
@@ -111,7 +111,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
 
         private async Task<AllowedMentions> GetMentionOptionsAsync(ulong userID)
         {
-            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, Context.CancellationToken).ConfigureAwait(false);
+            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, base.CancellationToken).ConfigureAwait(false);
             return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
         }
 
@@ -135,10 +135,10 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
 
                 if (user == null)
-                    user = await Context.Guild.GetGuildUserAsync(Context.User.Id, Context.CancellationToken);
+                    user = await Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken);
 
-                Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, Context.CancellationToken);
-                Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, Context.CancellationToken);
+                Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, base.CancellationToken);
+                Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, base.CancellationToken);
                 await Task.WhenAll(votesTargetTask, votesVoterTask).ConfigureAwait(false);
 
                 IEnumerable<Vote> votesTarget = votesTargetTask.Result;
@@ -246,7 +246,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 [Summary("VoteType", "Type of the vote")] VoteType? voteType = null)
             {
                 await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
-                IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, Context.CancellationToken).ConfigureAwait(false);
+                IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, base.CancellationToken).ConfigureAwait(false);
 
                 EmbedBuilder embed = new EmbedBuilder()
                     .WithTitle($"Found {results.LongCount()} votes")

@@ -22,7 +22,7 @@ namespace DevSubmarine.DiscordBot.Features
         {
             IUser user = this._client.CurrentUser;
             IGuildUser guildUser = base.Context.Guild?.GetUser(user.Id);
-            IUser authorUser = await this._client.GetUserAsync(247081094799687682, base.Context.CancellationToken).ConfigureAwait(false);
+            IUser authorUser = await this._client.GetUserAsync(247081094799687682, base.CancellationToken).ConfigureAwait(false);
             IGuildUser authorGuildUser = base.Context.Guild?.GetUser(authorUser.Id);
 
             string botName = guildUser?.Nickname ?? user.Username;

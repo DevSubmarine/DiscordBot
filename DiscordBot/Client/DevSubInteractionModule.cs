@@ -19,15 +19,17 @@ namespace DevSubmarine.DiscordBot
 
     public class DevSubInteractionModule : DevSubInteractionModule<DevSubInteractionContext>
     {
+        public CancellationToken CancellationToken => base.Context.CancellationToken;
+
         public Task RespondAsync(string text, Embed embed)
-            => base.RespondAsync(text, embed, base.Context.CancellationToken);
+            => base.RespondAsync(text, embed, this.CancellationToken);
         public Task RespondAsync(string text)
-            => base.RespondAsync(text, base.Context.CancellationToken);
+            => base.RespondAsync(text, this.CancellationToken);
         public Task RespondAsync(Embed embed)
-            => base.RespondAsync(embed, base.Context.CancellationToken);
+            => base.RespondAsync(embed, this.CancellationToken);
 
         protected RequestOptions GetRequestOptions()
-            => this.GetRequestOptions(base.Context.CancellationToken);
+            => this.GetRequestOptions(this.CancellationToken);
     }
     #pragma warning restore DS0101 // Slash commands class doesn't inherit from DevSubInteractionModule
 }

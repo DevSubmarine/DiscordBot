@@ -41,7 +41,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             // if changing role of the other user, it should be only possible for user with specific permissions (admins basically)
-            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
             if (user != null)
             {
                 if (!this.CanEditOtherUsers(callerUser, out IRole highestRole))
@@ -97,7 +97,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             // if changing role of the other user, it should be only possible for user with specific permissions (admins basically)
-            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
             if (user != null)
             {
                 if (!this.CanEditOtherUsers(callerUser, out IRole highestCallerRole))
