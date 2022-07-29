@@ -21,7 +21,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             this._randomizer = randomizer;
         }
 
-        public async Task<Embed> BuildUpcomingBirthdaysEmbedAsync(IEnumerable<UserBirthday> birthdays, CancellationToken cancellationToken = default)
+        public async Task<Embed> BuildUpcomingBirthdaysEmbedAsync(IEnumerable<UserBirthday> birthdays, bool useEmotes, CancellationToken cancellationToken = default)
         {
             IEnumerable<UserBirthday> todayBirthdays = GetTodayBirthdays(birthdays);
             IEnumerable<UserBirthday> upcomingBirthdays = GetUpcomingBirthdays(birthdays);
@@ -37,8 +37,9 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 List<string> entries = new List<string>(todayBirthdays.Count());
                 foreach (UserBirthday bday in todayBirthdays)
                 {
+                    string emote = useEmotes ? this._randomizer.GetRandomValue(_emotes) : null;
                     IUser user = await this._client.GetUserAsync(bday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
-                    entries.Add($"Happy birthday {user.Mention} (`{user.GetUsernameWithDiscriminator()}`)! {this._randomizer.GetRandomValue(_emotes)}");
+                    entries.Add($"Happy birthday {user.Mention} (`{user.GetUsernameWithDiscriminator()}`)! {emote}");
                 }
                 embed.AddField("Today's Birthdays!", string.Join('\n', entries));
             }
