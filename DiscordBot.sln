@@ -22,15 +22,25 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordBot.Tests", "Tests\D
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Analyzers", "Analyzers", "{4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPlaceholder", "Analyzers\StatusPlaceholder\StatusPlaceholder\StatusPlaceholder.csproj", "{17A0CCC1-EE09-41B5-A3FD-BB6ADC46C2F0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatusPlaceholder", "Analyzers\StatusPlaceholder\StatusPlaceholder\StatusPlaceholder.csproj", "{17A0CCC1-EE09-41B5-A3FD-BB6ADC46C2F0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPlaceholder.CodeFixes", "Analyzers\StatusPlaceholder\StatusPlaceholder.CodeFixes\StatusPlaceholder.CodeFixes.csproj", "{7642E760-DD6E-4FD7-A995-D6C386241771}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatusPlaceholder.CodeFixes", "Analyzers\StatusPlaceholder\StatusPlaceholder.CodeFixes\StatusPlaceholder.CodeFixes.csproj", "{7642E760-DD6E-4FD7-A995-D6C386241771}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPlaceholder.Package", "Analyzers\StatusPlaceholder\StatusPlaceholder.Package\StatusPlaceholder.Package.csproj", "{648E5F27-E765-4ED6-9E28-AECF37E6EC19}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatusPlaceholder.Package", "Analyzers\StatusPlaceholder\StatusPlaceholder.Package\StatusPlaceholder.Package.csproj", "{648E5F27-E765-4ED6-9E28-AECF37E6EC19}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPlaceholder.Test", "Analyzers\StatusPlaceholder\StatusPlaceholder.Test\StatusPlaceholder.Test.csproj", "{19850488-DF76-4086-AA70-7EA04B6CB3D5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatusPlaceholder.Test", "Analyzers\StatusPlaceholder\StatusPlaceholder.Test\StatusPlaceholder.Test.csproj", "{19850488-DF76-4086-AA70-7EA04B6CB3D5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StatusPlaceholder.Vsix", "Analyzers\StatusPlaceholder\StatusPlaceholder.Vsix\StatusPlaceholder.Vsix.csproj", "{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "StatusPlaceholder.Vsix", "Analyzers\StatusPlaceholder\StatusPlaceholder.Vsix\StatusPlaceholder.Vsix.csproj", "{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordInteractions", "Analyzers\DiscordInteractions\DiscordInteractions\DiscordInteractions.csproj", "{94DEBFCE-7576-43A0-9D64-128C228C2057}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordInteractions.CodeFixes", "Analyzers\DiscordInteractions\DiscordInteractions.CodeFixes\DiscordInteractions.CodeFixes.csproj", "{4B36D10F-0D1A-4D51-B20A-43702158DCF2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordInteractions.Package", "Analyzers\DiscordInteractions\DiscordInteractions.Package\DiscordInteractions.Package.csproj", "{DA56A65C-EE76-41E4-A68F-18A4D3491BB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordInteractions.Test", "Analyzers\DiscordInteractions\DiscordInteractions.Test\DiscordInteractions.Test.csproj", "{D4137C4B-B756-4835-A211-895D87B336F5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordInteractions.Vsix", "Analyzers\DiscordInteractions\DiscordInteractions.Vsix\DiscordInteractions.Vsix.csproj", "{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -70,6 +80,26 @@ Global
 		{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94DEBFCE-7576-43A0-9D64-128C228C2057}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94DEBFCE-7576-43A0-9D64-128C228C2057}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94DEBFCE-7576-43A0-9D64-128C228C2057}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94DEBFCE-7576-43A0-9D64-128C228C2057}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B36D10F-0D1A-4D51-B20A-43702158DCF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B36D10F-0D1A-4D51-B20A-43702158DCF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B36D10F-0D1A-4D51-B20A-43702158DCF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B36D10F-0D1A-4D51-B20A-43702158DCF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D4137C4B-B756-4835-A211-895D87B336F5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D4137C4B-B756-4835-A211-895D87B336F5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D4137C4B-B756-4835-A211-895D87B336F5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D4137C4B-B756-4835-A211-895D87B336F5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +112,11 @@ Global
 		{648E5F27-E765-4ED6-9E28-AECF37E6EC19} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
 		{19850488-DF76-4086-AA70-7EA04B6CB3D5} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
 		{C5F65ADB-139B-46ED-94A9-AF5E8CEE33E9} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{94DEBFCE-7576-43A0-9D64-128C228C2057} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{4B36D10F-0D1A-4D51-B20A-43702158DCF2} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{D4137C4B-B756-4835-A211-895D87B336F5} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {33A5C378-0FC3-4A25-B8A9-04AF9A511F21}

@@ -3,6 +3,7 @@ using Discord.Interactions;
 
 namespace DevSubmarine.DiscordBot
 {
+    #pragma warning disable DS0101 // Slash commands class doesn't inherit from DevSubInteractionModule
     public class DevSubInteractionModule<TContext> : InteractionModuleBase<TContext> where TContext : class, IInteractionContext
     {
         protected Task RespondAsync(string text, Embed embed, CancellationToken cancellationToken)
@@ -28,4 +29,5 @@ namespace DevSubmarine.DiscordBot
         protected RequestOptions GetRequestOptions()
             => this.GetRequestOptions(base.Context.CancellationToken);
     }
+    #pragma warning restore DS0101 // Slash commands class doesn't inherit from DevSubInteractionModule
 }
