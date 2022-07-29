@@ -14,6 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<IUserBirthdaysStore, MongoUserBirthdayStore>();
             services.TryAddSingleton<IUserBirthdaysProvider, UserBirthdaysProvider>();
             services.TryAddTransient<IUserBirthdayEmbedBuilder, UserBirthdayEmbedBuilder>();
+            services.AddHostedService<UserBirthdayAutopostService>();
 
             return services;
         }
