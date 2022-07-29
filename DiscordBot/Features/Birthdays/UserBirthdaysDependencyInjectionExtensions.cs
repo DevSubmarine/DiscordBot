@@ -12,6 +12,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentNullException(nameof(services));
 
             services.TryAddTransient<IUserBirthdaysStore, MongoUserBirthdayStore>();
+            services.TryAddSingleton<IUserBirthdaysProvider, UserBirthdaysProvider>();
 
             return services;
         }

@@ -2,7 +2,7 @@
 
 namespace DevSubmarine.DiscordBot.Birthdays
 {
-    public struct BirthdayDate
+    public struct BirthdayDate : IEquatable<BirthdayDate>, IEquatable<DateTime>
     {
         [BsonElement("day")]
         public int Day { get; }
@@ -26,6 +26,30 @@ namespace DevSubmarine.DiscordBot.Birthdays
         {
             DateTime dt = (DateTime)this;
             return new BirthdayDate(dt.AddDays(days));
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is BirthdayDate bday)
+                return this.Equals(bday);
+            if (obj is DateTime dt)
+                return this.Equals(dt);
+            return false;
+        }
+
+        public bool Equals(BirthdayDate other)
+            => this.Equals((DateTime)other);
+
+        public bool Equals(DateTime other)
+        {
+            DateTime dt = (DateTime)this;
+            return dt.Day == other.Day && dt.Month == other.Month;
+        }
+
+        public override int GetHashCode()
+        {
+            DateTime dt = (DateTime)this;
+            return HashCode.Combine(dt.Day, dt.Month);
         }
 
         public static BirthdayDate Today
@@ -54,5 +78,11 @@ namespace DevSubmarine.DiscordBot.Birthdays
             }
             return result;
         }
+
+        public static bool operator ==(BirthdayDate left, BirthdayDate right)
+            => left.Equals(right);
+
+        public static bool operator !=(BirthdayDate left, BirthdayDate right)
+            => !(left == right);
     }
 }
