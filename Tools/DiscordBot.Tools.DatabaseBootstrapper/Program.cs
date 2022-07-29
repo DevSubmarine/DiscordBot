@@ -70,6 +70,7 @@ namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper
             services.AddCollectionCreator<SubWordsCollectionCreator>();
             services.AddCollectionCreator<VotesCollectionCreator>();
             services.AddCollectionCreator<UserSettingsCollectionCreator>();
+            services.AddCollectionCreator<UserBirthdaysCollectionCreator>();
 
             return services;
         }

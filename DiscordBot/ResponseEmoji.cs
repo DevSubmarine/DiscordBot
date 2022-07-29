@@ -12,6 +12,7 @@
         public static string JerryWhat => "<:what:526104145728503808>";
         public static string Parrot60fps => "<a:60fpsParrot:792709626000703488>";
         public static string ParrotParty => "<a:partyParrot:792709626726318091>";
+        public static string FastParrot => "<a:fastParrot:792740073548021860>";
         public static string FeelsBeanMan => "<:FeelsBeanMan:526803534197424128>";
         public static string FeelsDumbMan => "<:FeelsDumbMan:526803505219108879>";
         public static string BlobSweatAnimated => "<a:ablobSweat:820386948484431952>";
