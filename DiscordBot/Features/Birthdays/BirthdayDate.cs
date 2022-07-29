@@ -72,7 +72,7 @@ namespace DevSubmarine.DiscordBot.Birthdays
 
         public static explicit operator DateTime(BirthdayDate date)
         {
-            DateTime now = DateTime.UtcNow;
+            DateTime now = DateTime.UtcNow.Date;
             bool appliedLeapFix = false;
             DateTime result;
             try
