@@ -57,7 +57,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             {
                 await base.RespondAsync(
                     text: $"You cannot vote to mod yourself, dumbo. {ResponseEmoji.FeelsDumbMan}",
-                    options: GetRequestOptions()).ConfigureAwait(false);
+                    options: base.GetRequestOptions()).ConfigureAwait(false);
                 return;
             }
 
@@ -73,7 +73,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             SuccessVotingResult voteResult = (SuccessVotingResult)result;
             const string settingsCmd = "`/user-settings vote-ping`";
 
-            IGuildUser user = await Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.CancellationToken).ConfigureAwait(false);
+            IGuildUser user = await base.Context.Guild.GetGuildUserAsync(voteResult.CreatedVote.TargetID, base.CancellationToken).ConfigureAwait(false);
             UserSettings settings = await this._userSettings.GetUserSettingsAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
             AllowedMentions mentions = settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
 
@@ -84,7 +84,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             await base.RespondAsync(
                 text: message,
                 embed: embed,
-                options: GetRequestOptions(),
+                options: base.GetRequestOptions(),
                 allowedMentions: mentions)
                 .ConfigureAwait(false);
         }
@@ -93,11 +93,11 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             => base.RespondAsync(
                 text: $"You need to wait {cooldown.ToDisplayString()} more to vote against {user.Mention}. {ResponseEmoji.FeelsDumbMan}",
                 allowedMentions: AllowedMentions.None,
-                options: GetRequestOptions());
+                options: base.GetRequestOptions());
 
         private Embed BuildResultEmbed(SuccessVotingResult vote, IGuildUser target)
         {
-            string voterName = Context.Guild.GetUser(Context.User.Id)?.Nickname ?? Context.User.Username;
+            string voterName = base.Context.Guild.GetUser(Context.User.Id)?.Nickname ?? Context.User.Username;
             string targetName = target.Nickname ?? target.Username;
             return new EmbedBuilder()
                 .WithTitle($"Voted to {vote.CreatedVote.Type.GetText()} {targetName}")
@@ -107,12 +107,6 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 .WithFooter($"By {voterName} for the {vote.VotesAgainstTarget.GetOrdinalString()} time", Context.User.GetSafeAvatarUrl())
                 .WithColor(target.GetUserColour())
                 .Build();
-        }
-
-        private async Task<AllowedMentions> GetMentionOptionsAsync(ulong userID)
-        {
-            UserSettings settings = await this._userSettings.GetUserSettingsAsync(userID, base.CancellationToken).ConfigureAwait(false);
-            return settings.PingOnVote ? new AllowedMentions(AllowedMentionTypes.Users) : AllowedMentions.None;
         }
 
         [Group("statistics", "Check various voting statistics")]
@@ -132,10 +126,10 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
             public async Task CmdCheckAsync(
                 [Summary("User", "User to check statistics for")] IGuildUser user = null)
             {
-                await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
+                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
                 if (user == null)
-                    user = await Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken);
+                    user = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken);
 
                 Task<IEnumerable<Vote>> votesTargetTask = this._store.GetVotesAsync(user.Id, null, null, base.CancellationToken);
                 Task<IEnumerable<Vote>> votesVoterTask = this._store.GetVotesAsync(null, user.Id, null, base.CancellationToken);
@@ -235,7 +229,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                     msg.Embed = embed.Build();
                     msg.AllowedMentions = AllowedMentions.None;
                 },
-                    GetRequestOptions()).ConfigureAwait(false);
+                    base.GetRequestOptions()).ConfigureAwait(false);
             }
 
             [SlashCommand("search", "Query for statistics using specified search criteria")]
@@ -245,7 +239,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                 [Summary("Voter", "User that sent the vote")] IUser voter = null,
                 [Summary("VoteType", "Type of the vote")] VoteType? voteType = null)
             {
-                await base.DeferAsync(options: GetRequestOptions()).ConfigureAwait(false);
+                await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
                 IEnumerable<Vote> results = await this._store.GetVotesAsync(target?.Id, voter?.Id, voteType, base.CancellationToken).ConfigureAwait(false);
 
                 EmbedBuilder embed = new EmbedBuilder()
@@ -261,7 +255,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                             .WithDescription($"No votes matching your criteria found. {ResponseEmoji.FeelsBeanMan}")
                             .Build();
                         msg.AllowedMentions = AllowedMentions.None;
-                    }, GetRequestOptions()).ConfigureAwait(false);
+                    }, base.GetRequestOptions()).ConfigureAwait(false);
                     return;
                 }
 
@@ -281,7 +275,7 @@ namespace DevSubmarine.DiscordBot.Voting.Commands
                     msg.Embed = embed.Build();
                     msg.AllowedMentions = AllowedMentions.None;
                 },
-                    GetRequestOptions()).ConfigureAwait(false);
+                    base.GetRequestOptions()).ConfigureAwait(false);
             }
 
             private IEnumerable<IGrouping<TKey, Vote>> GetTop<TKey>(IEnumerable<Vote> votes, Func<Vote, TKey> keySelector, int count)
