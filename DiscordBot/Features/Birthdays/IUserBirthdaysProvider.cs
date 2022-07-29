@@ -3,8 +3,7 @@
     public interface IUserBirthdaysProvider
     {
         Task<UserBirthday> GetAsync(ulong userID, CancellationToken cancellationToken = default);
-        Task<IEnumerable<UserBirthday>> GetTodayBirthdaysAsync(CancellationToken cancellationToken = default);
-        Task<IEnumerable<UserBirthday>> GetUpcomingBirthdaysAsync(int days, CancellationToken cancellationToken = default);
-        Task AddBirthdayAsync(UserBirthday birthday, CancellationToken cancellationToken = default);
+        Task<IEnumerable<UserBirthday>> GetAllAsync(CancellationToken cancellationToken = default);
+        Task AddAsync(UserBirthday birthday, CancellationToken cancellationToken = default);
     }
 }

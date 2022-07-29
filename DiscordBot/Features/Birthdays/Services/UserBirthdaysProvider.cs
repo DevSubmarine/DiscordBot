@@ -37,7 +37,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             }
         }
 
-        public async Task AddBirthdayAsync(UserBirthday birthday, CancellationToken cancellationToken = default)
+        public async Task AddAsync(UserBirthday birthday, CancellationToken cancellationToken = default)
         {
             await this._lock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
@@ -51,32 +51,12 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             }
         }
 
-        public async Task<IEnumerable<UserBirthday>> GetTodayBirthdaysAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<UserBirthday>> GetAllAsync(CancellationToken cancellationToken = default)
         {
             await this._lock.WaitAsync(cancellationToken).ConfigureAwait(false);
             try
             {
-                IEnumerable<UserBirthday> results = await this._store.GetAllAsync(cancellationToken).ConfigureAwait(false);
-                return results.Where(birthday => birthday.Date == BirthdayDate.Today);
-            }
-            finally
-            {
-                this._lock.Release();
-            }
-        }
-
-        public async Task<IEnumerable<UserBirthday>> GetUpcomingBirthdaysAsync(int days, CancellationToken cancellationToken = default)
-        {
-            await this._lock.WaitAsync(cancellationToken).ConfigureAwait(false);
-            try
-            {
-                IEnumerable<UserBirthday> results = await this._store.GetAllAsync(cancellationToken).ConfigureAwait(false);
-                DateTime startDate = (DateTime)BirthdayDate.Today.AddDays(1);
-                DateTime endDate = startDate.AddDays(days);
-                return results.Where(birthday 
-                    => birthday.Date != BirthdayDate.Today 
-                    && (DateTime)birthday.Date >= startDate
-                    && (DateTime)birthday.Date <= endDate);
+                return await this._store.GetAllAsync(cancellationToken).ConfigureAwait(false);
             }
             finally
             {
