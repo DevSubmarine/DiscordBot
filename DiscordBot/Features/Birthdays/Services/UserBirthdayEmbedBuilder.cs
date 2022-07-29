@@ -61,6 +61,13 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 embed.AddField("Upcoming Birthdays", string.Join('\n', entries));
             }
 
+            if (todayBirthdays.Count() == 1)
+            {
+                UserBirthday birthday = todayBirthdays.Single();
+                IUser user = await this._client.GetUserAsync(birthday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+                embed.WithThumbnailUrl(user.GetMaxAvatarUrl());
+            }
+
             return embed.Build();
         }
 
