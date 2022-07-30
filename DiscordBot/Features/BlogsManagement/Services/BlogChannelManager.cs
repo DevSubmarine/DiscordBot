@@ -76,7 +76,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 // discord perm overwrites don't merge with each other
                 // so each overwrite is to be created by modifying @everyone perms from the category
                 // this is so we can both respect category permissions, as well as assign our own overrides
-                OverwritePermissions categoryPerms = category.PermissionOverwrites.First(p
+                OverwritePermissions categoryPerms = category.PermissionOverwrites.FirstOrDefault(p
                     => p.TargetId == guild.EveryoneRole.Id && p.TargetType == PermissionTarget.Role)
                     .Permissions;
 
