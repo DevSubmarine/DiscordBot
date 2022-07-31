@@ -16,8 +16,8 @@
         /// <returns>Alignment information.</returns>
         public static VotingAlignment CalculateAlignment(this IVotingAlignmentCalculator calculator, IEnumerable<Vote> allVotes)
         {
-            IEnumerable<Vote> goodVotes = allVotes.Where(vote => vote.Type == VoteType.Mod);
-            IEnumerable<Vote> badVotes = allVotes.Where(vote => vote.Type == VoteType.Kick || vote.Type == VoteType.Ban);
+            IEnumerable<Vote> goodVotes = allVotes.Where(vote => vote.IsPositive);
+            IEnumerable<Vote> badVotes = allVotes.Where(vote => vote.IsNegative);
             return CalculateAlignment(calculator, goodVotes, badVotes);
         }
     }

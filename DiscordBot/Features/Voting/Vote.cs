@@ -40,6 +40,11 @@ namespace DevSubmarine.DiscordBot.Voting
         public Vote(VoteType type, ulong voterID, ulong targetID) 
             : this(type, voterID, targetID, DateTimeOffset.UtcNow) { }
 
+        public bool IsPositive
+            => this.Type.IsPositive();
+        public bool IsNegative
+            => this.Type.IsNegative();
+
         public override string ToString()
             => this.ID.ToString();
 

@@ -1,7 +1,7 @@
 ﻿using Discord;
 using Discord.Interactions;
 
-namespace DevSubmarine.DiscordBot.SubWords.Services
+namespace DevSubmarine.DiscordBot.SubWords.Commands
 {
     [Group("dictionary", "Commands for managing dictionary of dev sub invented words.")]
     public class SubWordsCommands : DevSubInteractionModule
@@ -24,9 +24,9 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             result.ChannelID = base.Context.Channel?.Id;
             result.GuildID = base.Context.Guild?.Id;
             result.Description = description;
-            result = await this._subwords.AddOrGetWordAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
+            result = await this._subwords.AddOrGetWordAsync(result, base.CancellationToken).ConfigureAwait(false);
 
-            Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false); 
+            Embed embed = await this.BuildWordEmbedAsync(result, base.CancellationToken).ConfigureAwait(false); 
 
             await base.RespondAsync(embed).ConfigureAwait(false);
         }
@@ -36,15 +36,15 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             [Summary("User", "User that said the silly word")] IUser user,
             [Summary("Word", "The word to look for")] string word)
         {
-            SubWord result = await this._subwords.GetSubWordAsync(word, user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            SubWord result = await this._subwords.GetSubWordAsync(word, user.Id, base.CancellationToken).ConfigureAwait(false);
             if (result == null)
             {
-                string username = await this.GetUserNameAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+                string username = await this.GetUserNameAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
                 await base.RespondAsync($"{ResponseEmoji.SeriousThonk} Nope, word *`{word}`* by {username} not found.").ConfigureAwait(false);
             }
             else
             {
-                Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
+                Embed embed = await this.BuildWordEmbedAsync(result, base.CancellationToken).ConfigureAwait(false);
                 await base.RespondAsync(embed).ConfigureAwait(false);
             }
         }
@@ -53,9 +53,9 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
         public async Task CmdRandomAsync(
             [Summary("User", "User that said the silly word, optional")] IUser user = null)
         {
-            SubWord result = await this._subwords.GetRandomWordAsync(user?.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            SubWord result = await this._subwords.GetRandomWordAsync(user?.Id, base.CancellationToken).ConfigureAwait(false);
             string username = user != null
-                ? await this.GetUserNameAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false)
+                ? await this.GetUserNameAsync(user.Id, base.CancellationToken).ConfigureAwait(false)
                 : null;
 
             if (result == null)
@@ -67,7 +67,7 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             }
             else
             {
-                Embed embed = await this.BuildWordEmbedAsync(result, base.Context.CancellationToken).ConfigureAwait(false);
+                Embed embed = await this.BuildWordEmbedAsync(result, base.CancellationToken).ConfigureAwait(false);
                 string message = username != null ? $"Random word by {username} from DevSub Dictionary:" : "Random word from DevSub Dictionary:";
 
                 await base.RespondAsync(
@@ -84,8 +84,8 @@ namespace DevSubmarine.DiscordBot.SubWords.Services
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
             try
             {
-                string result = await this._subwords.UploadWordsListAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
-                string username = await this.GetUserNameAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+                string result = await this._subwords.UploadWordsListAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
+                string username = await this.GetUserNameAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
 
                 await base.ModifyOriginalResponseAsync(msg =>
                 {

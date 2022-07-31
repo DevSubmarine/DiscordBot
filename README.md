@@ -67,14 +67,9 @@ For this reason, it's okay to add roles from different Discord guilds if necessa
 Note that for roles that are testing only, I recommend adding them to [appsettings.Development.json](DiscordBot/appsettings.Development.json) instead, just so the main config file is not polluted with testing configuration.
 
 #### Random Statuses
-The bot will automatically change its status on login, and also on a timer. This can be configured in [appsettings.json](DiscordBot/appsettings.json), `RandomStatus` section.
+The bot will automatically change its status on login, and also on a timer. This can be configured in [appsettings.Production.json](DiscordBot/appsettings.Production.json), `RandomStatus` section.
 
 The statuses themselves are in `RandomStatus:Statuses` array. Each status is JSON object, and should have `Text` and `ActivityType` property. Currently supported Activity Types are "Playing", "Watching", "Listening" and "Streaming". Additionally you can add `Link` property.
-
-#### In-Development Commands
-Development Environment Commands shouldn't be registered globally for numerous reasons. For this reason you should set your test server ID in [appsettings.Development.json](DiscordBot/appsettings.Development.json) using `CommandsGuildID` property. This config will be used only during debugging, and your in-dev commands will be registered in one server only.
-
-Better yet, it's recommended to create `appsecrets.Development.json` file - much like in step 3 of [running locally instructions](#running). This file is git-ignored, so your ID will not overwrite settings of others every time you commit changes.
 
 #### DataDog
 The bot is set up to support logging to DataDog without any further code changes. All you need to do is add following config section to your `appsecrets.json` or `appsecrets.Development.json`:
@@ -88,6 +83,16 @@ The bot is set up to support logging to DataDog without any further code changes
 ```
 
 Of course you have to replace `<KEY>` with your DataDog API key. Also double check if you don't accidentally push it to GitHub. `appsecrets.json` or `appsecrets.Development.json` should be both git-ignored, but better safe than sorry.
+
+#### Production-Only Configuration
+The bot now has [appsettings.Production.json](DiscordBot/appsettings.Production.json) file, and some of the settings were moved from [appsettings.json](DiscordBot/appsettings.json) there. The reason is that the way .NET Core Configuration deals with arrays causes issues in development if [appsettings.json](DiscordBot/appsettings.json) arrays have more items than the ones in [appsettings.Development.json](DiscordBot/appsettings.Development.json).
+
+In practice it mainly matters during development, but it's worth keeping in mind that values in [appsettings.Production.json](DiscordBot/appsettings.Production.json) will overwrite those from [appsettings.json](DiscordBot/appsettings.json) in production builds.
+
+#### In-Development Commands
+Development Environment Commands shouldn't be registered globally for numerous reasons. For this reason you should set your test server ID in [appsettings.Development.json](DiscordBot/appsettings.Development.json) using `CommandsGuildID` property. This config will be used only during debugging, and your in-dev commands will be registered in one server only.
+
+Better yet, it's recommended to create `appsecrets.Development.json` file - much like in step 3 of [running locally instructions](#running). This file is git-ignored, so your ID will not overwrite settings of others every time you commit changes.
 
 ## Planned Features
 - Whatever we neeed

@@ -42,6 +42,7 @@ namespace DevSubmarine.DiscordBot
                 .ConfigureServices((context, services) =>
                 {
                     // options
+                    services.Configure<DevSubOptions>(context.Configuration);
                     services.Configure<Client.DiscordOptions>(context.Configuration);
                     services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
@@ -49,6 +50,7 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<BlogsManagement.BlogsManagementOptions>(context.Configuration.GetSection("BlogsManagement"));
                     services.Configure<Voting.VotingOptions>(context.Configuration.GetSection("Voting"));
                     services.Configure<RandomStatus.RandomStatusOptions>(context.Configuration.GetSection("RandomStatus"));
+                    services.Configure<Birthdays.UserBirthdaysOptions>(context.Configuration.GetSection("Birthdays"));
 
                     // dependencies
                     services.AddDiscordClient();
@@ -63,6 +65,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddBlogsManagement();
                     services.AddVoting();
                     services.AddRandomStatus();
+                    services.AddUserBirthdays();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);

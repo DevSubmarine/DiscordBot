@@ -10,17 +10,19 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly IRandomizer _randomizer;
+        private readonly IStatusPlaceholderEngine _placeholders;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<RandomStatusOptions> _options;
         private CancellationTokenSource _cts;
 
         private DateTime _lastChangeUtc;
 
-        public RandomStatusService(DiscordSocketClient client, IRandomizer randomizer,
+        public RandomStatusService(DiscordSocketClient client, IRandomizer randomizer, IStatusPlaceholderEngine placeholders,
             ILogger<RandomStatusService> log, IOptionsMonitor<RandomStatusOptions> options)
         {
             this._client = client;
             this._randomizer = randomizer;
+            this._placeholders = placeholders;
             this._log = log;
             this._options = options;
         }
@@ -59,17 +61,22 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
                 return null;
 
             Status status = this._randomizer.GetRandomValue(options.Statuses);
+
             try
             {
+                string text = status.Text;
                 if (this._client.CurrentUser == null || this._client.ConnectionState != ConnectionState.Connected)
                     return null;
                 if (status == null)
                     return null;
                 if (!string.IsNullOrWhiteSpace(status.Text))
-                    this._log.LogDebug("Changing status to `{NewStatus}`", status);
+                {
+                    text = await this._placeholders.ConvertPlaceholdersAsync(status.Text, cancellationToken).ConfigureAwait(false);
+                    this._log.LogDebug("Changing status to `{Status}`", text);
+                }
                 else
                     this._log.LogDebug("Clearing status");
-                await this._client.SetGameAsync(status.Text, status.Link, status.ActivityType).ConfigureAwait(false);
+                await this._client.SetGameAsync(text, status.Link, status.ActivityType).ConfigureAwait(false);
                 return status;
             }
             catch (Exception ex) when (options.IsEnabled && ex.LogAsError(this._log, "Failed changing status to {Status}", status))

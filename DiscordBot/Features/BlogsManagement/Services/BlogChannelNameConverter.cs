@@ -1,7 +1,7 @@
 ﻿namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
     /// <inheritdoc/>
-    public class BlogChannelNameConverter : IBlogChannelNameConverter
+    internal class BlogChannelNameConverter : IBlogChannelNameConverter
     {
         private static readonly Regex _validationRegex = new Regex(@"^[a-z0-9\-]{3,15}$", 
             RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);

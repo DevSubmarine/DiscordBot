@@ -23,5 +23,11 @@
                     return vote.ToString();
             }
         }
+
+        public static bool IsPositive(this VoteType vote)
+            => vote == VoteType.Mod;
+
+        public static bool IsNegative(this VoteType vote)
+            => vote == VoteType.Kick || vote == VoteType.Ban;
     }
 }

@@ -10,20 +10,22 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         private readonly DiscordSocketClient _client;
         private readonly ILogger _log;
         private readonly BlogsManagementOptions _options;
+        private readonly DevSubOptions _devsubOptions;
 
         public BlogChannelManager(IBlogChannelSorter sorter, DiscordSocketClient client,
-            ILogger<BlogChannelManager> log, IOptionsMonitor<BlogsManagementOptions> options)
+            ILogger<BlogChannelManager> log, IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._sorter = sorter;
             this._client = client;
             this._log = log;
             this._options = options.CurrentValue;
+            this._devsubOptions = devsubOptions.CurrentValue;
         }
 
         /// <inheritdoc/>
         public Task<IEnumerable<IGuildChannel>> GetBlogChannelsAsync(CancellationToken cancellationToken = default)
         {
-            SocketGuild guild = this._client.GetGuild(this._options.GuildID);
+            SocketGuild guild = this._client.GetGuild(this._devsubOptions.GuildID);
             IEnumerable<IGuildChannel> channels = guild.Channels
                 .Where(channel => channel is SocketTextChannel)
                 .Cast<SocketTextChannel>()
@@ -63,7 +65,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         {
             this._log.LogInformation("Creating blog channel {ChannelName} for user(s) {UserIDs}", name, string.Join(", ", userIDs));
 
-            SocketGuild guild = this._client.GetGuild(this._options.GuildID);
+            SocketGuild guild = this._client.GetGuild(this._devsubOptions.GuildID);
             SocketCategoryChannel category = guild.GetCategoryChannel(this._options.ActiveBlogsCategoryID);
 
             IGuildChannel result = await guild.CreateTextChannelAsync(name, props =>
@@ -74,7 +76,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 // discord perm overwrites don't merge with each other
                 // so each overwrite is to be created by modifying @everyone perms from the category
                 // this is so we can both respect category permissions, as well as assign our own overrides
-                OverwritePermissions categoryPerms = category.PermissionOverwrites.First(p
+                OverwritePermissions categoryPerms = category.PermissionOverwrites.FirstOrDefault(p
                     => p.TargetId == guild.EveryoneRole.Id && p.TargetType == PermissionTarget.Role)
                     .Permissions;
 

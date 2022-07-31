@@ -13,18 +13,20 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         private readonly IBlogChannelSorter _sorter;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<BlogsManagementOptions> _options;
+        private readonly IOptionsMonitor<DevSubOptions> _devsubOptions;
         private CancellationTokenSource _cts;
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
         public BlogActivityListener(IBlogChannelActivator activator, IBlogChannelSorter sorter, DiscordSocketClient client,
-            ILogger<BlogActivityListener> log, IOptionsMonitor<BlogsManagementOptions> options)
+            ILogger<BlogActivityListener> log, IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._activator = activator;
             this._sorter = sorter;
             this._client = client;
             this._log = log;
             this._options = options;
+            this._devsubOptions = devsubOptions;
 
             this._client.MessageReceived += OnClientMessageReceived;
         }
@@ -33,7 +35,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         {
             if (message.Channel is not SocketTextChannel channel)
                 return;
-            if (channel.Guild.Id != this.Options.GuildID)
+            if (channel.Guild.Id != this._devsubOptions.CurrentValue.GuildID)
                 return;
             if (channel.CategoryId != this.Options.InactiveBlogsCategoryID)
                 return;

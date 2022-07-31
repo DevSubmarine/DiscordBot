@@ -3,7 +3,7 @@ using Discord.Interactions;
 using Discord.Net;
 using TehGM.Utilities.Randomization;
 
-namespace DevSubmarine.DiscordBot.BlogsManagement.Services
+namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
 {
     [Group("blog", "Commands for managing blog channels")]
     [EnabledInDm(false)]
@@ -32,7 +32,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             // creating channel for other user should only be possible for admins
-            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
             if (user != null)
             {
                 if (!callerUser.IsOwner() && !callerUser.GuildPermissions.Administrator)
@@ -52,14 +52,14 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 return;
             }
 
-            IEnumerable<IGuildChannel> existingChannels = await this._manager.GetBlogChannelsAsync(channelName, base.Context.CancellationToken).ConfigureAwait(false);
+            IEnumerable<IGuildChannel> existingChannels = await this._manager.GetBlogChannelsAsync(channelName, base.CancellationToken).ConfigureAwait(false);
             if (existingChannels.Any())
             {
                 await RespondFailureAsync($"{ResponseEmoji.Failure} Channel {MentionUtils.MentionChannel(existingChannels.First().Id)} already exists {ResponseEmoji.FeelsBeanMan}");
                 return;
             }
 
-            IEnumerable<IGuildChannel> userChannels = await this._manager.FindUserBlogChannelsAsync(user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+            IEnumerable<IGuildChannel> userChannels = await this._manager.FindUserBlogChannelsAsync(user.Id, base.CancellationToken).ConfigureAwait(false);
             if (userChannels.Any())
             {
                 string responseStart = CreatingForSelf() ? "You already have" : $"{user.Mention} already has";
@@ -80,7 +80,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
             try
             {
-                IGuildChannel result = await this._manager.CreateBlogChannel(channelName, user.Id, base.Context.CancellationToken).ConfigureAwait(false);
+                IGuildChannel result = await this._manager.CreateBlogChannel(channelName, user.Id, base.CancellationToken).ConfigureAwait(false);
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
                     msg.Content = null;
