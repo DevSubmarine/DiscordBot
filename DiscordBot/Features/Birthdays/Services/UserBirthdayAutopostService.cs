@@ -35,26 +35,25 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
                 }
 
-                if (this.Options.AutoPostChannelID == null)
+                if (this.Options.AutoPostChannelID != null)
                 {
-                    this._log.LogDebug("No birthday auto-post channel set, skipping");
-                    continue;
-                }
-
-                IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(cancellationToken).ConfigureAwait(false);
-                Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, false, cancellationToken).ConfigureAwait(false);
-                if (embed != null)
-                {
-                    this._log.LogDebug("Auto-posting upcoming birthdays");
-                    IChannel channel = await this._client.GetChannelAsync(this.Options.AutoPostChannelID.Value, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
-                    if (channel is not ITextChannel textChannel)
+                    IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(cancellationToken).ConfigureAwait(false);
+                    Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, false, cancellationToken).ConfigureAwait(false);
+                    if (embed != null)
                     {
-                        this._log.LogError("Channel ID {ChannelID} is not a valid text channel", channel.Id);
-                        continue;
-                    }
+                        this._log.LogDebug("Auto-posting upcoming birthdays");
+                        IChannel channel = await this._client.GetChannelAsync(this.Options.AutoPostChannelID.Value, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+                        if (channel is not ITextChannel textChannel)
+                        {
+                            this._log.LogError("Channel ID {ChannelID} is not a valid text channel", channel.Id);
+                            continue;
+                        }
 
-                    await textChannel.SendMessageAsync(embed: embed, options: cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+                        await textChannel.SendMessageAsync(embed: embed, options: cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+                    }
                 }
+                else
+                    this._log.LogDebug("No birthday auto-post channel set, skipping");
 
                 this._log.LogDebug("Next birthdays autpost: {Time}", DateTime.Now.AddDays(1));
                 await Task.Delay(TimeSpan.FromDays(1), cancellationToken).ConfigureAwait(false);
