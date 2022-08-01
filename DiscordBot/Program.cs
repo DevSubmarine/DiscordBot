@@ -52,6 +52,8 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<RandomStatus.RandomStatusOptions>(context.Configuration.GetSection("RandomStatus"));
                     services.Configure<Birthdays.UserBirthdaysOptions>(context.Configuration.GetSection("Birthdays"));
 
+                    services.AddSingleton<IValidateOptions<DevSubOptions>, DevSubOptionsValidator>();
+
                     // dependencies
                     services.AddDiscordClient();
                     services.AddRandomizer();
