@@ -26,7 +26,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             {
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
-                    msg.Content = $"No birthday date found for user {user.Mention} (`{user.Mention}`). {ResponseEmoji.FeelsBeanMan}";
+                    msg.Content = $"No birthday date found for user {user.Mention} (`{user.GetUsernameWithDiscriminator()}`). {ResponseEmoji.FeelsBeanMan}";
                     msg.AllowedMentions = AllowedMentions.None;
                 },
                     base.GetRequestOptions());
