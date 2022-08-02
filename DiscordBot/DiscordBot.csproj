@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/DevSubmarine/DiscordBot</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>bot; discord; devsub; devsubmarine</PackageTags>
-    <Version>1.2.0</Version>
+    <Version>1.2.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

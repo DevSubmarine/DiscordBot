@@ -22,7 +22,7 @@ namespace DevSubmarine.DiscordBot.Client
             this._options = options.Value;
             this._interactions = new InteractionService(this._client, new InteractionServiceConfig()
             {
-                DefaultRunMode = RunMode.Async,
+                DefaultRunMode = RunMode.Sync,
                 UseCompiledLambda = this._options.CompileCommands
             });
 
