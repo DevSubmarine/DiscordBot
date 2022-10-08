@@ -27,6 +27,7 @@
     <None Remove="appsettings.Production.json" />
     <None Remove="Dockerfile" />
     <None Remove="dockerscript.sh" />
+    <None Remove="timezones.json" />
   </ItemGroup>
 
 	<ItemGroup>
@@ -58,6 +59,9 @@
     </Content>
     <Content Include="dockerscript.sh" Condition="Exists('dockerscript.sh')">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="timezones.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
 

@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using DevSubmarine.DiscordBot.Time;
+using Discord;
 using Discord.Interactions;
 
 namespace DevSubmarine.DiscordBot.Birthdays.Commands
@@ -8,11 +9,13 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
     {
         private readonly IUserBirthdaysProvider _provider;
         private readonly IUserBirthdayEmbedBuilder _embedBuilder;
+        private readonly ITimezoneProvider _timezones;
 
-        public UserBirthdaysSlashCommands(IUserBirthdaysProvider provider, IUserBirthdayEmbedBuilder embedBuilder)
+        public UserBirthdaysSlashCommands(IUserBirthdaysProvider provider, IUserBirthdayEmbedBuilder embedBuilder, ITimezoneProvider timezones)
         {
             this._provider = provider;
             this._embedBuilder = embedBuilder;
+            this._timezones = timezones;
         }
 
         [SlashCommand("get", "Gets birthday for user")]
@@ -70,7 +73,8 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             [Summary("User", "User to set birthday of")] IUser user,
             [Summary("Day", "Day of the month"), MinValue(1), MaxValue(31)] int day,
             [Summary("Month", "Month of birth")] Month month,
-            [Summary("Year", "Year of birth"), MinValue(0)] int? year = null)
+            [Summary("Year", "Year of birth"), MinValue(0)] int? year = null,
+            [Summary("Timezone", "Your timezone"), Autocomplete(typeof(UserBirthdayTimezoneAutocompleteHandler))] string timezoneID = null)
         {
             if (year != null)
             {
@@ -98,8 +102,19 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
                 return;
             }
 
+            if (string.IsNullOrWhiteSpace(timezoneID))
+                timezoneID = null;
+            else if (!this._timezones.ContainsTimezone(timezoneID))
+            {
+                await base.RespondAsync($"What... the hell... is this timezone? {ResponseEmoji.FeelsBeanMan}",
+                    ephemeral: false,
+                    allowedMentions: AllowedMentions.None,
+                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                return;
+            }
+
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
-            BirthdayDate date = new BirthdayDate(day, (int)month, year);
+            BirthdayDate date = new BirthdayDate(day, (int)month, year, timezoneID);
             UserBirthday birthday = new UserBirthday(user.Id, date);
             await this._provider.AddAsync(birthday, base.CancellationToken).ConfigureAwait(false);
 

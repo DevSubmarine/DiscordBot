@@ -35,6 +35,7 @@ namespace DevSubmarine.DiscordBot
             IHost host = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((context, config) =>
                 {
+                    config.AddJsonFile("timezones.json", optional: false);
                     config.AddJsonFile("appsecrets.json", optional: true);
                     config.AddJsonFile($"appsecrets.{context.HostingEnvironment.EnvironmentName}.json", optional: true);
                 })
@@ -44,6 +45,7 @@ namespace DevSubmarine.DiscordBot
                     // options
                     services.Configure<DevSubOptions>(context.Configuration);
                     services.Configure<Client.DiscordOptions>(context.Configuration);
+                    services.Configure<Time.TimezoneOptions>(context.Configuration);
                     services.Configure<Database.MongoOptions>(context.Configuration.GetSection("Database"));
                     services.Configure<SubWords.SubWordsOptions>(context.Configuration.GetSection("SubWords"));
                     services.Configure<ColourRoles.ColourRolesOptions>(context.Configuration.GetSection("ColourRoles"));
@@ -61,6 +63,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddPasteMyst();
                     services.AddCaching();
                     services.AddUserSettings();
+                    services.AddTimezones();
 
                     // features
                     services.AddSubWords();
