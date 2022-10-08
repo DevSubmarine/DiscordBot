@@ -1,7 +1,12 @@
-﻿using System.Diagnostics;
+﻿using System;
+using System.Diagnostics;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
+using ILogger = Serilog.ILogger;
 
 namespace DevSubmarine.DiscordBot.Tools
 {
@@ -10,10 +15,13 @@ namespace DevSubmarine.DiscordBot.Tools
         private static bool _initialized = false;
         private static readonly object _lock = new object();
 
-        public static void ConfigureLogging(IConfiguration configuration)
+        public static ILogger ConfigureLogging(IConfiguration configuration)
         {
             lock (_lock)
             {
+                if (_initialized)
+                    return Log.Logger;
+
                 LoggerConfiguration config = new LoggerConfiguration();
 
                 if (configuration?.GetSection("Serilog").Exists() == true)
@@ -26,15 +34,22 @@ namespace DevSubmarine.DiscordBot.Tools
                             .Enrich.FromLogContext();
                 }
 
-                // create the logger
                 Log.Logger = config.CreateLogger();
-
-                // enable logging of unhandled exceptions, but only when initializing for the first time
-                if (!_initialized)
-                    AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
+                AppDomain.CurrentDomain.UnhandledException += OnUnhandledException;
 
                 _initialized = true;
+                return Log.Logger;
             }
+        }
+
+        public static IServiceCollection AddToolsLogging(this IServiceCollection services, IConfiguration configuration = null)
+        {
+            ILogger log = ConfigureLogging(configuration);
+            services.TryAddSingleton<ILoggerFactory>(new LoggerFactory()
+                .AddSerilog(log, dispose: true));
+            services.AddLogging();
+
+            return services;
         }
 
         private static void OnUnhandledException(object sender, UnhandledExceptionEventArgs e)

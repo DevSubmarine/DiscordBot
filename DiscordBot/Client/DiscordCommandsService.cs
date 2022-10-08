@@ -26,13 +26,14 @@ namespace DevSubmarine.DiscordBot.Client
                 UseCompiledLambda = this._options.CompileCommands
             });
 
-            this._client.Ready += OnClientReady;
-            this._client.SlashCommandExecuted += OnSlashCommandAsync;
-            this._client.UserCommandExecuted += OnUserCommandAsync;
-            this._client.MessageCommandExecuted += OnMessageCommandAsync;
-            this._client.ButtonExecuted += OnButtonCommandAsync;
-            this._client.SelectMenuExecuted += OnMenuCommandAsync;
-            this._interactions.Log += OnLog;
+            this._client.Ready += this.OnClientReady;
+            this._client.SlashCommandExecuted += this.OnSlashCommandAsync;
+            this._client.UserCommandExecuted += this.OnUserCommandAsync;
+            this._client.MessageCommandExecuted += this.OnMessageCommandAsync;
+            this._client.ButtonExecuted += this.OnButtonCommandAsync;
+            this._client.SelectMenuExecuted += this.OnMenuCommandAsync;
+            this._client.AutocompleteExecuted += this.OnAutocompleteAsync;
+            this._interactions.Log += this.OnLog;
         }
 
         private async Task OnClientReady()
@@ -65,11 +66,13 @@ namespace DevSubmarine.DiscordBot.Client
             => this.OnInteractionAsync(interaction);
         private  Task OnUserCommandAsync(SocketUserCommand interaction)
             => this.OnInteractionAsync(interaction);
-        private  Task OnMessageCommandAsync(SocketMessageCommand interaction)
+        private Task OnMessageCommandAsync(SocketMessageCommand interaction)
             => this.OnInteractionAsync(interaction);
         private Task OnMenuCommandAsync(SocketMessageComponent interaction)
             => this.OnInteractionAsync(interaction);
         private Task OnButtonCommandAsync(SocketMessageComponent interaction)
+            => this.OnInteractionAsync(interaction);
+        private Task OnAutocompleteAsync(SocketAutocompleteInteraction interaction)
             => this.OnInteractionAsync(interaction);
 
         private async Task OnInteractionAsync(SocketInteraction interaction)
@@ -116,13 +119,13 @@ namespace DevSubmarine.DiscordBot.Client
 
         public void Dispose()
         {
-            try { this._client.Ready -= OnClientReady; } catch { }
-            try { this._client.SlashCommandExecuted -= OnSlashCommandAsync; } catch { }
-            try { this._client.UserCommandExecuted -= OnUserCommandAsync; } catch { }
-            try { this._client.MessageCommandExecuted -= OnMessageCommandAsync; } catch { }
-            try { this._client.ButtonExecuted -= OnMenuCommandAsync; } catch { }
-            try { this._client.SelectMenuExecuted -= OnButtonCommandAsync; } catch { }
-            try { this._interactions.Log -= OnLog; } catch { }
+            try { this._client.Ready -= this.OnClientReady; } catch { }
+            try { this._client.SlashCommandExecuted -= this.OnSlashCommandAsync; } catch { }
+            try { this._client.UserCommandExecuted -= this.OnUserCommandAsync; } catch { }
+            try { this._client.MessageCommandExecuted -= this.OnMessageCommandAsync; } catch { }
+            try { this._client.ButtonExecuted -= this.OnMenuCommandAsync; } catch { }
+            try { this._client.SelectMenuExecuted -= this.OnButtonCommandAsync; } catch { }
+            try { this._interactions.Log -= this.OnLog; } catch { }
             try { this._interactions?.Dispose(); } catch { }
             try { this._cts?.Dispose(); } catch { }
         }

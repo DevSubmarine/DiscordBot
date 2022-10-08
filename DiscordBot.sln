@@ -38,6 +38,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordInteractions.Package
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DiscordInteractions.Vsix", "Analyzers\DiscordInteractions\DiscordInteractions.Vsix\DiscordInteractions.Vsix.csproj", "{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot.Tools.TimezonesGenerator", "Tools\DiscordBot.Tools.TimezonesGenerator\DiscordBot.Tools.TimezonesGenerator.csproj", "{0EC98897-68FA-4A90-AE53-8EC19483EAD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DiscordBot.Tools.Core", "Tools\DiscordBot.Tools.Core\DiscordBot.Tools.Core.csproj", "{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -88,6 +92,14 @@ Global
 		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EC98897-68FA-4A90-AE53-8EC19483EAD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EC98897-68FA-4A90-AE53-8EC19483EAD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EC98897-68FA-4A90-AE53-8EC19483EAD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EC98897-68FA-4A90-AE53-8EC19483EAD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -103,6 +115,8 @@ Global
 		{4B36D10F-0D1A-4D51-B20A-43702158DCF2} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
 		{DA56A65C-EE76-41E4-A68F-18A4D3491BB9} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
 		{BBA07C66-7E4F-44F7-9C71-3ABBCFCB9DF5} = {4A0D3882-0F82-4FE4-A021-EB30AAF9AC81}
+		{0EC98897-68FA-4A90-AE53-8EC19483EAD8} = {23E321EE-4459-4449-9790-002469D392BE}
+		{2544EA38-EC6D-4DC0-BB31-FBBB0DDF94A0} = {23E321EE-4459-4449-9790-002469D392BE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {33A5C378-0FC3-4A25-B8A9-04AF9A511F21}

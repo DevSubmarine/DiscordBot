@@ -1,4 +1,5 @@
-﻿using Discord;
+﻿using DevSubmarine.DiscordBot.Time;
+using Discord;
 using System.Text;
 using TehGM.Utilities.Randomization;
 
@@ -8,13 +9,15 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
     {
         private readonly IDiscordClient _client;
         private readonly IRandomizer _randomizer;
+        private readonly ITimezoneProvider _timezoneProvider;
 
         private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug };
 
-        public UserBirthdayEmbedBuilder(IDiscordClient client, IRandomizer randomizer)
+        public UserBirthdayEmbedBuilder(IDiscordClient client, IRandomizer randomizer, ITimezoneProvider timezoneProvider)
         {
             this._client = client;
             this._randomizer = randomizer;
+            this._timezoneProvider = timezoneProvider;
         }
 
         public async Task<Embed> BuildUpcomingBirthdaysEmbedAsync(IEnumerable<UserBirthday> birthdays, bool useEmotes, CancellationToken cancellationToken = default)
@@ -52,8 +55,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 {
                     entryBuilder.Clear();
                     IUser user = await this._client.GetUserAsync(birthday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
-                    DateTime date = (DateTime)birthday.Date;
-                    entryBuilder.Append($"{user.Mention} (`{user.GetUsernameWithDiscriminator()}`) - **{birthday.Date}** {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}");
+                    entryBuilder.Append($"{user.Mention} (`{user.GetUsernameWithDiscriminator()}`) - **{birthday.Date}** {this.GetTimestamp(birthday.Date)}");
                     if (birthday.Date.Year != null)
                         entryBuilder.Append($" (will be **{(GetAge(birthday) + 1)}**)");
                     entries.Add(entryBuilder.ToString());
@@ -73,7 +75,6 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
 
         public async Task<Embed> BuildUserBirthdayEmbedAsync(UserBirthday birthday, ulong? guildID, CancellationToken cancellationToken = default)
         {
-            DateTime date = (DateTime)birthday.Date;
             IGuildUser guildUser = null;
             if (guildID != null)
             {
@@ -90,7 +91,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 .WithAuthor(user);
             if (birthday.Date.Year != null)
                 embed.AddField("Age", GetAge(birthday));
-            if (birthday.Date.IsToday)
+            if (birthday.Date.IsToday(this._timezoneProvider))
             {
                 if (birthday.Date.Year != null)
                 {
@@ -101,7 +102,9 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     embed.WithDescription($"Today! It's today! Happy birthday! {this._randomizer.GetRandomValue(_emotes)}");
             }
             else
-                embed.WithDescription($"**{birthday.Date}** {TimestampTag.FromDateTime(date, TimestampTagStyles.Relative)}");
+            {
+                embed.WithDescription($"**{birthday.Date}** {this.GetTimestamp(birthday.Date)}");
+            }
 
             return embed.Build();
         }
@@ -117,18 +120,21 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             return age;
         }
 
-        private static IEnumerable<UserBirthday> GetTodayBirthdays(IEnumerable<UserBirthday> birthdays)
-            => birthdays.Where(birthday => birthday.Date.IsToday);
+        private IEnumerable<UserBirthday> GetTodayBirthdays(IEnumerable<UserBirthday> birthdays)
+            => birthdays.Where(birthday => birthday.Date.IsToday(this._timezoneProvider));
 
-        private static IEnumerable<UserBirthday> GetUpcomingBirthdays(IEnumerable<UserBirthday> birthdays, int days = 7)
+        private IEnumerable<UserBirthday> GetUpcomingBirthdays(IEnumerable<UserBirthday> birthdays, int days = 7)
         {
-            DateTime startDate = (DateTime)BirthdayDate.Today.AddDays(1);
-            DateTime endDate = startDate.AddDays(days);
-            return birthdays.Where(birthday
-                => !birthday.Date.IsToday
-                && (DateTime)birthday.Date >= startDate
-                && (DateTime)birthday.Date <= endDate)
+            TimeSpan maxDiff = TimeSpan.FromDays(days);
+            return birthdays.Where(birthday =>
+            {
+                TimeSpan diff = birthday.Date.GetTimeRemaining(this._timezoneProvider);
+                return diff <= maxDiff && !birthday.Date.IsToday(this._timezoneProvider);
+            })
                 .OrderBy(birthday => (DateTime)birthday.Date);
         }
+
+        private TimestampTag GetTimestamp(BirthdayDate date)
+            => TimestampTag.FromDateTime(date.GetNextTimestamp(this._timezoneProvider), TimestampTagStyles.Relative);
     }
 }

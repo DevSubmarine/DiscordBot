@@ -4,20 +4,14 @@ global using System.Threading;
 global using System.Threading.Tasks;
 global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
-global using DevSubmarine.DiscordBot.Database;
-global using MongoDB.Driver;
 
-using System.Diagnostics;
-using DevSubmarine.DiscordBot.Database.Services;
-using DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper.CollectionCreators;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Serilog;
+using System.Diagnostics;
 
-namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper
+namespace DevSubmarine.DiscordBot.Tools.TimezonesGenerator
 {
-    class Program
+    internal class Program
     {
         private static IServiceProvider _services;
 
@@ -47,17 +41,8 @@ namespace DevSubmarine.DiscordBot.Tools.DatabaseBootstrapper
         {
             IServiceCollection services = new ServiceCollection();
 
-            services.Configure<MongoOptions>(configuration);
-
             services.AddToolsLogging(configuration);
             services.AddTransient<ApplicationRunner>();
-            services.AddSingleton<IMongoDatabaseClient, MongoDatabaseClient>();
-
-            // COLLECTION CREATORS
-            services.AddCollectionCreator<SubWordsCollectionCreator>();
-            services.AddCollectionCreator<VotesCollectionCreator>();
-            services.AddCollectionCreator<UserSettingsCollectionCreator>();
-            services.AddCollectionCreator<UserBirthdaysCollectionCreator>();
 
             return services;
         }
