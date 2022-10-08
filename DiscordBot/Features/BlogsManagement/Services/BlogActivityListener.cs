@@ -28,7 +28,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             this._options = options;
             this._devsubOptions = devsubOptions;
 
-            this._client.MessageReceived += OnClientMessageReceived;
+            this._client.MessageReceived += this.OnClientMessageReceived;
         }
 
         private async Task OnClientMessageReceived(SocketMessage message)
@@ -51,11 +51,11 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             });
 
             this._log.LogInformation("Message received from inactive blog channel {ChannelName} ({ChannelID})", channel.Name, channel.Id);
-            CancellationToken cancellationToken = this._cts.Token;
-            SocketCategoryChannel categoryToSort = channel.Guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
             try
             {
+                CancellationToken cancellationToken = this._cts.Token;
                 await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
+                SocketCategoryChannel categoryToSort = channel.Guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
                 await this._sorter.SortChannelsAsync(categoryToSort, cancellationToken).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.IsMissingPermissions() &&
@@ -78,7 +78,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         public void Dispose()
         {
-            try { this._client.MessageReceived -= OnClientMessageReceived; } catch { }
+            try { this._client.MessageReceived -= this.OnClientMessageReceived; } catch { }
             try { this._cts?.Dispose(); } catch { }
         }
     }
