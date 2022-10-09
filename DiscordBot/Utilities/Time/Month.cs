@@ -1,4 +1,4 @@
-﻿namespace DevSubmarine.DiscordBot
+﻿namespace DevSubmarine.DiscordBot.Time
 {
     public enum Month
     {
