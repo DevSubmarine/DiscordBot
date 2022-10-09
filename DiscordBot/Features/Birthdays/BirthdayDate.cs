@@ -8,8 +8,6 @@ namespace DevSubmarine.DiscordBot.Birthdays
     // this should be struct but mongodb doesn't like deserializing them
     public class BirthdayDate : IEquatable<BirthdayDate>, IEquatable<DateTime>
     {
-        private static readonly TimeSpan _oneDay = TimeSpan.FromDays(1);
-
         [BsonElement("day")]
         public int Day { get; }
         [BsonElement("month")]
