@@ -42,6 +42,10 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
         private async Task OnClientMessageReceivedAsync(SocketMessage message)
         {
+            RandomReactionsOptions options = this._options.CurrentValue;
+            if (!options.Enabled)
+                return;
+
             if (message.Author.Id == this._client.CurrentUser.Id)
                 return;
             if (message.Channel is not SocketTextChannel channel)
@@ -49,7 +53,6 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             if (channel.Guild.Id != this._devsubOptions.CurrentValue.GuildID)
                 return;
 
-            RandomReactionsOptions options = this._options.CurrentValue;
             this.SortAndCacheEmotes(options);
             if (this._sortedWelcomeEmotes?.Any() != true && this._sortedFollowupEmotes?.Any() != true && this._sortedRandomEmotes?.Any() != true)
                 return;
@@ -64,6 +67,10 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
         private async Task OnClientReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> messageChannel, SocketReaction reaction)
         {
+            RandomReactionsOptions options = this._options.CurrentValue;
+            if (!options.Enabled)
+                return;
+
             if (messageChannel.Value is not SocketTextChannel channel)
                 return;
             if (channel.Guild.Id != this._devsubOptions.CurrentValue.GuildID)
@@ -74,7 +81,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
             this._log.LogTrace("Attempting to handle followup reaction for message {MessageID}", message.Id);
 
-            this.SortAndCacheEmotes(this._options.CurrentValue);
+            this.SortAndCacheEmotes(options);
             ParsedEmote emote = this._sortedFollowupEmotes.FirstOrDefault(e => e.Emote.Equals(reaction.Emote));
             if (emote == null)
                 return;
