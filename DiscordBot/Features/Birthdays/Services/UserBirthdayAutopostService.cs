@@ -38,7 +38,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                 if (this.Options.AutoPostChannelID != null)
                 {
                     IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(cancellationToken).ConfigureAwait(false);
-                    Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, false, cancellationToken).ConfigureAwait(false);
+                    Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, this.Options.AutoPostDaysAhead, false, cancellationToken).ConfigureAwait(false);
                     if (embed != null)
                     {
                         this._log.LogDebug("Auto-posting upcoming birthdays");

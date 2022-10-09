@@ -51,7 +51,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
 
             IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(base.CancellationToken).ConfigureAwait(false);
-            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, true, base.CancellationToken).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, daysAhead: 7, useEmotes: true, base.CancellationToken).ConfigureAwait(false);
 
             if (embed == null)
             {

@@ -20,10 +20,10 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             this._timezoneProvider = timezoneProvider;
         }
 
-        public async Task<Embed> BuildUpcomingBirthdaysEmbedAsync(IEnumerable<UserBirthday> birthdays, bool useEmotes, CancellationToken cancellationToken = default)
+        public async Task<Embed> BuildUpcomingBirthdaysEmbedAsync(IEnumerable<UserBirthday> birthdays, int daysAhead, bool useEmotes, CancellationToken cancellationToken = default)
         {
-            IEnumerable<UserBirthday> todayBirthdays = GetTodayBirthdays(birthdays);
-            IEnumerable<UserBirthday> upcomingBirthdays = GetUpcomingBirthdays(birthdays);
+            IEnumerable<UserBirthday> todayBirthdays = this.GetTodayBirthdays(birthdays);
+            IEnumerable<UserBirthday> upcomingBirthdays = this.GetUpcomingBirthdays(birthdays, daysAhead);
 
             if (!todayBirthdays.Any() && !upcomingBirthdays.Any())
                 return null;
