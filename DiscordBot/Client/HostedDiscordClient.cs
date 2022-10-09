@@ -22,6 +22,7 @@ namespace DevSubmarine.DiscordBot.Client
             DiscordSocketConfig clientConfig = new DiscordSocketConfig();
             clientConfig.LogLevel = LogSeverity.Verbose;
             clientConfig.LogGatewayIntentWarnings = false;
+            clientConfig.GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent | GatewayIntents.GuildMembers;
             this._client = new DiscordSocketClient(clientConfig);
             this._client.Log += this.OnClientLog;
 
