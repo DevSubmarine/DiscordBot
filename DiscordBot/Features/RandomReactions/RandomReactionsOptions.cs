@@ -1,9 +1,9 @@
-﻿using Discord;
-
-namespace DevSubmarine.DiscordBot.RandomReactions
+﻿namespace DevSubmarine.DiscordBot.RandomReactions
 {
     public class RandomReactionsOptions
     {
+        public bool Enabled { get; set; } = true;
+
         // followups - happen if a message already contains the emote, or has a reaction with that emote.
         public IDictionary<string, double> FollowupEmotes { get; set; } = new Dictionary<string, double>()
         {
