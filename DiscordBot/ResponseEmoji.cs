@@ -23,5 +23,6 @@
         public static string BlobHug => "<:blobHug:776368699216494631>";
         public static string Zoop => "<:zoop:816001754125566003>";
         public static string PandaSip => "<:pandSip:844291740441509909>";
+        public static string PepeComfy => "<:pepeComfy:966290245668700191>";
     }
 }
