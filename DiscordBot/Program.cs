@@ -53,6 +53,7 @@ namespace DevSubmarine.DiscordBot
                     services.Configure<Voting.VotingOptions>(context.Configuration.GetSection("Voting"));
                     services.Configure<RandomStatus.RandomStatusOptions>(context.Configuration.GetSection("RandomStatus"));
                     services.Configure<Birthdays.UserBirthdaysOptions>(context.Configuration.GetSection("Birthdays"));
+                    services.Configure<RandomReactions.RandomReactionsOptions>(context.Configuration.GetSection("RandomReactions"));
 
                     services.AddSingleton<IValidateOptions<DevSubOptions>, DevSubOptionsValidator>();
 
@@ -71,6 +72,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddVoting();
                     services.AddRandomStatus();
                     services.AddUserBirthdays();
+                    services.AddRandomReactions();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);
