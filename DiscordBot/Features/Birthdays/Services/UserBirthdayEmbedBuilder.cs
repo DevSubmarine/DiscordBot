@@ -60,7 +60,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                         entryBuilder.Append($" (will be **{(GetAge(birthday) + 1)}**)");
                     entries.Add(entryBuilder.ToString());
                 }
-                embed.AddField("Upcoming Birthdays", string.Join('\n', entries));
+                embed.AddField($"Upcoming Birthdays in next {daysAhead} day(s)", string.Join('\n', entries));
             }
 
             if (todayBirthdays.Count() == 1)
