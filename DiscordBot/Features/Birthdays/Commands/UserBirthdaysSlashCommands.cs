@@ -72,7 +72,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
         public async Task CmdSetAsync(
             [Summary("User", "User to set birthday of")] IUser user,
             [Summary("Day", "Day of the month"), MinValue(1), MaxValue(31)] int day,
-            [Summary("Month", "Month of birth")] Month month,
+            [Summary("Month", "Month of birth"), Autocomplete(typeof(MonthAutocompleteHandler))] int month,
             [Summary("Year", "Year of birth"), MinValue(0)] int? year = null,
             [Summary("Timezone", "Your timezone"), Autocomplete(typeof(UserBirthdayTimezoneAutocompleteHandler))] string timezoneID = null)
         {
@@ -94,7 +94,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
                 }
             }
 
-            if (!BirthdayDate.Validate(day, (int)month))
+            if (!BirthdayDate.Validate(day, month))
             {
                 await base.RespondAsync($"{day}.{month} is not a valid date. {ResponseEmoji.Failure}",
                     ephemeral: true,
@@ -114,7 +114,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
             }
 
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
-            BirthdayDate date = new BirthdayDate(day, (int)month, year, timezoneID);
+            BirthdayDate date = new BirthdayDate(day, month, year, timezoneID);
             UserBirthday birthday = new UserBirthday(user.Id, date);
             await this._provider.AddAsync(birthday, base.CancellationToken).ConfigureAwait(false);
 
