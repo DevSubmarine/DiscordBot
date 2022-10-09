@@ -50,8 +50,9 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
             }
             if (upcomingBirthdays.Any())
             {
-                List<string> entries = new List<string>(todayBirthdays.Count());
-                foreach (UserBirthday birthday in upcomingBirthdays)
+                const int maxItems = 10;
+                List<string> entries = new List<string>(maxItems + 1);
+                foreach (UserBirthday birthday in upcomingBirthdays.Take(maxItems))
                 {
                     entryBuilder.Clear();
                     IUser user = await this._client.GetUserAsync(birthday.UserID, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
@@ -59,6 +60,11 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     if (birthday.Date.Year != null)
                         entryBuilder.Append($" (will be **{(GetAge(birthday) + 1)}**)");
                     entries.Add(entryBuilder.ToString());
+                }
+                if (upcomingBirthdays.Count() > maxItems)
+                {
+                    int remaining = upcomingBirthdays.Count() - maxItems;
+                    entries.Add($"... and {remaining} more! {ResponseEmoji.Hype}");
                 }
                 embed.AddField($"Upcoming Birthdays in next {daysAhead} day(s)", string.Join('\n', entries));
             }
