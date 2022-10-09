@@ -46,17 +46,28 @@ namespace DevSubmarine.DiscordBot.Birthdays.Commands
         }
 
         [SlashCommand("upcoming", "Gets today's and upcoming birthdays")]
-        public async Task CmdGetUpcomingAsync()
+        public async Task CmdGetUpcomingAsync(
+            [Summary("Days", "Amount of days to check bdays for. 1-366.")] int daysAhead = 7)
         {
+            const int minDays = 1;
+            const int maxDays = 366;
+            if (daysAhead < minDays || daysAhead > maxDays)
+            {
+                await base.RespondAsync($"{ResponseEmoji.IAmAgony} Invalid days count, bruh. {minDays} to {maxDays} pls. {ResponseEmoji.FeelsDumbMan}",
+                    ephemeral: true,
+                    options: base.GetRequestOptions()).ConfigureAwait(false);
+                return;
+            }
+
             await base.DeferAsync(false, base.GetRequestOptions()).ConfigureAwait(false);
 
             IEnumerable<UserBirthday> allBirthdays = await this._provider.GetAllAsync(base.CancellationToken).ConfigureAwait(false);
-            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, daysAhead: 7, useEmotes: true, base.CancellationToken).ConfigureAwait(false);
+            Embed embed = await this._embedBuilder.BuildUpcomingBirthdaysEmbedAsync(allBirthdays, daysAhead, useEmotes: true, base.CancellationToken).ConfigureAwait(false);
 
             if (embed == null)
             {
-                await base.ModifyOriginalResponseAsync(msg => msg.Content = $"No upcoming birthdays found! {ResponseEmoji.FeelsDumbMan}",
-                    base.GetRequestOptions());
+                await base.ModifyOriginalResponseAsync(msg => msg.Content = $"No upcoming birthdays in next {daysAhead} day(s) found! {ResponseEmoji.FeelsDumbMan}",
+                    base.GetRequestOptions()).ConfigureAwait(false);
                 return;
             }
 
