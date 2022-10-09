@@ -11,7 +11,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
         private readonly IRandomizer _randomizer;
         private readonly ITimezoneProvider _timezoneProvider;
 
-        private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug };
+        private static readonly string[] _emotes = { ResponseEmoji.EyesBlurry, ResponseEmoji.Parrot60fps, ResponseEmoji.ParrotParty, ResponseEmoji.Zoop, ResponseEmoji.BlobHearts, ResponseEmoji.BlobHug, ResponseEmoji.PepeComfy };
 
         public UserBirthdayEmbedBuilder(IDiscordClient client, IRandomizer randomizer, ITimezoneProvider timezoneProvider)
         {
