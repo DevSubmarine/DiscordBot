@@ -97,7 +97,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             this._log.LogTrace("Attempting to handle welcome reaction for message {MessageID}", message.Id);
 
             string content = message.Content.TrimStart();
-            if (!options.WelcomeTriggers.Any(trigger => content.StartsWith(trigger, StringComparison.OrdinalIgnoreCase)))
+            if (options.WelcomeTriggers?.Any(trigger => content.StartsWith(trigger, StringComparison.OrdinalIgnoreCase)) != true)
                 return false;
 
             foreach (ParsedEmote emote in this._sortedWelcomeEmotes)
