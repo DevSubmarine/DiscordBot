@@ -17,9 +17,9 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
         // we sort emotes by chance to give those with low chance a fair... chance?
         // cache to do it only once per options reload
-        private IEnumerable<ParsedEmote> _sortedWelcomeEmotes;
-        private IEnumerable<ParsedEmote> _sortedFollowupEmotes;
-        private IEnumerable<ParsedEmote> _sortedRandomEmotes;
+        private IEnumerable<RandomReactionEmote> _sortedWelcomeEmotes;
+        private IEnumerable<RandomReactionEmote> _sortedFollowupEmotes;
+        private IEnumerable<RandomReactionEmote> _sortedRandomEmotes;
 
         public RandomReactionsListener(DiscordSocketClient client, IRandomizer randomizer,
             ILogger<RandomReactionsListener> log, IOptionsMonitor<RandomReactionsOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
@@ -82,7 +82,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             this._log.LogTrace("Attempting to handle followup reaction for message {MessageID}", message.Id);
 
             this.SortAndCacheEmotes(options);
-            ParsedEmote emote = this._sortedFollowupEmotes.FirstOrDefault(e => e.Emote.Equals(reaction.Emote));
+            RandomReactionEmote emote = this._sortedFollowupEmotes.FirstOrDefault(e => e.Emote.Equals(reaction.Emote));
             if (emote == null)
                 return;
 
@@ -100,7 +100,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             if (options.WelcomeTriggers?.Any(trigger => content.StartsWith(trigger, StringComparison.OrdinalIgnoreCase)) != true)
                 return false;
 
-            foreach (ParsedEmote emote in this._sortedWelcomeEmotes)
+            foreach (RandomReactionEmote emote in this._sortedWelcomeEmotes)
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -116,7 +116,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
         {
             this._log.LogTrace("Attempting to handle followup reaction for message {MessageID}", message.Id);
 
-            foreach (ParsedEmote emote in this._sortedFollowupEmotes)
+            foreach (RandomReactionEmote emote in this._sortedFollowupEmotes)
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -134,7 +134,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
         {
             this._log.LogTrace("Attempting to handle random reaction for message {MessageID}", message.Id);
 
-            foreach (ParsedEmote emote in this._sortedRandomEmotes)
+            foreach (RandomReactionEmote emote in this._sortedRandomEmotes)
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -152,8 +152,8 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             this._sortedFollowupEmotes ??= SortEmotes(options.FollowupEmotes);
             this._sortedRandomEmotes ??= SortEmotes(options.RandomEmotes);
 
-            IOrderedEnumerable<ParsedEmote> SortEmotes(IDictionary<string, double> emotes)
-                => emotes.Select(kvp => new ParsedEmote(kvp.Key, kvp.Value))
+            IOrderedEnumerable<RandomReactionEmote> SortEmotes(IEnumerable<RandomReactionsOptions.EmoteOptions> emotes)
+                => emotes.Select(e => new RandomReactionEmote(e.Emote, e.Chance))
                     .OrderBy(e => e.Chance);
         }
 
@@ -187,29 +187,6 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             try { this._client.MessageReceived -= this.OnClientMessageReceivedAsync; } catch { }
             try { this._client.ReactionAdded -= this.OnClientReactionAddedAsync; } catch { }
             try { this._cts?.Dispose(); } catch { }
-        }
-
-        private class ParsedEmote
-        {
-            public string RawValue { get; }
-            public IEmote Emote { get; }
-            public double Chance { get; }
-
-            public ParsedEmote(string rawEmote, double chance)
-            {
-                this.RawValue = rawEmote;
-                this.Chance = chance;
-
-                if (Emoji.TryParse(rawEmote, out Emoji emoji))
-                    this.Emote = emoji;
-                else if (Discord.Emote.TryParse(rawEmote, out Emote emote))
-                    this.Emote = emote;
-                else
-                    throw new FormatException($"{rawEmote} is not a valid emote format!");
-            }
-
-            public override string ToString()
-                => this.Emote.ToString();
         }
     }
 }
