@@ -95,10 +95,7 @@ Development Environment Commands shouldn't be registered globally for numerous r
 Better yet, it's recommended to create `appsecrets.Development.json` file - much like in step 3 of [running locally instructions](#running). This file is git-ignored, so your ID will not overwrite settings of others every time you commit changes.
 
 ## Planned Features
-- Whatever we neeed
-
-## Known issues
-- Due to a Discord backend bug, global slash commands do not appear in devsub guild on PC clients. As a *potential* workaround, currently [appsettings.json](DiscordBot/appsettings.json) is set to register only in that guild. This might not work and is less than optimal, but as bot is used currently, this is acceptable and won't hurt.
+- Whatever we need
 
 ## Contributing
 Feel free to open a PR or submit an issue to contribute.

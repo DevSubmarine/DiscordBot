@@ -18,7 +18,8 @@ namespace DevSubmarine.DiscordBot.Features
 
         [EnabledInDm(true)]
         [SlashCommand("about", "Info about the bot", ignoreGroupNames: true)]
-        public async Task CmdAboutAsync()
+        public async Task CmdAboutAsync(
+            [Summary("Ephemeral", "Whether response should be sent as ephemeral")] bool ephemeral = false)
         {
             IUser user = this._client.CurrentUser;
             IGuildUser guildUser = base.Context.Guild?.GetUser(user.Id);
@@ -54,6 +55,7 @@ namespace DevSubmarine.DiscordBot.Features
             await base.RespondAsync(
                 embed: embed.Build(),
                 components: components.Build(),
+                ephemeral: ephemeral,
                 allowedMentions: AllowedMentions.None,
                 options: base.GetRequestOptions())
                 .ConfigureAwait(false);
