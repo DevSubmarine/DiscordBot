@@ -47,24 +47,38 @@ namespace DevSubmarine.DiscordBot.Client
                 if (this._commandsInitialized)
                     return;
 
-                if (this._options.PurgeGlobalCommands)
+                if (this._options.RegisterCommandsGlobally)
+                {
+                    if (this._options.CommandsGuildID != null)
+                    {
+                        this._log.LogDebug("Purging commands from guild {GuildID}", this._options.CommandsGuildID.Value);
+                        await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                    }
+                }
+                else
                 {
                     this._log.LogDebug("Purging global commands");
                     await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
                 }
 
+
                 this._log.LogTrace("Loading all command modules");
                 await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
 
-                if (this._options.CommandsGuildID != null)
+
+                if (this._options.RegisterCommandsGlobally)
+                {
+                    this._log.LogDebug("Registering all commands globally");
+                    await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                }
+                else if (this._options.CommandsGuildID != null)
                 {
                     this._log.LogDebug("Registering all commands for guild {GuildID}", this._options.CommandsGuildID.Value);
                     await this._interactions.RegisterCommandsToGuildAsync(this._options.CommandsGuildID.Value).ConfigureAwait(false);
                 }
                 else
                 {
-                    this._log.LogDebug("Registering all commands globally");
-                    await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                    this._log.LogError("Failed to register commands - either allow global registration or set commands guild ID");
                 }
 
                 this._commandsInitialized = true;
