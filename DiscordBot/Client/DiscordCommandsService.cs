@@ -12,7 +12,9 @@ namespace DevSubmarine.DiscordBot.Client
         private readonly InteractionService _interactions;
         private readonly IServiceProvider _services;
         private readonly ILogger _log;
+        private readonly SemaphoreSlim _initializationLock;
         private CancellationTokenSource _cts;
+        private bool _commandsInitialized;
 
         public DiscordCommandsService(DiscordSocketClient client, IServiceProvider services, ILogger<DiscordCommandsService> log, IOptions<DiscordOptions> options)
         {
@@ -20,6 +22,7 @@ namespace DevSubmarine.DiscordBot.Client
             this._services = services;
             this._log = log;
             this._options = options.Value;
+            this._initializationLock = new SemaphoreSlim(1, 1);
             this._interactions = new InteractionService(this._client, new InteractionServiceConfig()
             {
                 DefaultRunMode = RunMode.Sync,
@@ -38,24 +41,37 @@ namespace DevSubmarine.DiscordBot.Client
 
         private async Task OnClientReady()
         {
-            if (this._options.PurgeGlobalCommands)
+            await this._initializationLock.WaitAsync(this._cts?.Token ?? default).ConfigureAwait(false);
+            try
             {
-                this._log.LogDebug("Purging global commands");
-                await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
-            }
+                if (this._commandsInitialized)
+                    return;
 
-            this._log.LogTrace("Loading all command modules");
-            await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
+                if (this._options.PurgeGlobalCommands)
+                {
+                    this._log.LogDebug("Purging global commands");
+                    await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                }
+                
+                this._log.LogTrace("Loading all command modules");
+                await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
 
-            if (this._options.CommandsGuildID != null)
-            {
-                this._log.LogDebug("Registering all commands for guild {GuildID}", this._options.CommandsGuildID.Value);
-                await this._interactions.RegisterCommandsToGuildAsync(this._options.CommandsGuildID.Value).ConfigureAwait(false);
+                if (this._options.CommandsGuildID != null)
+                {
+                    this._log.LogDebug("Registering all commands for guild {GuildID}", this._options.CommandsGuildID.Value);
+                    await this._interactions.RegisterCommandsToGuildAsync(this._options.CommandsGuildID.Value).ConfigureAwait(false);
+                }
+                else
+                {
+                    this._log.LogDebug("Registering all commands globally");
+                    await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                }
+
+                this._commandsInitialized = true;
             }
-            else
+            finally
             {
-                this._log.LogDebug("Registering all commands globally");
-                await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
+                this._initializationLock.Release();
             }
         }
 
