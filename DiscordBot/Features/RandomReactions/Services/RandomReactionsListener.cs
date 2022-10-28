@@ -9,35 +9,24 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
     {
         private readonly DiscordSocketClient _client;
         private readonly IRandomizer _randomizer;
+        private readonly IRandomReactionEmoteProvider _emotes;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<RandomReactionsOptions> _options;
         private readonly IOptionsMonitor<DevSubOptions> _devsubOptions;
-        private readonly IDisposable _optionsChangeHandle;
         private CancellationTokenSource _cts;
 
-        // we sort emotes by chance to give those with low chance a fair... chance?
-        // cache to do it only once per options reload
-        private IEnumerable<RandomReactionEmote> _sortedWelcomeEmotes;
-        private IEnumerable<RandomReactionEmote> _sortedFollowupEmotes;
-        private IEnumerable<RandomReactionEmote> _sortedRandomEmotes;
-
-        public RandomReactionsListener(DiscordSocketClient client, IRandomizer randomizer,
+        public RandomReactionsListener(DiscordSocketClient client, IRandomizer randomizer, IRandomReactionEmoteProvider emotes,
             ILogger<RandomReactionsListener> log, IOptionsMonitor<RandomReactionsOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._client = client;
             this._randomizer = randomizer;
+            this._emotes = emotes;
             this._log = log;
             this._options = options;
             this._devsubOptions = devsubOptions;
 
             this._client.MessageReceived += this.OnClientMessageReceivedAsync;
             this._client.ReactionAdded += this.OnClientReactionAddedAsync;
-            this._optionsChangeHandle = this._options.OnChange(_ =>
-            {
-                this._sortedWelcomeEmotes = null;
-                this._sortedFollowupEmotes = null;
-                this._sortedRandomEmotes = null;
-            });
         }
 
         private async Task OnClientMessageReceivedAsync(SocketMessage message)
@@ -53,10 +42,6 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             if (channel.Guild.Id != this._devsubOptions.CurrentValue.GuildID)
                 return;
 
-            this.SortAndCacheEmotes(options);
-            if (this._sortedWelcomeEmotes?.Any() != true && this._sortedFollowupEmotes?.Any() != true && this._sortedRandomEmotes?.Any() != true)
-                return;
-
             if (await this.TryHandleWelcomeAsync(message, options))
                 return;
             if (await this.TryHandleFollowupAsync(message))
@@ -67,8 +52,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
         private async Task OnClientReactionAddedAsync(Cacheable<IUserMessage, ulong> cachedMessage, Cacheable<IMessageChannel, ulong> messageChannel, SocketReaction reaction)
         {
-            RandomReactionsOptions options = this._options.CurrentValue;
-            if (!options.Enabled)
+            if (!this._options.CurrentValue.Enabled)
                 return;
 
             if (messageChannel.Value is not SocketTextChannel channel)
@@ -81,8 +65,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
             this._log.LogTrace("Attempting to handle followup reaction for message {MessageID}", message.Id);
 
-            this.SortAndCacheEmotes(options);
-            RandomReactionEmote emote = this._sortedFollowupEmotes.FirstOrDefault(e => e.Emote.Equals(reaction.Emote));
+            RandomReactionEmote emote = this._emotes.GetFollowupEmotes().FirstOrDefault(e => e.Emote.Equals(reaction.Emote));
             if (emote == null)
                 return;
 
@@ -100,7 +83,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             if (options.WelcomeTriggers?.Any(trigger => content.StartsWith(trigger, StringComparison.OrdinalIgnoreCase)) != true)
                 return false;
 
-            foreach (RandomReactionEmote emote in this._sortedWelcomeEmotes)
+            foreach (RandomReactionEmote emote in this._emotes.GetWelcomeEmotes())
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -116,7 +99,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
         {
             this._log.LogTrace("Attempting to handle followup reaction for message {MessageID}", message.Id);
 
-            foreach (RandomReactionEmote emote in this._sortedFollowupEmotes)
+            foreach (RandomReactionEmote emote in this._emotes.GetFollowupEmotes())
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -134,7 +117,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
         {
             this._log.LogTrace("Attempting to handle random reaction for message {MessageID}", message.Id);
 
-            foreach (RandomReactionEmote emote in this._sortedRandomEmotes)
+            foreach (RandomReactionEmote emote in this._emotes.GetRandomEmotes())
             {
                 if (!this._randomizer.RollChance(emote.Chance))
                     continue;
@@ -144,17 +127,6 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             }
 
             return false;
-        }
-
-        private void SortAndCacheEmotes(RandomReactionsOptions options)
-        {
-            this._sortedWelcomeEmotes ??= SortEmotes(options.WelcomeEmotes);
-            this._sortedFollowupEmotes ??= SortEmotes(options.FollowupEmotes);
-            this._sortedRandomEmotes ??= SortEmotes(options.RandomEmotes);
-
-            IOrderedEnumerable<RandomReactionEmote> SortEmotes(IEnumerable<RandomReactionsOptions.EmoteOptions> emotes)
-                => emotes.Select(e => new RandomReactionEmote(e.Emote, e.Chance))
-                    .OrderBy(e => e.Chance);
         }
 
         private Task AddReactionAsync(IMessage message, IEmote emote)
@@ -183,7 +155,6 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
 
         public void Dispose()
         {
-            try { this._optionsChangeHandle?.Dispose(); } catch { }
             try { this._client.MessageReceived -= this.OnClientMessageReceivedAsync; } catch { }
             try { this._client.ReactionAdded -= this.OnClientReactionAddedAsync; } catch { }
             try { this._cts?.Dispose(); } catch { }

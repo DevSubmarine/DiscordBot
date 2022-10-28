@@ -1,5 +1,6 @@
 ﻿using DevSubmarine.DiscordBot.RandomReactions;
 using DevSubmarine.DiscordBot.RandomReactions.Services;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Microsoft.Extensions.DependencyInjection
 {
@@ -13,6 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection
             if (configureOptions != null)
                 services.Configure(configureOptions);
 
+            services.TryAddSingleton<IRandomReactionEmoteProvider, SortedRandomReactionEmoteProvider>();
             services.AddHostedService<RandomReactionsListener>();
 
             return services;
