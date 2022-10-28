@@ -52,7 +52,7 @@ namespace DevSubmarine.DiscordBot.Client
                     this._log.LogDebug("Purging global commands");
                     await this._interactions.RegisterCommandsGloballyAsync().ConfigureAwait(false);
                 }
-                
+
                 this._log.LogTrace("Loading all command modules");
                 await this._interactions.AddModulesAsync(this.GetType().Assembly, this._services);
 
@@ -143,6 +143,7 @@ namespace DevSubmarine.DiscordBot.Client
             try { this._client.SelectMenuExecuted -= this.OnButtonCommandAsync; } catch { }
             try { this._interactions.Log -= this.OnLog; } catch { }
             try { this._interactions?.Dispose(); } catch { }
+            try { this._initializationLock?.Dispose(); } catch { }
             try { this._cts?.Dispose(); } catch { }
         }
     }
