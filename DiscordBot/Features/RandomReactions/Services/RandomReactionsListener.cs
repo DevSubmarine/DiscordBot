@@ -10,23 +10,25 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
         private readonly DiscordSocketClient _client;
         private readonly IRandomizer _randomizer;
         private readonly IRandomReactionEmoteProvider _emotes;
+        private readonly IWelcomeTriggerProvider _welcomeTriggers;
         private readonly ILogger _log;
         private readonly IOptionsMonitor<RandomReactionsOptions> _options;
         private readonly IOptionsMonitor<DevSubOptions> _devsubOptions;
         private CancellationTokenSource _cts;
 
-        public RandomReactionsListener(DiscordSocketClient client, IRandomizer randomizer, IRandomReactionEmoteProvider emotes,
+        public RandomReactionsListener(DiscordSocketClient client, IRandomizer randomizer, IRandomReactionEmoteProvider emotes, IWelcomeTriggerProvider welcomeTriggers,
             ILogger<RandomReactionsListener> log, IOptionsMonitor<RandomReactionsOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._client = client;
             this._randomizer = randomizer;
             this._emotes = emotes;
+            this._welcomeTriggers = welcomeTriggers;
             this._log = log;
             this._options = options;
             this._devsubOptions = devsubOptions;
 
             this._client.MessageReceived += this.OnClientMessageReceivedAsync;
-            this._client.ReactionAdded += this.OnClientReactionAddedAsync;
+            //this._client.ReactionAdded += this.OnClientReactionAddedAsync;
         }
 
         private async Task OnClientMessageReceivedAsync(SocketMessage message)
@@ -80,7 +82,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             this._log.LogTrace("Attempting to handle welcome reaction for message {MessageID}", message.Id);
 
             string content = message.Content.TrimStart();
-            if (options.WelcomeTriggers?.Any(trigger => content.StartsWith(trigger, StringComparison.OrdinalIgnoreCase)) != true)
+            if (!this._welcomeTriggers.IsAnyMatching(content))
                 return false;
 
             foreach (RandomReactionEmote emote in this._emotes.GetWelcomeEmotes())

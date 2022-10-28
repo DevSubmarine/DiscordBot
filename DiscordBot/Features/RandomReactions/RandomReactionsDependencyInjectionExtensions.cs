@@ -15,6 +15,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 services.Configure(configureOptions);
 
             services.TryAddSingleton<IRandomReactionEmoteProvider, SortedRandomReactionEmoteProvider>();
+            services.TryAddSingleton<IWelcomeTriggerProvider, WelcomeTriggerProvider>();
             services.AddHostedService<RandomReactionsListener>();
 
             return services;
