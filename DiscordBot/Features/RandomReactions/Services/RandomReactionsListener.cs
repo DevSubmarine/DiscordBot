@@ -28,7 +28,7 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             this._devsubOptions = devsubOptions;
 
             this._client.MessageReceived += this.OnClientMessageReceivedAsync;
-            //this._client.ReactionAdded += this.OnClientReactionAddedAsync;
+            this._client.ReactionAdded += this.OnClientReactionAddedAsync;
         }
 
         private async Task OnClientMessageReceivedAsync(SocketMessage message)
@@ -60,6 +60,8 @@ namespace DevSubmarine.DiscordBot.RandomReactions.Services
             if (messageChannel.Value is not SocketTextChannel channel)
                 return;
             if (channel.Guild.Id != this._devsubOptions.CurrentValue.GuildID)
+                return;
+            if (reaction.UserId == this._client.CurrentUser.Id)
                 return;
             IMessage message = await channel.GetMessageAsync(cachedMessage.Id, this._cts.Token.ToRequestOptions()).ConfigureAwait(false);
             if (message.Author.Id == this._client.CurrentUser.Id)
