@@ -91,12 +91,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             {
                 await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.IsMissingPermissions() &&
-                    ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions"))
-            { }
-            catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})"))
-            { }
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})")) { }
         }
 
         private async Task<bool> ScanChannelAsync(SocketTextChannel channel, CancellationToken cancellationToken)
