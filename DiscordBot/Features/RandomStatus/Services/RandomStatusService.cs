@@ -29,28 +29,33 @@ namespace DevSubmarine.DiscordBot.RandomStatus.Services
 
         private async Task AutoChangeLoopAsync(CancellationToken cancellationToken)
         {
-            this._log.LogDebug("Starting status randomization loop. Change rate is {ChangeRate}", this._options.CurrentValue.ChangeRate);
-            if (this._options.CurrentValue.ChangeRate <= TimeSpan.FromSeconds(10))
-                this._log.LogWarning("Change rate is less than 10 seconds!");
-
-            while (!cancellationToken.IsCancellationRequested && this._options.CurrentValue.IsEnabled)
+            try
             {
-                RandomStatusOptions options = this._options.CurrentValue;
+                this._log.LogDebug("Starting status randomization loop. Change rate is {ChangeRate}", this._options.CurrentValue.ChangeRate);
+                if (this._options.CurrentValue.ChangeRate <= TimeSpan.FromSeconds(10))
+                    this._log.LogWarning("Change rate is less than 10 seconds!");
 
-                while (this._client.ConnectionState != ConnectionState.Connected)
+                while (!cancellationToken.IsCancellationRequested && this._options.CurrentValue.IsEnabled)
                 {
-                    this._log.LogTrace("Client not connected, waiting");
-                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
-                }
+                    RandomStatusOptions options = this._options.CurrentValue;
 
-                DateTime nextChangeUtc = this._lastChangeUtc + this._options.CurrentValue.ChangeRate;
-                TimeSpan remainingWait = nextChangeUtc - DateTime.UtcNow;
-                if (remainingWait > TimeSpan.Zero)
-                    await Task.Delay(remainingWait, cancellationToken).ConfigureAwait(false);
-                await this.RandomizeStatusAsync(cancellationToken).ConfigureAwait(false);
-                this._log.LogTrace("Next status change: {ChangeTime}", this._lastChangeUtc + options.ChangeRate);
-                await Task.Delay(options.ChangeRate, cancellationToken).ConfigureAwait(false);
+                    while (this._client.ConnectionState != ConnectionState.Connected)
+                    {
+                        this._log.LogTrace("Client not connected, waiting");
+                        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+                    }
+
+                    DateTime nextChangeUtc = this._lastChangeUtc + this._options.CurrentValue.ChangeRate;
+                    TimeSpan remainingWait = nextChangeUtc - DateTime.UtcNow;
+                    if (remainingWait > TimeSpan.Zero)
+                        await Task.Delay(remainingWait, cancellationToken).ConfigureAwait(false);
+                    await this.RandomizeStatusAsync(cancellationToken).ConfigureAwait(false);
+                    this._log.LogTrace("Next status change: {ChangeTime}", this._lastChangeUtc + options.ChangeRate);
+                    await Task.Delay(options.ChangeRate, cancellationToken).ConfigureAwait(false);
+                }
             }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) when (ex.LogAsError(this._log, "An exception occured in status auto-change loop")) { }
         }
 
         private async Task<Status> RandomizeStatusAsync(CancellationToken cancellationToken)
