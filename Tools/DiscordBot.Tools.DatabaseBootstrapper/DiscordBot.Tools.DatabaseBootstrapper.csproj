@@ -20,10 +20,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="MongoDB.Driver" Version="2.16.0" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<ProjectReference Include="..\..\DiscordBot\DiscordBot.csproj" />
 		<ProjectReference Include="..\DiscordBot.Tools.Core\DiscordBot.Tools.Core.csproj" />
 	</ItemGroup>
