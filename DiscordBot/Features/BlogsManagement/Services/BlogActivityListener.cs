@@ -69,6 +69,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         {
             try
             {
+                await Task.Delay(TimeSpan.FromSeconds(1.5));
                 await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Failed sorting category {CategoryName} ({CategoryID}) due to missing permissions", category.Name, category.Id)) { }

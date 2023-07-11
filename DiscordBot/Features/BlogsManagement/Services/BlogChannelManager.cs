@@ -95,6 +95,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             }, cancellationToken.ToRequestOptions());
 
             this._log.LogTrace("Sorting channels");
+            await Task.Delay(TimeSpan.FromSeconds(1));
             await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
 
             this._log.LogDebug("Channel {ChannelName} ({ChannelID}) created", result.Name, result.Id);
