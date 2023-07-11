@@ -108,8 +108,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
 
                 // an additional case is when user has admin perms, but the target role is above theirs
                 // this isn't really common, but it is a possibility, and security comes first, so we need to check that
-                IRole highestTargetRole = user.GetHighestRole(r => options.AllowedRoleIDs.Contains(r.Id));
-                if (!callerUser.IsOwner() && highestTargetRole.Position >= highestCallerRole.Position)
+                if (!callerUser.IsOwner() && user.GetHighestRole().Position >= highestCallerRole.Position)
                 {
                     await base.ModifyOriginalResponseAsync(msg => msg.Content = $"{ResponseEmoji.Failure} Your role isn't privileged enough to clear colour of this user.");
                     return;
