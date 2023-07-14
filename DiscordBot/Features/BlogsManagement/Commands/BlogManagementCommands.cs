@@ -36,7 +36,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
             IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
             if (user != null)
             {
-                if (!callerUser.IsOwner() && !callerUser.GuildPermissions.Administrator)
+                if (!CreatingForSelf() && !callerUser.IsOwner() && !callerUser.GuildPermissions.Administrator)
                 {
                     await base.ModifyOriginalResponseAsync(msg => msg.Content = $"{ResponseEmoji.Failure} You have no permissions to create blogs for other users.");
                     return;
@@ -122,16 +122,16 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
 
         [SlashCommand("update", "Updates a blog channel for user")]
         public async Task CmdUpdateAsync(
-            [Summary("Channel", "Which channel to update; can only be used by administrators")] IGuildChannel channel = null,
+            [Summary("Channel", "Which channel to update; not needed if you only have 1 blog")] IGuildChannel channel = null,
             [Summary("NSFW", "Should the channel be marked as NSFW?")] bool nsfw = false)
         {
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
-            bool asAdmin = callerUser.IsOwner() || callerUser.GuildPermissions.Administrator;
-            IEnumerable<IGuildChannel> channels = asAdmin && channel != null
+            bool isAdmin = callerUser.IsOwner() || callerUser.GuildPermissions.Administrator;
+            IEnumerable<IGuildChannel> channels = isAdmin && channel != null
                 ? await this._manager.GetBlogChannelsAsync(base.CancellationToken).ConfigureAwait(false)
-                : await this._manager.FindUserBlogChannelsAsync(callerUser.Id);
+                : await this._manager.FindUserBlogChannelsAsync(callerUser.Id, base.CancellationToken).ConfigureAwait(false);
             channels = channels.ToArray();
 
             if (channel == null)
