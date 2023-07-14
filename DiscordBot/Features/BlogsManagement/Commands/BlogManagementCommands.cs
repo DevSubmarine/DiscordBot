@@ -26,8 +26,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
         }
 
         [SlashCommand("create", "Creates a blog channel for user")]
-        public async Task CmdClearAsync(
-            [Summary("User", "Which user to create channel for; can only be used by administrators")] IGuildUser user = null)
+        public async Task CmdCreateAsync(
+            [Summary("User", "Which user to create channel for; can only be used by administrators")] IGuildUser user = null,
+            [Summary("NSFW", "Should the channel be marked as NSFW?")] bool nsfw = false)
         {
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
@@ -48,14 +49,14 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
             if (!this._nameConverter.TryConvertUsername(user.Username, out string channelName))
             {
                 string usernameMention = CreatingForSelf() ? "Your username" : $"{user.Mention}'s username";
-                await RespondFailureAsync($"{ResponseEmoji.Failure} {usernameMention} contains invalid characters. {ResponseEmoji.FeelsDumbMan}").ConfigureAwait(false);
+                await this.RespondFailureAsync($"{ResponseEmoji.Failure} {usernameMention} contains invalid characters. {ResponseEmoji.FeelsDumbMan}").ConfigureAwait(false);
                 return;
             }
 
             IEnumerable<IGuildChannel> existingChannels = await this._manager.GetBlogChannelsAsync(channelName, base.CancellationToken).ConfigureAwait(false);
             if (existingChannels.Any())
             {
-                await RespondFailureAsync($"{ResponseEmoji.Failure} Channel {MentionUtils.MentionChannel(existingChannels.First().Id)} already exists {ResponseEmoji.FeelsBeanMan}");
+                await this.RespondFailureAsync($"{ResponseEmoji.Failure} Channel {MentionUtils.MentionChannel(existingChannels.First().Id)} already exists {ResponseEmoji.FeelsBeanMan}");
                 return;
             }
 
@@ -64,7 +65,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
             {
                 string responseStart = CreatingForSelf() ? "You already have" : $"{user.Mention} already has";
                 string channelsMentions = string.Join(", ", userChannels.OrderBy(channel => channel.Name).Select(channel => MentionUtils.MentionChannel(channel.Id)));
-                await RespondFailureAsync($"{ResponseEmoji.Failure} {responseStart} access to {channelsMentions} blog channel(s). {ResponseEmoji.BlobSweatAnimated}").ConfigureAwait(false);
+                await this.RespondFailureAsync($"{ResponseEmoji.Failure} {responseStart} access to {channelsMentions} blog channel(s). {ResponseEmoji.BlobSweatAnimated}").ConfigureAwait(false);
                 return;
             }
 
@@ -74,13 +75,18 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
             if (CreatingForSelf() && memberAge < this._options.MinMemberAge)
             {
                 string[] emojis = new string[] { ResponseEmoji.FeelsBeanMan, ResponseEmoji.FeelsDumbMan, ResponseEmoji.EyesBlurry, ResponseEmoji.BlobSweatAnimated };
-                await RespondFailureAsync($"{ResponseEmoji.Failure} You need to be here for at least {this._options.MinMemberAge.ToDisplayString()} to create a blog channel.\nYou've been here for {memberAge.ToDisplayString()} so far. {this._randomizer.GetRandomValue(emojis)}");
+                await this.RespondFailureAsync($"{ResponseEmoji.Failure} You need to be here for at least {this._options.MinMemberAge.ToDisplayString()} to create a blog channel.\nYou've been here for {memberAge.ToDisplayString()} so far. {this._randomizer.GetRandomValue(emojis)}");
                 return;
             }
 
             try
             {
-                IGuildChannel result = await this._manager.CreateBlogChannel(channelName, user.Id, base.CancellationToken).ConfigureAwait(false);
+                BlogChannelProperties props = new BlogChannelProperties()
+                {
+                    NSFW = nsfw
+                };
+
+                IGuildChannel result = await this._manager.CreateBlogChannel(channelName, user.Id, props, base.CancellationToken).ConfigureAwait(false);
                 await base.ModifyOriginalResponseAsync(msg =>
                 {
                     msg.Content = null;
@@ -110,15 +116,81 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
                 return;
             }
 
-
             bool CreatingForSelf()
                 => callerUser == user;
-            Task RespondFailureAsync(string text)
-                => base.ModifyOriginalResponseAsync(msg =>
-                {
-                    msg.Content = text;
-                    msg.AllowedMentions = AllowedMentions.None;
-                }, base.GetRequestOptions());
         }
+
+        [SlashCommand("update", "Updates a blog channel for user")]
+        public async Task CmdUpdateAsync(
+            [Summary("Channel", "Which channel to update; can only be used by administrators")] IGuildChannel channel = null,
+            [Summary("NSFW", "Should the channel be marked as NSFW?")] bool nsfw = false)
+        {
+            await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
+
+            IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
+            bool asAdmin = callerUser.IsOwner() || callerUser.GuildPermissions.Administrator;
+            IEnumerable<IGuildChannel> channels = asAdmin && channel != null
+                ? await this._manager.GetBlogChannelsAsync(base.CancellationToken).ConfigureAwait(false)
+                : await this._manager.FindUserBlogChannelsAsync(callerUser.Id);
+            channels = channels.ToArray();
+
+            if (channel == null)
+            {
+                if (channels.Count() > 1)
+                {
+                    await this.RespondFailureAsync("You can edit more than 1 channel - specify which one you want to edit.").ConfigureAwait(false);
+                    return;
+                }
+
+                channel = channels.First();
+            }
+            else if (!channels.Any(c => c.Id == channel.Id))
+            {
+                await this.RespondFailureAsync($"You have no rights to edit this channel! {ResponseEmoji.BlobSweatAnimated}").ConfigureAwait(false);
+                return;
+            }
+
+            try
+            {
+                BlogChannelProperties props = new BlogChannelProperties()
+                {
+                    NSFW = nsfw
+                };
+
+                await this._manager.EditBlogChannel(channel, props, base.CancellationToken).ConfigureAwait(false);
+                await base.ModifyOriginalResponseAsync(msg =>
+                {
+                    msg.Content = null;
+                    msg.Embed = new EmbedBuilder()
+                        .WithAuthor(callerUser)
+                        .WithTitle($"Blog Channel updated!")
+                        .WithDescription($"{ResponseEmoji.ParrotParty}{ResponseEmoji.ParrotParty}{ResponseEmoji.ParrotParty}{ResponseEmoji.ParrotParty}{ResponseEmoji.ParrotParty}")
+                        .WithColor(callerUser.GetUserColour())
+                        .AddField("Channel", MentionUtils.MentionChannel(channel.Id), inline: true)
+                        .WithTimestamp(DateTime.UtcNow)
+                        .WithFooter("DevSub Blogs yo!")
+                        .Build();
+                    msg.Components = new ComponentBuilder()
+                        .WithButton("Go now!", null,
+                            ButtonStyle.Link,
+                            Emote.Parse(ResponseEmoji.EyesBlurry),
+                            channel.GetURL())
+                        .Build();
+                }, base.GetRequestOptions());
+            }
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Exception when updating blog channel"))
+            {
+                await base.ModifyOriginalResponseAsync(msg => msg.Content = $"Oops! {ResponseEmoji.Failure}\nI lack permissions to update the channel! {ResponseEmoji.FeelsBeanMan}",
+                    base.GetRequestOptions()).ConfigureAwait(false);
+                return;
+            }
+        }
+
+        private Task RespondFailureAsync(string text)
+            => base.ModifyOriginalResponseAsync(msg =>
+            {
+                msg.Content = text;
+                msg.AllowedMentions = AllowedMentions.None;
+            }, base.GetRequestOptions());
     }
 }
