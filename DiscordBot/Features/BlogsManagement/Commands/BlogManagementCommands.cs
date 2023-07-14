@@ -122,31 +122,44 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Commands
 
         [SlashCommand("update", "Updates a blog channel for user")]
         public async Task CmdUpdateAsync(
-            [Summary("Channel", "Which channel to update; not needed if you only have 1 blog")] IGuildChannel channel = null,
+            [Summary("Channel", "Which channel to update; not needed if you only have 1 blog"), Autocomplete(typeof(UserBlogChannelsAutocompleteHandler))] string providedChannelID = null,
             [Summary("NSFW", "Should the channel be marked as NSFW?")] bool nsfw = false)
         {
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
+            if (!ulong.TryParse(providedChannelID ?? "0", out ulong channelID))
+            {
+                await this.RespondFailureAsync($"Channel with specified ID not found. {ResponseEmoji.Failure}").ConfigureAwait(false);
+                return;
+            }
+
             IGuildUser callerUser = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id, base.CancellationToken).ConfigureAwait(false);
             bool isAdmin = callerUser.IsOwner() || callerUser.GuildPermissions.Administrator;
-            IEnumerable<IGuildChannel> channels = isAdmin && channel != null
+            IEnumerable<IGuildChannel> channels = isAdmin && channelID != 0
                 ? await this._manager.GetBlogChannelsAsync(base.CancellationToken).ConfigureAwait(false)
                 : await this._manager.FindUserBlogChannelsAsync(callerUser.Id, base.CancellationToken).ConfigureAwait(false);
             channels = channels.ToArray();
 
-            if (channel == null)
+            if (channelID == 0)
             {
                 if (channels.Count() > 1)
                 {
-                    await this.RespondFailureAsync("You can edit more than 1 channel - specify which one you want to edit.").ConfigureAwait(false);
+                    await this.RespondFailureAsync($"You can edit more than 1 channel - specify which one you want to edit. {ResponseEmoji.Failure}").ConfigureAwait(false);
                     return;
                 }
 
-                channel = channels.First();
+                channelID = channels.First().Id;
             }
-            else if (!channels.Any(c => c.Id == channel.Id))
+            else if (!channels.Any(c => c.Id == channelID))
             {
                 await this.RespondFailureAsync($"You have no rights to edit this channel! {ResponseEmoji.BlobSweatAnimated}").ConfigureAwait(false);
+                return;
+            }
+
+            IGuildChannel channel = base.Context.Guild.GetTextChannel(channelID);
+            if (channel == null)
+            {
+                await this.RespondFailureAsync($"Channel with specified ID not found. {ResponseEmoji.Failure}").ConfigureAwait(false);
                 return;
             }
 
