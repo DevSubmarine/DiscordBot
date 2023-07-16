@@ -6,6 +6,8 @@ namespace DevSubmarine.DiscordBot
     {
         IDiscordClient Client { get; }
 
+        Task WaitForConnectionAsync(CancellationToken cancellationToken = default);
+
         Task StartClientAsync();
         Task StopClientAsync();
     }

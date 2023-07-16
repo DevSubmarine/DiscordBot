@@ -8,7 +8,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     /// <summary>Background service that periodically scans blog channels for last activity and activates or deactivates them.</summary>
     internal class BlogActivityScanner : IHostedService, IDisposable
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IHostedDiscordClient _client;
         private readonly IBlogChannelActivator _activator;
         private readonly IBlogChannelSorter _sorter;
         private readonly ILogger _log;
@@ -18,7 +18,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogActivityScanner(IBlogChannelActivator activator, IBlogChannelSorter sorter, DiscordSocketClient client,
+        public BlogActivityScanner(IBlogChannelActivator activator, IBlogChannelSorter sorter, IHostedDiscordClient client,
             ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._activator = activator;
@@ -34,15 +34,13 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         {
             try
             {
+                DiscordSocketClient client = (DiscordSocketClient)this._client.Client;
+
                 while (!cancellationToken.IsCancellationRequested)
                 {
-                    while (this._client.ConnectionState != ConnectionState.Connected)
-                    {
-                        this._log.LogTrace("Client not connected, waiting");
-                        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
-                    }
+                    await this._client.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
 
-                    SocketGuild guild = this._client.GetGuild(this._devsubOptions.CurrentValue.GuildID);
+                    SocketGuild guild = client.GetGuild(this._devsubOptions.CurrentValue.GuildID);
                     using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
                     {
                         { "GuildID", guild.Id },
