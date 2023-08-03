@@ -27,7 +27,7 @@ namespace DevSubmarine.DiscordBot.Features
             IGuildUser authorGuildUser = base.Context.Guild?.GetUser(authorUser.Id);
 
             string botName = guildUser?.Nickname ?? user.Username;
-            string authorName = authorGuildUser?.Mention ?? user?.GetUsernameWithDiscriminator() ?? "TehGM";
+            string authorName = authorGuildUser?.Mention ?? authorUser?.GetUsernameWithDiscriminator() ?? "TehGM";
 
             StringBuilder features = new StringBuilder();
             this.AddFeatureInfo(features, "Colour Roles", $"You can change the colour of your nickname using `/colour` commands! {ResponseEmoji.ParrotParty}");
