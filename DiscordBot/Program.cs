@@ -73,6 +73,7 @@ namespace DevSubmarine.DiscordBot
                     services.AddRandomStatus();
                     services.AddUserBirthdays();
                     services.AddRandomReactions();
+                    services.AddColourRoles();
                 })
                 .Build();
             await host.RunAsync().ConfigureAwait(false);

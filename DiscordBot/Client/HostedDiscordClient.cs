@@ -13,6 +13,7 @@ namespace DevSubmarine.DiscordBot.Client
         private readonly IDisposable _optionsChangeHandle;
         private DiscordSocketClient _client;
         private bool _started = false;
+        private TaskCompletionSource<object> _connectionTcs;
 
         public HostedDiscordClient(IOptionsMonitor<DiscordOptions> discordOptions, ILogger<HostedDiscordClient> log)
         {
@@ -23,8 +24,10 @@ namespace DevSubmarine.DiscordBot.Client
             clientConfig.LogLevel = LogSeverity.Verbose;
             clientConfig.LogGatewayIntentWarnings = false;
             clientConfig.GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent | GatewayIntents.GuildMembers;
+            this._connectionTcs = new TaskCompletionSource<object>();
             this._client = new DiscordSocketClient(clientConfig);
             this._client.Log += this.OnClientLog;
+            this._client.Ready += this.OnClientReady;
 
             this._optionsChangeHandle = this._discordOptions.OnChange(async _ =>
             {
@@ -37,6 +40,12 @@ namespace DevSubmarine.DiscordBot.Client
             });
         }
 
+        private Task OnClientReady()
+        {
+            this._connectionTcs.TrySetResult(null);
+            return Task.CompletedTask;
+        }
+
         public async Task StartClientAsync()
         {
             await this._client.LoginAsync(TokenType.Bot, this._discordOptions.CurrentValue.BotToken).ConfigureAwait(false);
@@ -45,10 +54,20 @@ namespace DevSubmarine.DiscordBot.Client
 
         public async Task StopClientAsync()
         {
+            this._connectionTcs?.TrySetCanceled();
+            this._connectionTcs = new TaskCompletionSource<object>();
+
             if (this._client.LoginState == LoginState.LoggedIn || this._client.LoginState == LoginState.LoggingIn)
                 await this._client.LogoutAsync().ConfigureAwait(false);
             if (this._client.ConnectionState == ConnectionState.Connected || this._client.ConnectionState == ConnectionState.Connecting)
                 await this._client.StopAsync().ConfigureAwait(false);
+        }
+
+        public Task WaitForConnectionAsync(CancellationToken cancellationToken = default)
+        {
+            if (this._connectionTcs.Task.IsCompleted)
+                return Task.CompletedTask;
+            return Task.WhenAny(this._connectionTcs.Task, Task.Delay(-1, cancellationToken));
         }
 
         private Task OnClientLog(LogMessage message)
@@ -78,6 +97,8 @@ namespace DevSubmarine.DiscordBot.Client
         public void Dispose()
         {
             try { this._client.Log -= this.OnClientLog; } catch { }
+            try { this._client.Ready -= this.OnClientReady; } catch { }
+            try { this._connectionTcs?.TrySetCanceled(); } catch { }
             try { this._client?.Dispose(); } catch { }
             try { this._optionsChangeHandle?.Dispose(); } catch { }
         }

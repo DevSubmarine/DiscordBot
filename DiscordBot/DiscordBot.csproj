@@ -15,7 +15,7 @@
     <RepositoryUrl>https://github.com/DevSubmarine/DiscordBot</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>bot; discord; devsub; devsubmarine</PackageTags>
-    <Version>1.3.2</Version>
+    <Version>1.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
@@ -73,22 +73,22 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Discord.Net" Version="3.8.1" />
+    <PackageReference Include="Discord.Net" Version="3.11.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
-    <PackageReference Include="MongoDB.Driver" Version="2.16.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
-    <PackageReference Include="Serilog" Version="2.11.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.18.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Serilog" Version="3.0.1" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="4.2.0" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
     <PackageReference Include="Serilog.Sinks.Async" Version="1.5.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-    <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.3.6" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Datadog.Logs" Version="0.5.2" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
-    <PackageReference Include="TehGM.Utilities.Randomization" Version="0.1.0" />
+    <PackageReference Include="TehGM.Utilities.Randomization" Version="0.2.2" />
   </ItemGroup>
 
   <ItemGroup>

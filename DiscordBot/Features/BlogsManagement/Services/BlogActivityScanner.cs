@@ -8,7 +8,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
     /// <summary>Background service that periodically scans blog channels for last activity and activates or deactivates them.</summary>
     internal class BlogActivityScanner : IHostedService, IDisposable
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IHostedDiscordClient _client;
         private readonly IBlogChannelActivator _activator;
         private readonly IBlogChannelSorter _sorter;
         private readonly ILogger _log;
@@ -18,7 +18,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
         private BlogsManagementOptions Options => this._options.CurrentValue;
 
-        public BlogActivityScanner(IBlogChannelActivator activator, IBlogChannelSorter sorter, DiscordSocketClient client,
+        public BlogActivityScanner(IBlogChannelActivator activator, IBlogChannelSorter sorter, IHostedDiscordClient client,
             ILogger<BlogActivityScanner> log, IOptionsMonitor<BlogsManagementOptions> options, IOptionsMonitor<DevSubOptions> devsubOptions)
         {
             this._activator = activator;
@@ -32,34 +32,36 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 #pragma warning disable CA2017 // Parameter count mismatch
         private async Task ScannerLoopAsync(CancellationToken cancellationToken)
         {
-            while (!cancellationToken.IsCancellationRequested)
+            try
             {
-                while (this._client.ConnectionState != ConnectionState.Connected)
+                DiscordSocketClient client = (DiscordSocketClient)this._client.Client;
+
+                while (!cancellationToken.IsCancellationRequested)
                 {
-                    this._log.LogTrace("Client not connected, waiting");
-                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
+                    await this._client.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
+
+                    SocketGuild guild = client.GetGuild(this._devsubOptions.CurrentValue.GuildID);
+                    using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>()
+                    {
+                        { "GuildID", guild.Id },
+                        { "GuildName", guild.Name }
+                    });
+
+                    this._log.LogInformation("Scanning guild {GuildName} ({GuildID}) blog channels");
+                    SocketCategoryChannel activeCategory = guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
+                    SocketCategoryChannel inactiveCategory = guild.GetCategoryChannel(this.Options.InactiveBlogsCategoryID);
+                    bool anyActiveMoved = await this.ScanCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
+                    bool anyInactiveMoved = await this.ScanCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
+
+                    if (anyActiveMoved)
+                        await this.SortCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
+                    if (anyInactiveMoved)
+                        await this.SortCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
+
+                    await Task.Delay(this.Options.ActivityScanningRate, cancellationToken).ConfigureAwait(false);
                 }
-
-                SocketGuild guild = this._client.GetGuild(this._devsubOptions.CurrentValue.GuildID);
-                using IDisposable logScope = this._log.BeginScope(new Dictionary<string, object>() 
-                { 
-                    { "GuildID", guild.Id },
-                    { "GuildName", guild.Name }
-                });
-
-                this._log.LogInformation("Scanning guild {GuildName} ({GuildID}) blog channels");
-                SocketCategoryChannel activeCategory = guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
-                SocketCategoryChannel inactiveCategory = guild.GetCategoryChannel(this.Options.InactiveBlogsCategoryID);
-                bool anyActiveMoved = await this.ScanCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
-                bool anyInactiveMoved = await this.ScanCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
-
-                if (anyActiveMoved)
-                    await this.SortCategoryAsync(inactiveCategory, cancellationToken).ConfigureAwait(false);
-                if (anyInactiveMoved)
-                    await this.SortCategoryAsync(activeCategory, cancellationToken).ConfigureAwait(false);
-
-                await Task.Delay(this.Options.ActivityScanningRate, cancellationToken).ConfigureAwait(false);
             }
+            catch (Exception ex) when (ex.LogAsError(this._log, "An exception occured in blog channel scanner loop")) { }
         }
 
         /// <summary>Scans category, automatically moving channels as needed.</summary>
@@ -91,12 +93,9 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             {
                 await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
             }
-            catch (HttpException ex) when (ex.IsMissingPermissions() &&
-                    ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions"))
-            { }
-            catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})"))
-            { }
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID}) due to missing permissions")) { }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) when (ex.LogAsError(this._log, "Failed reordering channels in category {CategoryName} ({CategoryID})")) { }
         }
 
         private async Task<bool> ScanChannelAsync(SocketTextChannel channel, CancellationToken cancellationToken)

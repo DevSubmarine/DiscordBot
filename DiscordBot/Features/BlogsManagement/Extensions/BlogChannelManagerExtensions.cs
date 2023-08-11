@@ -20,10 +20,11 @@ namespace DevSubmarine.DiscordBot.BlogsManagement
         /// <remarks>This method creates channels with data as-provided. No validation is performed.</remarks>
         /// <param name="manager">The service instance.</param>
         /// <param name="name">Name of the channel to create.</param>
-        /// <param name="userIDs">ID of user that should have permissions to post in the channel.</param>
+        /// <param name="userID">ID of user that should have permissions to post in the channel.</param>
+        /// <param name="properties">Optional properties for the new channel.</param>
         /// <param name="cancellationToken">Token to cancel the operation.</param>
         /// <returns>The created channel.</returns>
-        public static Task<IGuildChannel> CreateBlogChannel(this IBlogChannelManager manager, string name, ulong userID, CancellationToken cancellationToken = default)
-            => manager.CreateBlogChannel(name, new ulong[] { userID }, cancellationToken);
+        public static Task<IGuildChannel> CreateBlogChannel(this IBlogChannelManager manager, string name, ulong userID, BlogChannelProperties properties, CancellationToken cancellationToken = default)
+            => manager.CreateBlogChannel(name, new ulong[] { userID }, properties, cancellationToken);
     }
 }

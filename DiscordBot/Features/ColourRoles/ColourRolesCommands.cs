@@ -1,8 +1,6 @@
 ﻿using Discord;
 using Discord.Interactions;
 using Discord.Net;
-using Discord.WebSocket;
-using TehGM.Utilities.Randomization;
 
 namespace DevSubmarine.DiscordBot.ColourRoles
 {
@@ -10,15 +8,18 @@ namespace DevSubmarine.DiscordBot.ColourRoles
     [EnabledInDm(false)]
     public class ColourRolesCommands : DevSubInteractionModule
     {
-        private readonly IRandomizer _randomizer;
+        private readonly IColourRoleProvider _roleProvider;
+        private readonly IColourRoleChanger _roleChanger;
         private readonly IOptionsMonitor<ColourRolesOptions> _options;
         private readonly ILogger _log;
 
-        public ColourRolesCommands(IRandomizer randomizer, IOptionsMonitor<ColourRolesOptions> options, ILogger<ColourRolesCommands> log)
+        public ColourRolesCommands(IColourRoleProvider colourRoleProvider, IColourRoleChanger roleChanger,
+            IOptionsMonitor<ColourRolesOptions> options, ILogger<ColourRolesCommands> log)
         {
-            this._randomizer = randomizer;
             this._options = options;
             this._log = log;
+            this._roleProvider = colourRoleProvider;
+            this._roleChanger = roleChanger;
         }
 
         [SlashCommand("set", "Sets your colour role to the one you selected")]
@@ -27,9 +28,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
             [Summary("Role", "Role to apply")] IRole role,
             [Summary("User", "Which user to apply the role to; can only be used by administrators")] IGuildUser user = null)
         {
-            ColourRolesOptions options = this._options.CurrentValue;
-
-            if (!this.GetAvailableRoles().Any(r => r.Id == role.Id))
+            if (!this._roleProvider.IsRoleAvailable(role))
             {
                 await base.RespondAsync(
                     text: $"{ResponseEmoji.Failure} No, you cannot use {role.Mention} role!",
@@ -69,7 +68,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
         [EnabledInDm(false)]
         public Task CmdListAsync()
         {
-            IEnumerable<SocketRole> availableRoles = this.GetAvailableRoles();
+            IEnumerable<IRole> availableRoles = this._roleProvider.GetAvailableRoles(base.Context.Guild);
             if (!availableRoles.Any())
                 return base.RespondAsync($"{ResponseEmoji.Failure} No applicable roles found?! {ResponseEmoji.JerryWhat}");
 
@@ -108,8 +107,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
 
                 // an additional case is when user has admin perms, but the target role is above theirs
                 // this isn't really common, but it is a possibility, and security comes first, so we need to check that
-                IRole highestTargetRole = user.GetHighestRole(r => options.AllowedRoleIDs.Contains(r.Id));
-                if (!callerUser.IsOwner() && highestTargetRole.Position >= highestCallerRole.Position)
+                if (!callerUser.IsOwner() && user.GetHighestRole().Position >= highestCallerRole.Position)
                 {
                     await base.ModifyOriginalResponseAsync(msg => msg.Content = $"{ResponseEmoji.Failure} Your role isn't privileged enough to clear colour of this user.");
                     return;
@@ -120,7 +118,7 @@ namespace DevSubmarine.DiscordBot.ColourRoles
 
             try
             {
-                await this.RemoveColourRolesAsync(user).ConfigureAwait(false);
+                await this._roleChanger.RemoveUserRolesAsync(user).ConfigureAwait(false);
             }
             catch (HttpException ex) when (ex.IsMissingPermissions())
             {
@@ -136,74 +134,28 @@ namespace DevSubmarine.DiscordBot.ColourRoles
         [EnabledInDm(false)]
         public async Task CmdRandomAsync()
         {
-            ColourRolesOptions options = this._options.CurrentValue;
             await base.DeferAsync(options: base.GetRequestOptions()).ConfigureAwait(false);
 
             IGuildUser user = await base.Context.Guild.GetGuildUserAsync(base.Context.User.Id).ConfigureAwait(false);
+            IRole selectedRole = this._roleProvider.GetNewRandomRole(user);
 
-            // to ensure role does change, exclude user's current role
-            // they might have multiple for some damn reason (wtf Nerdu?), but it's okay - we only care about the highest one as that influences colour
-            // note they might have none
-            ulong? excludedRoleID = user.GetHighestRole(r => r.Color != Color.Default && options.AllowedRoleIDs.Contains(r.Id))?.Id;
-            IEnumerable<ulong> availableIDs = excludedRoleID == null ? options.AllowedRoleIDs : options.AllowedRoleIDs.Except(new[] { excludedRoleID.Value });
-
-            // keep in mind that available roles might contain roles from other guilds, so we have to verify them
-            availableIDs = availableIDs.Intersect(base.Context.Guild.Roles.Select(r => r.Id));
-
-            ulong selectedRoleID = this._randomizer.GetRandomValue(availableIDs);
-            IRole selectedRole = base.Context.Guild.GetRole(selectedRoleID);
-
-            await this.SetUserRoleAsync(user, selectedRole).ConfigureAwait(false);
-            await this.ConfirmRoleChangeAsync(selectedRole.Color, selectedRole.Mention).ConfigureAwait(false);
+            if (await this.SetUserRoleAsync(user, selectedRole).ConfigureAwait(false))
+                await this.ConfirmRoleChangeAsync(selectedRole.Color, selectedRole.Mention).ConfigureAwait(false);
         }
 
-        private async Task SetUserRoleAsync(IGuildUser user, IRole role)
+        private async Task<bool> SetUserRoleAsync(IGuildUser user, IRole role)
         {
             try
             {
-                if (this._options.CurrentValue.RemoveOldRoles)
-                    await this.RemoveColourRolesAsync(user, oldRole => oldRole.Id != role.Id).ConfigureAwait(false);
-
-                // special case is when user already has requested role. Just skip doing any changes then to prevent exceptions, Discord vomiting or whatever else
-                if (!user.RoleIds.Contains(role.Id))
-                {
-                    this._log.LogDebug("Adding role {RoleName} ({RoleID}) to user {UserID}", role.Name, role.Id, user.Id);
-                    await user.AddRoleAsync(role, base.GetRequestOptions()).ConfigureAwait(false);
-                }
+                await this._roleChanger.SetUserRoleAsync(user, role);
+                return true;
             }
             catch (HttpException ex) when (ex.IsMissingPermissions())
             {
                 await base.ModifyOriginalResponseAsync(msg => msg.Content = $"Oops! {ResponseEmoji.Failure}\nI lack permissions to change your role! {ResponseEmoji.FeelsBeanMan}",
                     base.GetRequestOptions()).ConfigureAwait(false);
-                return;
+                return false;
             }
-        }
-
-        private IEnumerable<SocketRole> GetAvailableRoles()
-        {
-            return base.Context.Guild.Roles.Where(role =>
-                this._options.CurrentValue.AllowedRoleIDs.Contains(role.Id)
-                && role.Color != Color.Default);
-        }
-
-        private IEnumerable<IRole> GetUserCurrentRoles(IGuildUser user)
-        {
-            return user.GetRoles(role => this._options.CurrentValue.AllowedRoleIDs.Contains(role.Id));
-        }
-
-        private Task RemoveColourRolesAsync(IGuildUser user, Func<IRole, bool> filter = null)
-        {
-            IEnumerable<IRole> rolesToRemove = this.GetUserCurrentRoles(user);
-            if (filter != null)
-                rolesToRemove = rolesToRemove.Where(role => filter(role));
-
-            if (rolesToRemove.Any())
-            {
-                this._log.LogTrace("Removing {Count} old colour roles from user {UserID}", rolesToRemove.Count(), user.Id);
-                return user.RemoveRolesAsync(rolesToRemove.Select(role => role.Id), base.GetRequestOptions());
-            }
-
-            return Task.CompletedTask;
         }
 
         private Task ConfirmRoleChangeAsync(Color roleColour, string roleText)

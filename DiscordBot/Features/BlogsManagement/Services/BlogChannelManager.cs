@@ -61,12 +61,13 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
         }
 
         /// <inheritdoc/>
-        public async Task<IGuildChannel> CreateBlogChannel(string name, IEnumerable<ulong> userIDs, CancellationToken cancellationToken = default)
+        public async Task<IGuildChannel> CreateBlogChannel(string name, IEnumerable<ulong> userIDs, BlogChannelProperties properties, CancellationToken cancellationToken = default)
         {
             this._log.LogInformation("Creating blog channel {ChannelName} for user(s) {UserIDs}", name, string.Join(", ", userIDs));
 
             SocketGuild guild = this._client.GetGuild(this._devsubOptions.GuildID);
             SocketCategoryChannel category = guild.GetCategoryChannel(this._options.ActiveBlogsCategoryID);
+            properties ??= new BlogChannelProperties();
 
             IGuildChannel result = await guild.CreateTextChannelAsync(name, props =>
             {
@@ -92,13 +93,30 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                         manageWebhooks: PermValue.Allow
                     )));
                 }
-            }, cancellationToken.ToRequestOptions());
+
+                props.IsNsfw = properties.NSFW;
+            }, 
+            cancellationToken.ToRequestOptions());
 
             this._log.LogTrace("Sorting channels");
+            await Task.Delay(TimeSpan.FromSeconds(1));
             await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
 
             this._log.LogDebug("Channel {ChannelName} ({ChannelID}) created", result.Name, result.Id);
             return result;
+        }
+
+        public Task EditBlogChannel(IGuildChannel channel, BlogChannelProperties properties, CancellationToken cancellationToken = default)
+        {
+            this._log.LogInformation("Updating blog channel {ChannelID}", channel.Id);
+
+            properties ??= new BlogChannelProperties();
+
+            return (channel as SocketTextChannel).ModifyAsync(props =>
+            {
+                props.IsNsfw = properties.NSFW;
+            },
+            cancellationToken.ToRequestOptions());
         }
     }
 }

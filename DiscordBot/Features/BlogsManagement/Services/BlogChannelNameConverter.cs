@@ -3,9 +3,6 @@
     /// <inheritdoc/>
     internal class BlogChannelNameConverter : IBlogChannelNameConverter
     {
-        private static readonly Regex _validationRegex = new Regex(@"^[a-z0-9\-]{3,15}$", 
-            RegexOptions.Compiled | RegexOptions.Singleline | RegexOptions.CultureInvariant | RegexOptions.IgnoreCase);
-
         private readonly BlogsManagementOptions _options;
 
         public BlogChannelNameConverter(IOptionsMonitor<BlogsManagementOptions> options)
@@ -36,8 +33,6 @@
                 return false;
             if (this._options.ForbiddenChannelNameWords.Any(word => normalizedUsername.Contains(word)))
                 return false;
-            if (!_validationRegex.IsMatch(normalizedUsername))
-                return false;
 
             return true;
         }
@@ -45,8 +40,8 @@
         private string Normalize(string value)
             => value
                 .ToLowerInvariant()
-                .Replace(' ', '-')
-                .Replace("'", "")
+                .Replace('_', '-')
+                .Replace(".", "-")
                 .Trim('-');
     }
 }

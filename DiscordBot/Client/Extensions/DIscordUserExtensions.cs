@@ -30,7 +30,7 @@ namespace DevSubmarine.DiscordBot
             => user.GetAvatarUrl(format, size) ?? user.GetDefaultAvatarUrl();
 
         public static string GetUsernameWithDiscriminator(this IUser user)
-            => $"{user.Username}#{user.Discriminator}";
+            => user.DiscriminatorValue == 0 ? user.Username : $"{user.Username}#{user.Discriminator}";
 
         public static string GetName(this IUser user)
         {

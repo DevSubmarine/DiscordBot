@@ -6,7 +6,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
 {
     public class UserBirthdayAutopostService : IHostedService, IDisposable
     {
-        private readonly DiscordSocketClient _client;
+        private readonly IHostedDiscordClient _client;
         private readonly IUserBirthdaysProvider _provider;
         private readonly IUserBirthdayEmbedBuilder _embedBuilder;
         private readonly ILogger _log;
@@ -15,7 +15,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
 
         private UserBirthdaysOptions Options => this._options.CurrentValue;
 
-        public UserBirthdayAutopostService(IUserBirthdaysProvider provider, IUserBirthdayEmbedBuilder embedBuilder, DiscordSocketClient client,
+        public UserBirthdayAutopostService(IUserBirthdaysProvider provider, IUserBirthdayEmbedBuilder embedBuilder, IHostedDiscordClient client,
             ILogger<UserBirthdayAutopostService> log, IOptionsMonitor<UserBirthdaysOptions> options)
         {
             this._provider = provider;
@@ -29,11 +29,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
         {
             while (!cancellationToken.IsCancellationRequested)
             {
-                while (this._client.ConnectionState != ConnectionState.Connected)
-                {
-                    this._log.LogTrace("Client not connected, waiting");
-                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
-                }
+                await this._client.WaitForConnectionAsync(cancellationToken).ConfigureAwait(false);
 
                 if (this.Options.AutoPostChannelID != null)
                 {
@@ -42,7 +38,7 @@ namespace DevSubmarine.DiscordBot.Birthdays.Services
                     if (embed != null)
                     {
                         this._log.LogDebug("Auto-posting upcoming birthdays");
-                        IChannel channel = await this._client.GetChannelAsync(this.Options.AutoPostChannelID.Value, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
+                        IChannel channel = await this._client.Client.GetChannelAsync(this.Options.AutoPostChannelID.Value, CacheMode.AllowDownload, cancellationToken.ToRequestOptions()).ConfigureAwait(false);
                         if (channel is not ITextChannel textChannel)
                         {
                             this._log.LogError("Channel ID {ChannelID} is not a valid text channel", channel.Id);

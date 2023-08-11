@@ -2,6 +2,7 @@
 using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.Extensions.Hosting;
+using System.Threading.Channels;
 
 namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 {
@@ -55,13 +56,25 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             {
                 CancellationToken cancellationToken = this._cts.Token;
                 await this._activator.ActivateBlogChannel(channel, cancellationToken).ConfigureAwait(false);
+
+                // offload sorting the category to a background task as it seems it might hang the connection task?
                 SocketCategoryChannel categoryToSort = channel.Guild.GetCategoryChannel(this.Options.ActiveBlogsCategoryID);
-                await this._sorter.SortChannelsAsync(categoryToSort, cancellationToken).ConfigureAwait(false);
+                _ = this.SortChannelsAsync(categoryToSort, cancellationToken);
             }
-            catch (HttpException ex) when (ex.IsMissingPermissions() &&
-                    ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions", channel.Name, channel.Id)) { }
-            catch (Exception ex)
-                when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelID})", channel.Name, channel.Id)) { }
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Failed moving {ChannelName} ({ChannelID}) due to missing permissions", channel.Name, channel.Id)) { }
+            catch (Exception ex) when (ex.LogAsError(this._log, "Failed moving channel {ChannelName} ({ChannelID})", channel.Name, channel.Id)) { }
+        }
+
+        private async Task SortChannelsAsync(SocketCategoryChannel category, CancellationToken cancellationToken)
+        {
+            try
+            {
+                await Task.Delay(TimeSpan.FromSeconds(1.5));
+                await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
+            }
+            catch (HttpException ex) when (ex.IsMissingPermissions() && ex.LogAsError(this._log, "Failed sorting category {CategoryName} ({CategoryID}) due to missing permissions", category.Name, category.Id)) { }
+            catch (OperationCanceledException) { }
+            catch (Exception ex) when (ex.LogAsError(this._log, "Failed sorting category {CategoryName} ({CategoryID})", category.Name, category.Id)) { }
         }
 
         Task IHostedService.StartAsync(CancellationToken cancellationToken)
