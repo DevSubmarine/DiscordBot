@@ -83,16 +83,13 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
                 List<Overwrite> perms = new List<Overwrite>(category.PermissionOverwrites);
                 props.PermissionOverwrites = perms;
-                perms.Add(new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role,
-                            categoryPerms.Modify(sendMessages: PermValue.Deny)));
+                perms.Add(new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role, ModifyWith(categoryPerms, this._options.EveryonePermissions)));
+
                 foreach (ulong uid in userIDs)
-                {
-                    perms.Add(new Overwrite(uid, PermissionTarget.User, categoryPerms.Modify(
-                        sendMessages: PermValue.Allow,
-                        manageMessages: PermValue.Allow,
-                        manageWebhooks: PermValue.Allow
-                    )));
-                }
+                    perms.Add(new Overwrite(uid, PermissionTarget.User, ModifyWith(categoryPerms, this._options.OwnerPermissions)));
+
+                foreach (BlogChannelPermissionsOptions additionalPerms in this._options.AdditionalPermissions ?? Enumerable.Empty<BlogChannelPermissionsOptions>())
+                    perms.Add(new Overwrite(additionalPerms.TargetID, additionalPerms.TargetType, ModifyWith(categoryPerms, additionalPerms.Permissions)));
 
                 props.IsNsfw = properties.NSFW;
             }, 
@@ -117,6 +114,32 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 props.IsNsfw = properties.NSFW;
             },
             cancellationToken.ToRequestOptions());
+        }
+
+        private static OverwritePermissions ModifyWith(OverwritePermissions permissions, BlogChannelPermissionsOptions.PermissionValues options)
+        {
+            if (options == null)
+                return permissions;
+
+            return permissions.Modify(
+                sendMessages: AsPermValue(options.SendMessages),
+                manageMessages: AsPermValue(options.ManageMessages),
+                manageWebhooks: AsPermValue(options.ManageWebhooks),
+                useApplicationCommands: AsPermValue(options.UseApplicationCommands),
+                viewChannel: AsPermValue(options.ViewChannel),
+                embedLinks: AsPermValue(options.EmbedLinks),
+                addReactions: AsPermValue(options.AddReactions),
+                useExternalEmojis: AsPermValue(options.UseExternalEmojis));
+
+            PermValue? AsPermValue(bool? value)
+            {
+                return value switch
+                {
+                    true => PermValue.Allow,
+                    false => PermValue.Deny,
+                    _ => null
+                };
+            }
         }
     }
 }
