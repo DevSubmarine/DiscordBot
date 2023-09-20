@@ -20,5 +20,9 @@
         /// <summary>Words that cannot be contained in blog channel name.</summary>
         /// <remarks>This can be used to forbid certain words, such as swears or whatever.</remarks>
         public IEnumerable<string> ForbiddenChannelNameWords { get; set; }
+
+        public BlogChannelPermissionsOptions.PermissionValues EveryonePermissions { get; set; }
+        public BlogChannelPermissionsOptions.PermissionValues OwnerPermissions { get; set; }
+        public IEnumerable<BlogChannelPermissionsOptions> AdditionalPermissions { get; set; }
     }
 }

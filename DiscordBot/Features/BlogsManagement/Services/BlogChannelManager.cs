@@ -83,23 +83,20 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
 
                 List<Overwrite> perms = new List<Overwrite>(category.PermissionOverwrites);
                 props.PermissionOverwrites = perms;
-                perms.Add(new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role,
-                            categoryPerms.Modify(sendMessages: PermValue.Deny)));
+                perms.Add(new Overwrite(guild.EveryoneRole.Id, PermissionTarget.Role, ModifyWith(categoryPerms, this._options.EveryonePermissions)));
+
                 foreach (ulong uid in userIDs)
-                {
-                    perms.Add(new Overwrite(uid, PermissionTarget.User, categoryPerms.Modify(
-                        sendMessages: PermValue.Allow,
-                        manageMessages: PermValue.Allow,
-                        manageWebhooks: PermValue.Allow
-                    )));
-                }
+                    perms.Add(new Overwrite(uid, PermissionTarget.User, ModifyWith(categoryPerms, this._options.OwnerPermissions)));
+
+                foreach (BlogChannelPermissionsOptions additionalPerms in this._options.AdditionalPermissions ?? Enumerable.Empty<BlogChannelPermissionsOptions>())
+                    perms.Add(new Overwrite(additionalPerms.TargetID, additionalPerms.TargetType, ModifyWith(categoryPerms, additionalPerms.Permissions)));
 
                 props.IsNsfw = properties.NSFW;
             }, 
             cancellationToken.ToRequestOptions());
 
             this._log.LogTrace("Sorting channels");
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
             await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
 
             this._log.LogDebug("Channel {ChannelName} ({ChannelID}) created", result.Name, result.Id);
@@ -117,6 +114,45 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 props.IsNsfw = properties.NSFW;
             },
             cancellationToken.ToRequestOptions());
+        }
+
+        private static OverwritePermissions ModifyWith(OverwritePermissions permissions, BlogChannelPermissionsOptions.PermissionValues options)
+        {
+            if (options == null)
+                return permissions;
+
+            return permissions.Modify(
+                viewChannel: AsPermValue(options.ViewChannel),
+                manageChannel: AsPermValue(options.ManageChannel),
+                manageRoles: AsPermValue(options.ManagePermissions),
+                manageWebhooks: AsPermValue(options.ManageWebhooks),
+                createInstantInvite: AsPermValue(options.CreateInvite),
+                sendMessages: AsPermValue(options.SendMessages),
+                sendMessagesInThreads: AsPermValue(options.SendMessagesInThreads),
+                createPublicThreads: AsPermValue(options.CreatePublicThreads),
+                createPrivateThreads: AsPermValue(options.CreatePrivateThreads),
+                embedLinks: AsPermValue(options.EmbedLinks),
+                attachFiles: AsPermValue(options.AttachFiles),
+                addReactions: AsPermValue(options.AddReactions),
+                useExternalEmojis: AsPermValue(options.UseExternalEmojis),
+                useExternalStickers: AsPermValue(options.UseExternalStickers),
+                mentionEveryone: AsPermValue(options.MentionEveryone),
+                manageMessages: AsPermValue(options.ManageMessages),
+                manageThreads: AsPermValue(options.ManageThreads),
+                readMessageHistory: AsPermValue(options.ReadMessageHistory),
+                sendTTSMessages: AsPermValue(options.SendTTSMessages),
+                useApplicationCommands: AsPermValue(options.UseApplicationCommands),
+                startEmbeddedActivities: AsPermValue(options.UseActivities));
+
+            PermValue? AsPermValue(bool? value)
+            {
+                return value switch
+                {
+                    true => PermValue.Allow,
+                    false => PermValue.Deny,
+                    _ => null
+                };
+            }
         }
     }
 }
