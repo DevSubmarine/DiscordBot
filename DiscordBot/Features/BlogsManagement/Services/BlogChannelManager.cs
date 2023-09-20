@@ -96,7 +96,7 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
             cancellationToken.ToRequestOptions());
 
             this._log.LogTrace("Sorting channels");
-            await Task.Delay(TimeSpan.FromSeconds(1));
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken).ConfigureAwait(false);
             await this._sorter.SortChannelsAsync(category, cancellationToken).ConfigureAwait(false);
 
             this._log.LogDebug("Channel {ChannelName} ({ChannelID}) created", result.Name, result.Id);
@@ -122,14 +122,27 @@ namespace DevSubmarine.DiscordBot.BlogsManagement.Services
                 return permissions;
 
             return permissions.Modify(
-                sendMessages: AsPermValue(options.SendMessages),
-                manageMessages: AsPermValue(options.ManageMessages),
-                manageWebhooks: AsPermValue(options.ManageWebhooks),
-                useApplicationCommands: AsPermValue(options.UseApplicationCommands),
                 viewChannel: AsPermValue(options.ViewChannel),
+                manageChannel: AsPermValue(options.ManageChannel),
+                manageRoles: AsPermValue(options.ManagePermissions),
+                manageWebhooks: AsPermValue(options.ManageWebhooks),
+                createInstantInvite: AsPermValue(options.CreateInvite),
+                sendMessages: AsPermValue(options.SendMessages),
+                sendMessagesInThreads: AsPermValue(options.SendMessagesInThreads),
+                createPublicThreads: AsPermValue(options.CreatePublicThreads),
+                createPrivateThreads: AsPermValue(options.CreatePrivateThreads),
                 embedLinks: AsPermValue(options.EmbedLinks),
+                attachFiles: AsPermValue(options.AttachFiles),
                 addReactions: AsPermValue(options.AddReactions),
-                useExternalEmojis: AsPermValue(options.UseExternalEmojis));
+                useExternalEmojis: AsPermValue(options.UseExternalEmojis),
+                useExternalStickers: AsPermValue(options.UseExternalStickers),
+                mentionEveryone: AsPermValue(options.MentionEveryone),
+                manageMessages: AsPermValue(options.ManageMessages),
+                manageThreads: AsPermValue(options.ManageThreads),
+                readMessageHistory: AsPermValue(options.ReadMessageHistory),
+                sendTTSMessages: AsPermValue(options.SendTTSMessages),
+                useApplicationCommands: AsPermValue(options.UseApplicationCommands),
+                startEmbeddedActivities: AsPermValue(options.UseActivities));
 
             PermValue? AsPermValue(bool? value)
             {
